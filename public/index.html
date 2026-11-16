@@ -190,13 +190,7 @@
                 <div class="overflow-x-auto w-full max-h-[65vh]">
                     <table class="w-full text-right border-collapse">
                         <thead class="sticky top-0 z-10">
-                            <tr id="equipmentTableHeader" class="bg-slate-900 text-slate-400 text-xs border-b border-slate-700">
-                                <th class="p-2 text-center w-10">#</th>
-                                <th class="p-2 text-center">تایید</th>
-                                <th id="dynamicColumnsHeader"></th>
-                                <th class="p-3">کد اموال جدید</th>
-                                <th class="p-3 text-center">وضعیت موجودی</th>
-                            </tr>
+                            <tr id="equipmentTableHeader" class="bg-slate-900 text-slate-400 text-xs border-b border-slate-700"></tr>
                         </thead>
                         <tbody id="equipmentTableBody" class="divide-y divide-slate-700/60 text-sm"></tbody>
                     </table>
@@ -240,9 +234,14 @@
         };
 
         function renderDynamicHeader() {
-            // جایگذاری یک <th> با تمام ستونهای دینامیک (برای حفظ ساختار colspan جدول)
-            const th = document.getElementById('dynamicColumnsHeader');
-            th.innerHTML = currentColumns.map(c => `<span class="inline-block px-4 py-3 border-l border-slate-700 last:border-l-0">${c}</span>`).join('');
+            const thStyle = 'padding:10px 12px;border-bottom:1px solid #334155;white-space:nowrap;font-size:12px;font-weight:600;text-align:right;';
+            const tr = document.getElementById('equipmentTableHeader');
+            tr.innerHTML =
+                `<th style="${thStyle}text-align:center;">#</th>` +
+                `<th style="${thStyle}text-align:center;">تایید</th>` +
+                currentColumns.map(c => `<th style="${thStyle}">${c}</th>`).join('') +
+                `<th style="${thStyle}">کد اموال جدید</th>` +
+                `<th style="${thStyle}text-align:center;">وضعیت موجودی</th>`;
         }
 
         function renderDynamicCells(item) {
@@ -255,8 +254,10 @@
                 if (c === assetKey && val) val = cleanCode(val);
                 if (c === serialKey && val) val = cleanCode(val);
                 // شماره اموال و سریال به صورت مونواسپیس نمایش داده شوند
-                const mono = (c.includes('اموال') || c.includes('سریال')) ? 'asset-text text-[11px]' : 'text-slate-200';
-                return `<span class="inline-block px-4 py-3 border-l border-slate-700/60 last:border-l-0 ${mono}" title="${val}">${val || '-'}</span>`;
+                const isCode = c.includes('اموال') || c.includes('سریال');
+                const style = `padding:8px 12px;border-bottom:1px solid #1e293b;white-space:nowrap;font-size:12px;` +
+                    (isCode ? `font-family:monospace;color:#cbd5e1;` : `color:#e2e8f0;`);
+                return `<td style="${style}" title="${val}">${val || '-'}</td>`;
             }).join('');
         }
 
@@ -484,25 +485,25 @@
                 const newAssetVal = saved.newAsset || '';
 
                 htmlParts.push(`
-                    <tr class="${saved.checked ? 'bg-emerald-900/15' : ''} hover:bg-slate-700/40 border-b border-slate-700/40">
-                        <td class="p-2 text-center text-slate-500 text-xs">${item._rowNo || idx + 1}</td>
-                        <td class="p-2 text-center">
+                    <tr style="background-color:${saved.checked ? 'rgba(6,78,59,0.18)' : 'transparent'};">
+                        <td style="padding:8px;text-align:center;color:#64748b;font-size:12px;border-bottom:1px solid #1e293b;">${item._rowNo || idx + 1}</td>
+                        <td style="padding:8px;text-align:center;border-bottom:1px solid #1e293b;">
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
-                        <td class="p-0 text-right whitespace-nowrap">${renderDynamicCells(item)}</td>
-                        <td class="p-3">
+                        ${renderDynamicCells(item)}
+                        <td style="padding:8px;border-bottom:1px solid #1e293b;">
                             <div id="container_${itemId}">
                                 ${getNewAssetDisplayHtml(itemId, newAssetVal, isCurrentLocked)}
                             </div>
                         </td>
-                        <td class="p-3 text-center whitespace-nowrap">
-                            <div class="inline-flex rounded-xl p-0.5 bg-slate-900 border border-slate-700 text-xs">
-                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'present', this)" 
-                                    class="px-3 py-1 rounded-lg transition font-medium ${currentStatus === 'present' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-white'}">
+                        <td style="padding:8px;text-align:center;white-space:nowrap;border-bottom:1px solid #1e293b;">
+                            <div style="display:inline-flex;border:1px solid #334155;border-radius:10px;overflow:hidden;background:#0f172a;font-size:11px;">
+                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'present', this)"
+                                    style="padding:5px 10px;border:0;cursor:pointer;${currentStatus === 'present' ? 'background:#059669;color:#fff;' : 'background:transparent;color:#94a3b8;'}">
                                     موجود ✅
                                 </button>
-                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'missing', this)" 
-                                    class="px-3 py-1 rounded-lg transition font-medium ${currentStatus === 'missing' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}">
+                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'missing', this)"
+                                    style="padding:5px 10px;border:0;cursor:pointer;${currentStatus === 'missing' ? 'background:#e11d48;color:#fff;' : 'background:transparent;color:#94a3b8;'}">
                                     فاقد ❌
                                 </button>
                             </div>
@@ -568,13 +569,10 @@
 
             const parent = btnElement.parentElement;
             parent.querySelectorAll('button').forEach(btn => {
-                btn.className = "px-3 py-1 rounded-lg transition font-medium text-slate-400 hover:text-white";
+                btn.style.cssText = 'padding:5px 10px;border:0;cursor:pointer;background:transparent;color:#94a3b8;';
             });
-            if (status === 'present') {
-                btnElement.className = "px-3 py-1 rounded-lg transition font-medium bg-emerald-600 text-white shadow";
-            } else {
-                btnElement.className = "px-3 py-1 rounded-lg transition font-medium bg-rose-600 text-white shadow";
-            }
+            btnElement.style.cssText = 'padding:5px 10px;border:0;cursor:pointer;' +
+                (status === 'present' ? 'background:#059669;color:#fff;' : 'background:#e11d48;color:#fff;');
             updateProgressCounter(currentItems);
         }
 
