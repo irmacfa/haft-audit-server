@@ -520,24 +520,26 @@
         }
 
         function getNewAssetDisplayHtml(itemId, val, locked) {
+            const btnBase = 'display:inline-block;min-width:110px;text-align:center;padding:5px 8px;border:1px dashed #475569;border-radius:8px;background:#0f172a;color:#94a3b8;font-size:11px;cursor:pointer;';
             if (locked) {
-                return `<span class="asset-text">${val || '-'}</span>`;
+                return `<span style="color:#cbd5e1;font-family:monospace;font-size:12px;">${val || '-'}</span>`;
             }
             if (!val) {
-                return `<span onclick="switchToInput('${itemId}')" class="asset-text text-slate-500 cursor-pointer hover:text-orange-400 italic">+ ثبت کد جدید...</span>`;
+                return `<button type="button" onclick="switchToInput('${itemId}')" title="کلیک برای ثبت کد اموال جدید" style="${btnBase}">+ ثبت کد جدید</button>`;
             }
-            return `<span onclick="switchToInput('${itemId}')" class="asset-text editable-asset" title="برای ویرایش کلیک کنید">${val}</span>`;
+            return `<button type="button" onclick="switchToInput('${itemId}')" title="کلیک برای ویرایش کد" style="${btnBase}border-style:solid;border-color:#f97316;color:#fdba74;font-family:monospace;">✎ ${val}</button>`;
         }
 
         function switchToInput(itemId) {
             if (isCurrentLocked) return;
             const container = document.getElementById(`container_${itemId}`);
+            if (!container) return;
             const currentVal = localAuditData[itemId] && localAuditData[itemId].newAsset ? localAuditData[itemId].newAsset : '';
 
             container.innerHTML = `
-                <input type="text" id="input_${itemId}" value="${currentVal}" placeholder="کد جدید..." 
-                    onblur="saveInputVal('${itemId}')" onkeydown="if(event.key==='Enter') saveInputVal('${itemId}')" 
-                    class="bg-slate-900 border border-orange-500 rounded-xl px-3 py-1.5 text-xs text-white font-mono w-36 focus:outline-none">
+                <input type="text" id="input_${itemId}" value="${currentVal}" placeholder="کد اموال جدید..." dir="ltr"
+                    onblur="saveInputVal('${itemId}')" onkeydown="if(event.key==='Enter'){event.preventDefault();saveInputVal('${itemId}');}"
+                    style="width:150px;background:#0f172a;border:1px solid #f97316;border-radius:8px;padding:6px 8px;color:#fff;font-family:monospace;font-size:12px;outline:none;">
             `;
             const inputElem = document.getElementById(`input_${itemId}`);
             inputElem.focus();
