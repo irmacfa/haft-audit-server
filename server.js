@@ -42,7 +42,7 @@ function cleanExcelCode(code) {
     return String(code).replace(/[-–\s]/g, '').trim();
 }
 
-// ساخت داده‌های گزارش به صورت آرایه‌ای از اشیاء
+// ساخت دادههای گزارش به صورت آرایهای از اشیاء
 function buildReportRows(auditItems) {
     return Object.values(auditItems).map(item => ({
         'شرح کارت دارایی (مدل دستگاه)': item.desc || '',
@@ -69,7 +69,27 @@ function writeReportFile(plant, auditItems) {
     return fileName;
 }
 
-// خواندن متریال‌های سری 9000، اسکن نام فروشگاه و حذف موارد تکراری
+// استخراج لیست فروشگاهها از فایل اکسل (کد + نام مرکز هزینه)
+function getStoresFromExcel() {
+    const workbook = XLSX.readFile(EXCEL_PATH);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    const headers = rawData[0];
+    const plantIdx = headers.indexOf('پلنت محل تجهیز');
+    const storeIdx = headers.indexOf('شرح مرکز هزینه تجهیز');
+
+    const stores = {};
+    for (let i = 1; i < rawData.length; i++) {
+        const row = rawData[i];
+        const plant = row[plantIdx] ? String(row[plantIdx]).trim() : null;
+        if (plant && plant !== 'Equipment Maintenance Plant') {
+            stores[plant] = row[storeIdx] ? String(row[storeIdx]).trim() : 'نامشخص';
+        }
+    }
+    return stores;
+}
+
+// خواندن متریالهای سری 9000، اسکن نام فروشگاه و حذف موارد تکراری
 app.get('/api/equipment', (req, res) => {
     try {
         if (!fs.existsSync(EXCEL_PATH)) {
@@ -159,21 +179,7 @@ app.get('/api/monitoring/status', (req, res) => {
         }
 
         const db = JSON.parse(fs.readFileSync(DB_PATH));
-        const workbook = XLSX.readFile(EXCEL_PATH);
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        const headers = rawData[0];
-        const plantIdx = headers.indexOf('پلنت محل تجهیز');
-        const storeIdx = headers.indexOf('شرح مرکز هزینه تجهیز');
-
-        const stores = {};
-        for (let i = 1; i < rawData.length; i++) {
-            const row = rawData[i];
-            const plant = row[plantIdx] ? String(row[plantIdx]).trim() : null;
-            if (plant && plant !== 'Equipment Maintenance Plant') {
-                stores[plant] = row[storeIdx] ? String(row[storeIdx]).trim() : 'نامشخص';
-            }
-        }
+        const stores = getStoresFromExcel();
 
         const result = Object.keys(stores).map(plant => ({
             plant: plant,
@@ -186,6 +192,43 @@ app.get('/api/monitoring/status', (req, res) => {
         res.json(result);
     } catch (e) {
         console.error("Monitoring Server Error:", e);
+        res.status(500).json({ error: 'خطای سرور: ' + e.message });
+    }
+});
+
+// خروجی اکسل کلی از وضعیت تمام فروشگاهها
+app.get('/api/monitoring/export', (req, res) => {
+    try {
+        if (!fs.existsSync(EXCEL_PATH)) {
+            return res.status(404).json({ error: 'فایل اکسل پیدا نشد' });
+        }
+
+        const db = JSON.parse(fs.readFileSync(DB_PATH));
+        const stores = getStoresFromExcel();
+
+        const rows = Object.keys(stores).map(plant => {
+            const status = db.plant_status[plant];
+            return {
+                'کد فروشگاه': plant,
+                'نام فروشگاه': stores[plant],
+                'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال انجام' : 'در انتظار'),
+                'تاریخ انبارگردانی': status?.auditDate || '-',
+                'انبارگردان': status?.auditor || '-'
+            };
+        }).sort((a, b) => a['کد فروشگاه'].localeCompare(b['کد فروشگاه']));
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws['!dir'] = 'rtl';
+        ws['!cols'] = [{ wch: 14 }, { wch: 35 }, { wch: 18 }, { wch: 22 }, { wch: 28 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'وضعیت انبارگردانی');
+
+        const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename="Audit_Overview.xlsx"');
+        res.send(buffer);
+    } catch (e) {
+        console.error('Export Error:', e);
         res.status(500).json({ error: 'خطای سرور: ' + e.message });
     }
 });

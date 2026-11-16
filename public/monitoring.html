@@ -13,11 +13,31 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-8">
 
-    <header class="mb-10 flex flex-col md:flex-row justify-between items-center bg-slate-800 p-6 rounded-3xl shadow-lg border border-slate-700 gap-4">
+    <header class="mb-6 flex flex-col md:flex-row justify-between items-center bg-slate-800 p-6 rounded-3xl shadow-lg border border-slate-700 gap-4">
         <h1 class="text-xl font-bold text-white">مانیتورینگ وضعیت انبارگردانی</h1>
-        <input type="text" id="searchInput" oninput="filterStores()" placeholder="جستجوی کد یا نام فروشگاه..." class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 w-full md:w-64 text-sm focus:outline-none focus:border-orange-500">
-        <button onclick="window.location.href='/'" class="bg-slate-700 hover:bg-slate-600 px-5 py-2 rounded-xl text-sm font-bold">بازگشت به پنل</button>
+        <div class="flex flex-wrap items-center gap-2">
+            <input type="text" id="searchInput" oninput="filterStores()" placeholder="جستجوی کد یا نام فروشگاه..." class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 w-full md:w-64 text-sm focus:outline-none focus:border-orange-500">
+            <a href="/api/monitoring/export" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap">📥 اکسل کلی</a>
+            <button onclick="loadMonitoring()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
+            <button onclick="window.location.href='/'" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</button>
+        </div>
     </header>
+
+    <!-- شمارنده وضعیتها -->
+    <div class="grid grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
+        <div class="bg-emerald-900/40 border border-emerald-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-400" id="countDone">۰</p>
+            <p class="text-xs text-emerald-300 mt-1">تکمیل شده</p>
+        </div>
+        <div class="bg-amber-900/40 border border-amber-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-amber-400" id="countProgress">۰</p>
+            <p class="text-xs text-amber-300 mt-1">در حال انجام</p>
+        </div>
+        <div class="bg-rose-900/40 border border-rose-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-rose-400" id="countPending">۰</p>
+            <p class="text-xs text-rose-300 mt-1">در انتظار</p>
+        </div>
+    </div>
 
     <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
 
@@ -29,7 +49,13 @@
                 const res = await fetch('/api/monitoring/status');
                 const data = await res.json();
                 allStores = data.sort((a, b) => a.plant.localeCompare(b.plant));
-                renderGrid(allStores);
+
+                // به روزرسانی شمارندهها
+                document.getElementById('countDone').innerText = allStores.filter(s => s.isLocked).length;
+                document.getElementById('countProgress').innerText = allStores.filter(s => !s.isLocked && s.auditor).length;
+                document.getElementById('countPending').innerText = allStores.filter(s => !s.isLocked && !s.auditor).length;
+
+                filterStores();
             } catch (e) {
                 document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-20 text-rose-400">خطا: ${e.message}</div>`;
             }
@@ -46,9 +72,8 @@
             grid.innerHTML = '';
             stores.forEach(store => {
                 const isDone = store.isLocked;
-                // اگر انبارگردان ست شده باشد یعنی در حال انجام است (زرد)
                 const isInProgress = !isDone && (store.auditor !== null);
-                
+
                 let bgColor = 'bg-rose-950/20 border-rose-800';
                 let textColor = 'text-rose-400';
                 let label = 'در انتظار';
@@ -74,7 +99,10 @@
                 `;
             });
         }
+
         loadMonitoring();
+        // آپدیت خودکار هر ۱۵ ثانیه
+        setInterval(loadMonitoring, 15000);
     </script>
 </body>
 </html>
