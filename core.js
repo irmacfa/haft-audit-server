@@ -47,13 +47,12 @@ const DEFAULT_SETTINGS = {
     materialPrefix: '9000',
     columns: ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'],
     regions: [
-        { name: 'منطقه ۱', from: 1000, to: 1499 },
-        { name: 'منطقه ۲', from: 2000, to: 2599 },
-        { name: 'منطقه ۳', from: 3000, to: 3599 },
-        { name: 'منطقه ۴', from: 4000, to: 4099 },
-        { name: 'منطقه ۵', from: 5000, to: 5599 },
-        { name: 'منطقه ۶', from: 7000, to: 7099 },
-        { name: 'منطقه ۷', from: 8000, to: 9199 }
+        { name: 'تهران', ranges: [[1000, 1499], [7000, 7099]] },
+        { name: 'گیلان', ranges: [[2000, 2200], [5500, 5599]] },
+        { name: 'مازندران', ranges: [[2500, 2600]] },
+        { name: 'همدان', ranges: [[3000, 3200]] },
+        { name: 'کرمانشاه', ranges: [[3500, 3600]] },
+        { name: 'کرمان', ranges: [[5000, 5099], [8000, 8099], [8500, 8599]] }
     ]
 };
 
@@ -77,13 +76,22 @@ function getEffectiveSettings() {
 function getRegion(plant) {
     const code = Number(String(plant).replace(/\D/g, ''));
     const regions = getEffectiveSettings().regions;
-    const region = regions.find(r => code >= r.from && code <= r.to);
+    const region = regions.find(r => {
+        if (Array.isArray(r.ranges)) {
+            return r.ranges.some(([from, to]) => code >= from && code <= to);
+        }
+        return code >= r.from && code <= r.to;
+    });
     return region ? region.name : 'سایر';
 }
 
 function saveSettings(settings) {
     const db = readDb();
-    db.settings = settings;
+    // حفظ مناطق در صورتی که تنظیمات ستونها به تنهایی ذخیره شود
+    db.settings = { ...(db.settings || {}), ...settings };
+    if (!Array.isArray(db.settings.regions) || !db.settings.regions.length) {
+        db.settings.regions = DEFAULT_SETTINGS.regions;
+    }
     writeDb(db);
     invalidateCache();
     return getEffectiveSettings();

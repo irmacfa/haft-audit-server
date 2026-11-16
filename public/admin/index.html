@@ -63,13 +63,22 @@
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-sm font-bold text-white">۳. ستونهای قابل نمایش به انبارگردان</h3>
                 <div class="flex gap-2">
-                    <button onclick="selectAllColumns(true)" class="text-[11px] bg-slate-700 px-3 py-1 rounded-lg">نمایش_all</button>
+                    <button onclick="selectAllColumns(true)" class="text-[11px] bg-slate-700 px-3 py-1 rounded-lg">تیک همه</button>
                     <button onclick="selectAllColumns(false)" class="text-[11px] bg-slate-700 px-3 py-1 rounded-lg">پاک کردن</button>
                 </div>
             </div>
             <div id="columnsList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-80 overflow-y-auto p-1"></div>
             <button onclick="saveSettings()" class="mt-5 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold">💾 ذخیره تنظیمات ستونها</button>
             <p id="settingsStatus" class="text-xs mt-3 text-slate-400"></p>
+        </div>
+
+        <!-- مناطق -->
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 mt-6">
+            <h3 class="text-sm font-bold text-white mb-2">۴. مناطق فروشگاهها</h3>
+            <p class="text-[11px] text-slate-400 mb-3">هر خط: <code class="text-orange-300">نام منطقه:بازه,بازه</code> — مثلاً <code>تهران:1000-1499,7000-7099</code>. فقط فروشگاههای موجود در فایل مادر نمایش داده میشوند.</p>
+            <textarea id="regionsInput" rows="7" dir="ltr" class="w-full bg-slate-800 border border-slate-600 rounded-xl px-3 py-2 text-white text-xs font-mono focus:outline-none focus:border-orange-500"></textarea>
+            <button onclick="saveRegions()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold">💾 ذخیره مناطق</button>
+            <p id="regionsStatus" class="text-xs mt-3 text-slate-400"></p>
         </div>
     </section>
 
@@ -170,6 +179,12 @@
                 fillSelect('nameColumn', s.nameColumn);
                 fillSelect('materialColumn', s.materialColumn);
                 document.getElementById('materialPrefix').value = s.materialPrefix || '9000';
+                document.getElementById('regionsInput').value = (s.regions || []).map(r => {
+                    const ranges = r.ranges
+                        ? r.ranges.map(([f, t]) => `${f}-${t}`).join(',')
+                        : `${r.from}-${r.to}`;
+                    return `${r.name}:${ranges}`;
+                }).join('\n');
 
                 const list = document.getElementById('columnsList');
                 list.innerHTML = '';
@@ -239,6 +254,38 @@
                     : 'خطا: ' + data.error;
             } catch (e) {
                 document.getElementById('settingsStatus').innerText = 'خطا: ' + e.message;
+            }
+        }
+
+        async function saveRegions() {
+            const lines = document.getElementById('regionsInput').value.split('\n').map(l => l.trim()).filter(Boolean);
+            const regions = [];
+            let invalid = false;
+            lines.forEach(line => {
+                const [name, rangesStr] = line.split(':');
+                if (!name || !rangesStr) { invalid = true; return; }
+                const ranges = [];
+                rangesStr.split(',').forEach(part => {
+                    const [f, t] = part.split('-').map(x => Number(x.trim()));
+                    if (Number.isFinite(f) && Number.isFinite(t)) ranges.push([f, t]);
+                });
+                if (ranges.length) regions.push({ name: name.trim(), ranges });
+            });
+            if (invalid || !regions.length) {
+                document.getElementById('regionsStatus').innerText = 'فرمت خطها نادرست است. مثال: تهران:1000-1499,7000-7099';
+                return;
+            }
+            try {
+                const res = await fetch('/api/admin/regions', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ regions })
+                });
+                const data = await res.json();
+                document.getElementById('regionsStatus').innerText = data.success
+                    ? `✅ ${regions.length} منطقه ذخیره شد.`
+                    : 'خطا: ' + data.error;
+                if (data.success) loadAdmin();
+            } catch (e) {
+                document.getElementById('regionsStatus').innerText = 'خطا: ' + e.message;
             }
         }
 
