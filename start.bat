@@ -24,12 +24,12 @@ cls
 echo Checking dependencies...
 call npm install
 echo.
-netstat -ano | findstr ":3000 " >nul
+netstat -ano | findstr "LISTENING" | findstr ":3000 " >nul
 if %errorlevel%==0 (echo User panel already running on port 3000) else (
   echo Starting USER panel on port 3000...
   start "User Panel - Port 3000" node server.js
 )
-netstat -ano | findstr ":3001 " >nul
+netstat -ano | findstr "LISTENING" | findstr ":3001 " >nul
 if %errorlevel%==0 (echo Admin panel already running on port 3001) else (
   echo Starting ADMIN panel on port 3001...
   start "Admin Panel - Port 3001" node admin-server.js
