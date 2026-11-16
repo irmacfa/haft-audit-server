@@ -43,6 +43,12 @@
         </div>
     </div>
 
+    <!-- پیشرفت مناطق -->
+    <div class="max-w-5xl mx-auto mb-8 bg-slate-800 border border-slate-700 rounded-3xl p-5 shadow-xl">
+        <h2 class="text-sm font-bold text-white mb-4">📈 پیشرفت انبارگردانی به تفکیک منطقه</h2>
+        <div id="regionProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+    </div>
+
     <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
 
     <script>
@@ -80,7 +86,37 @@
             document.getElementById('countProgress').innerText = filtered.filter(s => !s.isLocked && s.auditor).length;
             document.getElementById('countPending').innerText = filtered.filter(s => !s.isLocked && !s.auditor).length;
 
+            renderRegionProgress();
             renderGrid(filtered);
+        }
+
+        function renderRegionProgress() {
+            const box = document.getElementById('regionProgress');
+            const byRegion = {};
+            allStores.forEach(s => {
+                const r = s.region || 'سایر';
+                if (!byRegion[r]) byRegion[r] = { total: 0, done: 0, progress: 0 };
+                byRegion[r].total++;
+                if (s.isLocked) byRegion[r].done++;
+                else if (s.auditor) byRegion[r].progress++;
+            });
+
+            box.innerHTML = Object.entries(byRegion).map(([name, v]) => {
+                const pct = v.total ? Math.round(v.done / v.total * 100) : 0;
+                const barColor = pct === 100 ? 'bg-emerald-500' : pct >= 50 ? 'bg-sky-500' : 'bg-orange-500';
+                return `
+                    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-white">${name}</span>
+                            <span class="text-xs font-bold ${pct === 100 ? 'text-emerald-400' : 'text-orange-400'}">${pct}٪</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                            <div class="${barColor} h-full transition-all duration-500" style="width:${pct}%"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2">${v.done} تکمیل · ${v.progress} در حال اجرا · ${v.total} کل</p>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderGrid(stores) {

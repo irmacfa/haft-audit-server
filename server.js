@@ -21,6 +21,18 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
+// وضعیت سلامت سرور
+app.get('/api/health', (req, res) => {
+    res.json({
+        ok: true,
+        service: 'user-panel',
+        port: PORT,
+        uptimeSeconds: Math.round(process.uptime()),
+        regions: core.getEffectiveSettings().regions.map(r => r.name),
+        cache: core.getCacheStatus()
+    });
+});
+
 // تجهیزات از فایل مادر (کش شده)
 app.get('/api/equipment', (req, res) => {
     try {

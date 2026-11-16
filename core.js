@@ -248,10 +248,24 @@ function sendTelegramNotification(text) {
     req.end();
 }
 
+// وضعیت کش و فایل مادر (برای endpoint سلامت سرور)
+function getCacheStatus() {
+    const fsAvailable = require('fs').existsSync(getExcelPath());
+    return {
+        masterFile: getExcelPath(),
+        masterFileReady: fsAvailable,
+        workbookCached: !!_workbook,
+        storesCached: !!_stores,
+        equipmentCached: !!_equipment,
+        storeCount: _stores ? Object.keys(_stores).length : null,
+        equipmentCount: _equipment ? _equipment.total : null
+    };
+}
+
 module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR,
     invalidateCache, getExcelPath, readDb, writeDb,
     getSettings, getEffectiveSettings, saveSettings, getRegion,
     getWorkbook, getMasterColumns, getStores, getEquipmentData,
-    writeReportFile, sendTelegramNotification
+    writeReportFile, sendTelegramNotification, getCacheStatus
 };

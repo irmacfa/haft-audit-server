@@ -19,6 +19,18 @@ app.use(express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
 
+// وضعیت سلامت سرور管理者
+app.get('/api/health', (req, res) => {
+    res.json({
+        ok: true,
+        service: 'admin-panel',
+        port: PORT,
+        uptimeSeconds: Math.round(process.uptime()),
+        regions: core.getEffectiveSettings().regions.map(r => r.name),
+        cache: core.getCacheStatus()
+    });
+});
+
 // ارتباط با سرور کاربر برای تازه کردن کش آن بعد از آپلود/تغییر تنظیمات
 function notifyUserServer() {
     const req = http.request({
