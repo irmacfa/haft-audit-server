@@ -52,29 +52,43 @@
         
         <!-- Search Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
-            <!-- Store Code Search Card -->
-            <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 shadow-xl text-center">
-                <h2 class="text-base font-semibold text-orange-400 mb-3">ورود کد فروشگاه (۴ رقمی)</h2>
-                <div class="flex justify-center">
-                    <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-48 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
+            <!-- مرحله ۱ -->
+            <div class="bg-slate-800 border border-orange-700/40 rounded-3xl p-5 shadow-xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-sm">۱</span>
+                    <div>
+                        <h2 class="text-sm font-bold text-orange-400">کد فروشگاه</h2>
+                        <p class="text-[10px] text-slate-400">کد ۴ رقمی پلنت را وارد کنید</p>
+                    </div>
                 </div>
+                <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
             </div>
 
-            <!-- Auditor Info Card -->
-            <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 shadow-xl">
-                <h2 class="text-base font-semibold text-sky-400 mb-3 text-center">اطلاعات انبارگردان</h2>
+            <!-- مرحله ۲ -->
+            <div class="bg-slate-800 border border-sky-700/40 rounded-3xl p-5 shadow-xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">۲</span>
+                    <div>
+                        <h2 class="text-sm font-bold text-sky-400">اطلاعات انبارگردان</h2>
+                        <p class="text-[10px] text-slate-400">برای گزارش و ایمیل نهایی استفاده میشود</p>
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <input type="text" id="auditorNameInput" value="علی قنبری (پشتیبانی IT)" placeholder="نام انبارگردان" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-500">
                     <input type="email" id="managerEmailInput" value="manager@haftstores.ir" placeholder="ایمیل مدیر فروشگاه" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-500">
                 </div>
             </div>
 
-            <!-- Global Asset / Serial Search Card -->
-            <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 shadow-xl">
-                <h2 class="text-base font-semibold text-emerald-400 mb-3 text-center">جستجوی سراسری اموال / سریال</h2>
-                <div class="relative">
-                    <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثلا: 217910401171" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-xs font-mono focus:outline-none focus:border-emerald-500">
+            <!-- مرحله ۳ -->
+            <div class="bg-slate-800 border border-emerald-700/40 rounded-3xl p-5 shadow-xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">۳</span>
+                    <div>
+                        <h2 class="text-sm font-bold text-emerald-400">جستجوی سراسری</h2>
+                        <p class="text-[10px] text-slate-400">جستجوی اموال یا سریال در تمام فروشگاهها</p>
+                    </div>
                 </div>
+                <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثال: 217910401171" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-xs font-mono focus:outline-none focus:border-emerald-500">
             </div>
         </div>
 
@@ -117,23 +131,37 @@
                     <span class="text-xs text-orange-400 font-bold block mb-1">نام فروشگاه (مرکز هزینه):</span>
                     <h2 id="storeTitleName" class="text-2xl font-bold text-white">---</h2>
                 </div>
-                <div class="flex gap-4">
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center">
-                        <p class="text-[11px] text-slate-400">تعداد تجهیزات</p>
+                <div class="flex flex-wrap gap-3">
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-400">کل تجهیزات</p>
                         <p id="totalEquipCount" class="text-lg font-bold text-orange-400 mt-0.5">۰</p>
                     </div>
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center">
-                        <p class="text-[11px] text-slate-400">پیشرفت انبارگردانی</p>
-                        <p id="auditProgressCount" class="text-lg font-bold text-emerald-400 mt-0.5">۰٪</p>
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-400">تایید شده</p>
+                        <p id="countChecked" class="text-lg font-bold text-emerald-400 mt-0.5">۰</p>
                     </div>
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-400">اقلام فاقد</p>
+                        <p id="countMissing" class="text-lg font-bold text-rose-400 mt-0.5">۰</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-400">پیشرفت</p>
+                        <p id="auditProgressCount" class="text-lg font-bold text-sky-400 mt-0.5">۰٪</p>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-700 mt-4">
+                    <div id="auditProgressBar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- Data Table Card -->
             <div class="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden w-full">
-                <div class="p-4 border-b border-slate-700 flex flex-wrap justify-between items-center gap-3">
-                    <h3 class="font-semibold text-white text-sm">لیست تجهیزات متریال سری 9000</h3>
-                    <div class="flex items-center gap-2">
+                <div class="p-3 sm:p-4 border-b border-slate-700 flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                        <h3 class="font-semibold text-white text-sm">لیست تجهیزات متریال سری 9000</h3>
+                        <p id="tableInfo" class="text-[10px] text-slate-400 mt-1">نمایش تمام تجهیزات</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
                         <button onclick="saveDraft()" id="draftBtn" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium shadow">
                             💾 ذخیره موقت
                         </button>
@@ -145,11 +173,26 @@
                         </button>
                     </div>
                 </div>
-                <div class="overflow-x-auto w-full">
-                    <table class="w-full text-right border-collapse min-w-[850px]">
-                        <thead>
-                            <tr id="equipmentTableHeader" class="bg-slate-900/80 text-slate-400 text-xs border-b border-slate-700">
-                                <th class="p-3 text-center">تایید</th>
+                <!-- نوار فیلتر لیست -->
+                <div class="p-3 border-b border-slate-700 bg-slate-900/40 flex flex-wrap items-center gap-2">
+                    <input type="text" id="tableSearchInput" oninput="renderFilteredTable()" placeholder="جستجو در لیست (اموال، سریال، شرح)..." class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs w-full md:w-64 focus:outline-none focus:border-orange-500">
+                    <div class="flex flex-wrap gap-1" id="tableStatusFilters">
+                        <button onclick="setAuditFilter('all')" id="af-all" class="af-btn bg-orange-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold">همه</button>
+                        <button onclick="setAuditFilter('unchecked')" id="af-unchecked" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید نشده</button>
+                        <button onclick="setAuditFilter('checked')" id="af-checked" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید شده</button>
+                        <button onclick="setAuditFilter('missing')" id="af-missing" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">فاقد</button>
+                    </div>
+                    <div class="flex gap-1 mr-auto">
+                        <button onclick="checkAllVisible(true)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">✓ تیک همه</button>
+                        <button onclick="checkAllVisible(false)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">✕ پاک کردن</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto w-full max-h-[65vh]">
+                    <table class="w-full text-right border-collapse">
+                        <thead class="sticky top-0 z-10">
+                            <tr id="equipmentTableHeader" class="bg-slate-900 text-slate-400 text-xs border-b border-slate-700">
+                                <th class="p-2 text-center w-10">#</th>
+                                <th class="p-2 text-center">تایید</th>
                                 <th id="dynamicColumnsHeader"></th>
                                 <th class="p-3">کد اموال جدید</th>
                                 <th class="p-3 text-center">وضعیت موجودی</th>
@@ -169,12 +212,16 @@
         let isCurrentLocked = false;
         let localAuditData = {};
         let currentColumns = [];
+        let auditFilter = 'all';
+        let currentItems = [];
+        let visibleRows = [];
 
         window.onload = async function() {
             try {
                 const res = await fetch('/api/equipment');
                 const result = await res.json();
                 serverData = result.data;
+                serverData.forEach((item, i) => { item._uid = item.eqId || ('row_' + i); });
                 currentColumns = result.columns || ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'];
                 renderDynamicHeader();
                 document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
@@ -367,7 +414,12 @@
                 setTimeout(() => {
                     statusBox.classList.add('hidden');
                     document.getElementById('resultsContainer').classList.remove('hidden');
-                    renderTable(filteredItems);
+                    currentItems = filteredItems;
+                    currentItems.forEach((it, i) => { it._rowNo = i + 1; });
+                    auditFilter = 'all';
+                    document.getElementById('tableSearchInput').value = '';
+                    updateFilterButtons();
+                    renderFilteredTable();
                 }, 400);
 
             } catch (e) {
@@ -376,23 +428,65 @@
             }
         }
 
+        function setAuditFilter(filter) {
+            auditFilter = filter;
+            updateFilterButtons();
+            renderFilteredTable();
+        }
+
+        function updateFilterButtons() {
+            ['all', 'unchecked', 'checked', 'missing'].forEach(f => {
+                const btn = document.getElementById('af-' + f);
+                if (btn) btn.className = 'af-btn px-3 py-1.5 rounded-lg text-[11px] font-bold ' +
+                    (f === auditFilter ? 'bg-orange-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600');
+            });
+        }
+
+        function renderFilteredTable() {
+            const q = document.getElementById('tableSearchInput').value.toLowerCase().trim();
+            const filtered = currentItems.filter(item => {
+                const saved = localAuditData[item._uid] || {};
+                const matchQ = !q || currentColumns.some(c => String(item.fields?.[c] || '').toLowerCase().includes(q))
+                    || String(item.assetNo).toLowerCase().includes(q) || String(item.serial).toLowerCase().includes(q);
+                const matchStatus =
+                    auditFilter === 'all' ? true :
+                    auditFilter === 'checked' ? !!saved.checked :
+                    auditFilter === 'unchecked' ? !saved.checked :
+                    saved.status === 'missing';
+                return matchQ && matchStatus;
+            });
+            document.getElementById('tableInfo').innerText = `نمایش ${filtered.length} از ${currentItems.length} تجهیز`;
+            visibleRows = filtered;
+            renderTable(filtered);
+        }
+
+        function checkAllVisible(val) {
+            visibleRows.forEach(item => {
+                if (!localAuditData[item._uid]) localAuditData[item._uid] = {};
+                localAuditData[item._uid].checked = val;
+            });
+            renderFilteredTable();
+        }
+
         function renderTable(items) {
             const tbody = document.getElementById('equipmentTableBody');
-            tbody.innerHTML = '';
 
-            document.getElementById('totalEquipCount').innerText = items.length;
+            document.getElementById('totalEquipCount').innerText = currentItems.length;
 
+            // ساخت تمام سطرها در یک رشته و تزریق یکباره (بسیار سریعتر برای هزاران ردیف)
+            const htmlParts = [];
             items.forEach((item, idx) => {
-                const itemId = item.eqId || ('item_' + idx);
+                const itemId = item._uid;
                 const saved = localAuditData[itemId] || {};
                 const disabledAttr = isCurrentLocked ? 'disabled' : '';
                 const formattedDesc = item.desc.replace(/([a-zA-Z0-9_-]+)/g, ' $1 ');
                 const currentStatus = saved.status || 'present';
                 const newAssetVal = saved.newAsset || '';
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-700/40">
-                        <td class="p-3 text-center">
+                htmlParts.push(`
+                    <tr class="${saved.checked ? 'bg-emerald-900/15' : ''} hover:bg-slate-700/40 border-b border-slate-700/40">
+                        <td class="p-2 text-center text-slate-500 text-xs">${item._rowNo || idx + 1}</td>
+                        <td class="p-2 text-center">
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
                         <td class="p-0 text-right whitespace-nowrap">${renderDynamicCells(item)}</td>
@@ -414,12 +508,13 @@
                             </div>
                         </td>
                     </tr>
-                `;
+                `);
                 if (!localAuditData[itemId]) {
                     localAuditData[itemId] = { desc: item.desc, assetNo: item.assetNo, serial: item.serial, checked: false, status: 'present', newAsset: '' };
                 }
             });
 
+            tbody.innerHTML = htmlParts.join('');
             updateProgressCounter(items);
         }
 
@@ -480,19 +575,23 @@
             } else {
                 btnElement.className = "px-3 py-1 rounded-lg transition font-medium bg-rose-600 text-white shadow";
             }
+            updateProgressCounter(currentItems);
         }
 
         function updateProgressCounter(items) {
             let checkedCount = 0;
-            items.forEach((item, idx) => {
-                const itemId = item.eqId || ('item_' + idx);
-                if (localAuditData[itemId] && localAuditData[itemId].checked) {
-                    checkedCount++;
-                }
+            let missingCount = 0;
+            items.forEach(item => {
+                const saved = localAuditData[item._uid];
+                if (saved && saved.checked) checkedCount++;
+                if (saved && saved.status === 'missing') missingCount++;
             });
             const total = items.length;
             const percent = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
-            document.getElementById('auditProgressCount').innerText = `${percent}٪ (${checkedCount} از ${total})`;
+            document.getElementById('countChecked').innerText = checkedCount;
+            document.getElementById('countMissing').innerText = missingCount;
+            document.getElementById('auditProgressCount').innerText = `${percent}٪`;
+            document.getElementById('auditProgressBar').style.width = percent + '%';
         }
 
         async function checkReport() {
@@ -526,7 +625,9 @@
                 document.getElementById('lockBanner').classList.add('hidden');
                 document.getElementById('draftBtn').classList.remove('hidden');
                 document.getElementById('finalizeBtn').classList.remove('hidden');
-                renderTable(serverData.filter(i => i.plant === currentPlant));
+                currentItems = serverData.filter(i => i.plant === currentPlant);
+                currentItems.forEach((it, i) => { it._rowNo = i + 1; });
+                renderFilteredTable();
             }
         }
 
