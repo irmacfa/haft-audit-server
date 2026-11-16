@@ -44,6 +44,7 @@ app.get('/api/monitoring/status', (req, res) => {
             const items = Object.values(db.audit_records[plant] || {});
             return {
                 plant,
+                region: core.getRegion(plant),
                 storeName: stores[plant],
                 isLocked: status?.isLocked || false,
                 auditDate: status?.auditDate || null,
@@ -95,7 +96,7 @@ app.get('/api/monitoring/export', (req, res) => {
             const status = db.plant_status[plant];
             const items = Object.values(db.audit_records[plant] || {});
             return {
-                'کد فروشگاه': plant, 'نام فروشگاه': stores[plant],
+                'کد فروشگاه': plant, 'منطقه': core.getRegion(plant), 'نام فروشگاه': stores[plant],
                 'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال اجرا' : 'در انتظار'),
                 'آخرین تاریخ انبارگردانی': status?.auditDate || '-',
                 'تعداد دفعات انبارگردانی': (status?.history || []).length,

@@ -45,7 +45,16 @@ const DEFAULT_SETTINGS = {
     nameColumn: 'شرح مرکز هزینه تجهیز',
     materialColumn: 'شماره متریال تجهیز',
     materialPrefix: '9000',
-    columns: ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی']
+    columns: ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'],
+    regions: [
+        { name: 'منطقه ۱', from: 1000, to: 1499 },
+        { name: 'منطقه ۲', from: 2000, to: 2599 },
+        { name: 'منطقه ۳', from: 3000, to: 3599 },
+        { name: 'منطقه ۴', from: 4000, to: 4099 },
+        { name: 'منطقه ۵', from: 5000, to: 5599 },
+        { name: 'منطقه ۶', from: 7000, to: 7099 },
+        { name: 'منطقه ۷', from: 8000, to: 9199 }
+    ]
 };
 
 function getSettings() {
@@ -59,8 +68,17 @@ function getEffectiveSettings() {
         nameColumn: s.nameColumn || DEFAULT_SETTINGS.nameColumn,
         materialColumn: s.materialColumn || DEFAULT_SETTINGS.materialColumn,
         materialPrefix: s.materialPrefix || DEFAULT_SETTINGS.materialPrefix,
-        columns: Array.isArray(s.columns) && s.columns.length ? s.columns : DEFAULT_SETTINGS.columns
+        columns: Array.isArray(s.columns) && s.columns.length ? s.columns : DEFAULT_SETTINGS.columns,
+        regions: Array.isArray(s.regions) && s.regions.length ? s.regions : DEFAULT_SETTINGS.regions
     };
+}
+
+// تعیین منطقه بر اساس کد فروشگاه
+function getRegion(plant) {
+    const code = Number(String(plant).replace(/\D/g, ''));
+    const regions = getEffectiveSettings().regions;
+    const region = regions.find(r => code >= r.from && code <= r.to);
+    return region ? region.name : 'سایر';
 }
 
 function saveSettings(settings) {
@@ -224,7 +242,7 @@ function sendTelegramNotification(text) {
 module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR,
     invalidateCache, getExcelPath, readDb, writeDb,
-    getSettings, getEffectiveSettings, saveSettings,
+    getSettings, getEffectiveSettings, saveSettings, getRegion,
     getWorkbook, getMasterColumns, getStores, getEquipmentData,
     writeReportFile, sendTelegramNotification
 };

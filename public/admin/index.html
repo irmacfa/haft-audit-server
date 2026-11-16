@@ -17,7 +17,8 @@
         <div class="flex flex-wrap items-center gap-2">
             <button onclick="toggleSettings()" class="bg-orange-700 hover:bg-orange-600 px-4 py-2 rounded-xl text-xs font-bold">⚙️ فایل مادر و ستونها</button>
             <a href="/api/monitoring/export" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded-xl text-xs font-bold">📥 خروجی اکسل کلی</a>
-            <a href="http://localhost:3000/monitoring.html" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">📊 نمای خانه ای</a>
+            <button onclick="setView('grid')" id="viewGridBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🏠 نمای خانه ای</button>
+            <button onclick="setView('table')" id="viewTableBtn" class="bg-indigo-700 px-4 py-2 rounded-xl text-xs font-bold">📋 جدول تفصیلی</button>
             <button onclick="loadAdmin()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
             <a href="http://localhost:3000/" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</a>
         </div>
@@ -107,6 +108,8 @@
         <input type="text" id="searchInput" oninput="renderTable()" placeholder="جستجوی کد یا نام فروشگاه..." class="bg-slate-900 border border-slate-600 rounded-xl px-4 py-2 w-full md:w-72 text-xs focus:outline-none focus:border-orange-500">
     </div>
 
+    <!-- تبها -->
+    <section id="tableView">
     <!-- جدول -->
     <div class="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden">
         <div class="overflow-x-auto">
@@ -131,6 +134,18 @@
             <p id="tableInfo" class="text-xs text-slate-500"></p>
         </div>
     </div>
+    </section>
+
+    <!-- نمای خانه ای -->
+    <section id="gridView" class="hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-6 flex flex-wrap gap-3 items-center justify-between">
+            <div class="flex flex-wrap gap-2" id="regionButtons"></div>
+            <select id="gridRegionFilter" onchange="renderAdminGrid()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500">
+                <option value="all">همه مناطق</option>
+            </select>
+        </div>
+        <div id="adminStatsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-2"></div>
+    </section>
 
     <script>
         let allStores = [];
@@ -239,10 +254,60 @@
                 document.getElementById('statPending').innerText = allStores.filter(s => !s.isLocked && !s.auditor).length;
                 document.getElementById('statAudits').innerText = allStores.reduce((sum, s) => sum + (s.historyCount || 0), 0);
 
+                // پر کردن مناطق
+                const regionSel = document.getElementById('gridRegionFilter');
+                const currentRegion = regionSel.value;
+                const regions = [...new Set(allStores.map(s => s.region).filter(Boolean))];
+                regionSel.innerHTML = '<option value="all">همه مناطق</option>' +
+                    regions.map(r => `<option value="${r}">${r}</option>`).join('');
+                regionSel.value = currentRegion || 'all';
+                document.getElementById('regionButtons').innerHTML = regions.map(r =>
+                    `<span class="bg-slate-700 px-3 py-1 rounded-lg text-[11px] text-slate-300">${r}: ${allStores.filter(s => s.region === r).length}</span>`
+                ).join('');
+
                 renderTable();
+                renderAdminGrid();
             } catch (e) {
                 document.getElementById('adminTableBody').innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-400">خطا: ${e.message}</td></tr>`;
             }
+        }
+
+        function setView(view) {
+            document.getElementById('tableView').classList.toggle('hidden', view !== 'table');
+            document.getElementById('gridView').classList.toggle('hidden', view !== 'grid');
+            document.getElementById('viewTableBtn').className = 'px-4 py-2 rounded-xl text-xs font-bold ' +
+                (view === 'table' ? 'bg-indigo-700 text-white' : 'bg-slate-700 text-slate-300');
+            document.getElementById('viewGridBtn').className = 'px-4 py-2 rounded-xl text-xs font-bold ' +
+                (view === 'grid' ? 'bg-indigo-700 text-white' : 'bg-slate-700 text-slate-300');
+            if (view === 'grid') renderAdminGrid();
+        }
+
+        function renderAdminGrid() {
+            const region = document.getElementById('gridRegionFilter').value;
+            const stores = allStores.filter(s => region === 'all' || s.region === region);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const shown = q ? stores.filter(s => s.plant.includes(q) || s.storeName.toLowerCase().includes(q)) : stores;
+
+            const grid = document.getElementById('adminStatsGrid');
+            grid.innerHTML = '';
+            shown.forEach(store => {
+                const isDone = store.isLocked;
+                const isInProgress = !isDone && store.auditor;
+                const cls = isDone
+                    ? 'bg-emerald-600/20 border-emerald-500'
+                    : isInProgress
+                        ? 'bg-amber-600/20 border-amber-500'
+                        : 'bg-rose-950/20 border-rose-800';
+                const txt = isDone ? 'text-emerald-400' : isInProgress ? 'text-amber-400' : 'text-rose-400';
+                const label = isDone ? 'تکمیل' : isInProgress ? 'در حال اجرا' : 'در انتظار';
+                grid.innerHTML += `
+                    <a href="http://localhost:3000/?plant=${store.plant}" class="border ${cls} rounded-xl p-2 shadow-sm text-center hover:scale-105 transition-transform" title="${store.storeName}">
+                        <div class="font-bold text-sm">${store.plant}</div>
+                        <div class="text-[9px] truncate opacity-70">${store.storeName}</div>
+                        <div class="text-[8px] font-bold ${txt} mt-1">${label}</div>
+                    </a>
+                `;
+            });
         }
 
         function setFilter(filter) {

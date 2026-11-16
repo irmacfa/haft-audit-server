@@ -58,6 +58,17 @@ app.get('/api/admin/settings', (req, res) => {
     }
 });
 
+app.post('/api/admin/regions', (req, res) => {
+    try {
+        const settings = core.getSettings();
+        const updated = core.saveSettings({ ...settings, regions: req.body.regions });
+        notifyUserServer();
+        res.json({ success: true, regions: updated.regions });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 app.post('/api/admin/settings', (req, res) => {
     try {
         const settings = core.saveSettings(req.body);
@@ -78,6 +89,7 @@ app.get('/api/monitoring/status', (req, res) => {
             const items = Object.values(db.audit_records[plant] || {});
             return {
                 plant,
+                region: core.getRegion(plant),
                 storeName: stores[plant],
                 isLocked: status?.isLocked || false,
                 auditDate: status?.auditDate || null,
@@ -105,6 +117,7 @@ app.get('/api/monitoring/export', (req, res) => {
             const items = Object.values(db.audit_records[plant] || {});
             return {
                 'کد فروشگاه': plant,
+                'منطقه': core.getRegion(plant),
                 'نام فروشگاه': stores[plant],
                 'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال اجرا' : 'در انتظار'),
                 'آخرین تاریخ انبارگردانی': status?.auditDate || '-',
