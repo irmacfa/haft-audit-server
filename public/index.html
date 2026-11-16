@@ -148,11 +148,9 @@
                 <div class="overflow-x-auto w-full">
                     <table class="w-full text-right border-collapse min-w-[850px]">
                         <thead>
-                            <tr class="bg-slate-900/80 text-slate-400 text-xs border-b border-slate-700">
+                            <tr id="equipmentTableHeader" class="bg-slate-900/80 text-slate-400 text-xs border-b border-slate-700">
                                 <th class="p-3 text-center">تایید</th>
-                                <th class="p-3">شرح کارت دارایی (مدل دستگاه)</th>
-                                <th class="p-3">شماره اموال تجهیز</th>
-                                <th class="p-3">شماره سریال کارت دارایی</th>
+                                <th id="dynamicColumnsHeader"></th>
                                 <th class="p-3">کد اموال جدید</th>
                                 <th class="p-3 text-center">وضعیت موجودی</th>
                             </tr>
@@ -170,12 +168,15 @@
         let currentStoreName = '';
         let isCurrentLocked = false;
         let localAuditData = {};
+        let currentColumns = [];
 
         window.onload = async function() {
             try {
                 const res = await fetch('/api/equipment');
                 const result = await res.json();
                 serverData = result.data;
+                currentColumns = result.columns || ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'];
+                renderDynamicHeader();
                 document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
                 document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
 
@@ -190,6 +191,27 @@
                 document.getElementById('serverStatusBadge').innerText = "✕ خطا در اتصال به سرور";
             }
         };
+
+        function renderDynamicHeader() {
+            // جایگذاری یک <th> با تمام ستونهای دینامیک (برای حفظ ساختار colspan جدول)
+            const th = document.getElementById('dynamicColumnsHeader');
+            th.innerHTML = currentColumns.map(c => `<span class="inline-block px-4 py-3 border-l border-slate-700 last:border-l-0">${c}</span>`).join('');
+        }
+
+        function renderDynamicCells(item) {
+            const fields = item.fields || {};
+            const assetKey = currentColumns.find(c => c.includes('اموال') && c.includes('تجهیز'));
+            const serialKey = currentColumns.find(c => c.includes('سریال'));
+            return currentColumns.map(c => {
+                let val = fields[c] || '';
+                if (val === 'undefined' || val === 'NaN') val = '';
+                if (c === assetKey && val) val = cleanCode(val);
+                if (c === serialKey && val) val = cleanCode(val);
+                // شماره اموال و سریال به صورت مونواسپیس نمایش داده شوند
+                const mono = (c.includes('اموال') || c.includes('سریال')) ? 'asset-text text-[11px]' : 'text-slate-200';
+                return `<span class="inline-block px-4 py-3 border-l border-slate-700/60 last:border-l-0 ${mono}" title="${val}">${val || '-'}</span>`;
+            }).join('');
+        }
 
         function cleanCode(code) {
             if (!code || code === '-') return '';
@@ -373,9 +395,7 @@
                         <td class="p-3 text-center">
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
-                        <td class="p-3 text-white font-medium text-mixed">${formattedDesc}</td>
-                        <td class="p-3"><span class="asset-text">${item.assetNo}</span></td>
-                        <td class="p-3"><span class="asset-text">${item.serial}</span></td>
+                        <td class="p-0 text-right whitespace-nowrap">${renderDynamicCells(item)}</td>
                         <td class="p-3">
                             <div id="container_${itemId}">
                                 ${getNewAssetDisplayHtml(itemId, newAssetVal, isCurrentLocked)}
