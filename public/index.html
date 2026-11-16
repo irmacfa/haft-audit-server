@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه انبارگردانی فروشگاه‌های زنجیره‌ای هفت</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .text-mixed { direction: rtl; unicode-bidi: plaintext; text-align: right; }
+        .asset-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+        }
+        .editable-asset {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .editable-asset:hover {
+            background-color: rgba(51, 65, 85, 0.4);
+            color: #f97316;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased w-full">
+
+    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/60 shadow-lg py-4 px-6 sticky top-0 z-50 w-full">
+        <div class="w-full flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-orange-600 text-white font-bold rounded-2xl w-12 h-12 flex items-center justify-center text-2xl shadow-lg shadow-orange-600/30">۷</div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">سامانه انبارگردانی انفورماتیک فروشگاه‌ها</h1>
+                    <p class="text-xs text-slate-400">فروشگاه‌های زنجیره‌ای هفت - واحد پشتیبانی IT</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="/monitoring.html" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">📊 صفحه مانیتورینگ</a>
+                <div id="serverStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300">
+                    ● متصل به سرور مرکزی
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full px-4 sm:px-8 py-6 flex-1">
+        
+        <!-- Search Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+            
+            <!-- Store Code Search Card -->
+            <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 shadow-xl text-center">
+                <h2 class="text-base font-semibold text-orange-400 mb-3">ورود کد فروشگاه (۴ رقمی)</h2>
+                <div class="flex justify-center">
+                    <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-48 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
+                </div>
+            </div>
+
+            <!-- Global Asset / Serial Search Card -->
+            <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 shadow-xl">
+                <h2 class="text-base font-semibold text-emerald-400 mb-3 text-center">جستجوی سراسری اموال / سریال</h2>
+                <div class="relative">
+                    <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثلا: 217910401171" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-xs font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Asset Search Results Dropdown / Box -->
+        <div id="globalSearchResultBox" class="hidden max-w-4xl mx-auto mb-8 bg-slate-800 border border-emerald-600/60 rounded-3xl p-5 shadow-2xl">
+            <h3 class="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                🔍 نتایج جستجوی سراسری تجهیز:
+            </h3>
+            <div id="globalSearchResultContent" class="space-y-2 text-xs"></div>
+        </div>
+
+        <!-- Progress & Status Box -->
+        <div id="statusBox" class="hidden max-w-xl mx-auto mb-8 bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg">
+            <div class="flex justify-between items-center mb-2">
+                <span id="statusMessage" class="text-xs font-medium text-slate-300">در حال جستجوی رکوردها...</span>
+                <span id="statusPercentage" class="text-xs font-bold text-orange-400">0%</span>
+            </div>
+            <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                <div id="progressBar" class="bg-orange-500 h-full w-0 transition-all duration-150"></div>
+            </div>
+        </div>
+
+        <!-- Lock Status Banner -->
+        <div id="lockBanner" class="hidden bg-amber-950/80 border border-amber-600 text-amber-200 p-4 rounded-2xl mb-6 text-sm flex justify-between items-center">
+            <div>
+                🔒 <b id="lockBannerTitle">انبارگردانی این فروشگاه انجام شده است.</b>
+                <span id="lockInfo" class="block text-xs text-amber-400 mt-1"></span>
+            </div>
+            <button onclick="unlockStore()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition shadow">
+                🔓 باز کردن قفل و ویرایش مجدد
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsContainer" class="hidden space-y-6 w-full">
+            
+            <!-- Store Title & Counters Card -->
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-3xl shadow-xl flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <span class="text-xs text-orange-400 font-bold block mb-1">نام فروشگاه (مرکز هزینه):</span>
+                    <h2 id="storeTitleName" class="text-2xl font-bold text-white">---</h2>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center">
+                        <p class="text-[11px] text-slate-400">تعداد تجهیزات</p>
+                        <p id="totalEquipCount" class="text-lg font-bold text-orange-400 mt-0.5">۰</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center">
+                        <p class="text-[11px] text-slate-400">پیشرفت انبارگردانی</p>
+                        <p id="auditProgressCount" class="text-lg font-bold text-emerald-400 mt-0.5">۰٪</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table Card -->
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden w-full">
+                <div class="p-4 border-b border-slate-700 flex flex-wrap justify-between items-center gap-3">
+                    <h3 class="font-semibold text-white text-sm">لیست تجهیزات متریال سری 9000</h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="downloadCSV()" id="downloadBtn" class="hidden bg-blue-700 hover:bg-blue-600 text-white text-xs px-4 py-2 rounded-xl transition font-bold shadow">
+                            📥 دانلود فایل گزارش (CSV)
+                        </button>
+                        <button onclick="saveDraft()" id="draftBtn" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium shadow">
+                            💾 ذخیره موقت
+                        </button>
+                        <button onclick="downloadReport()" id="downloadBtn" class="hidden bg-sky-700 hover:bg-sky-600 text-white text-xs px-4 py-2 rounded-xl transition font-bold shadow">
+                            📥 دانلود اکسل
+                        </button>
+                        <button onclick="finalizeAndLock()" id="finalizeBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl transition font-bold shadow">
+                            🔒 تایید نهایی و قفل انبارگردانی
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-right border-collapse min-w-[850px]">
+                        <thead>
+                            <tr class="bg-slate-900/80 text-slate-400 text-xs border-b border-slate-700">
+                                <th class="p-3 text-center">تایید</th>
+                                <th class="p-3">شرح کارت دارایی (مدل دستگاه)</th>
+                                <th class="p-3">شماره اموال تجهیز</th>
+                                <th class="p-3">شماره سریال کارت دارایی</th>
+                                <th class="p-3">کد اموال جدید</th>
+                                <th class="p-3 text-center">وضعیت موجودی</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentTableBody" class="divide-y divide-slate-700/60 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let serverData = [];
+        let currentPlant = '';
+        let currentStoreName = '';
+        let isCurrentLocked = false;
+        let localAuditData = {};
+
+        window.onload = async function() {
+            try {
+                const res = await fetch('/api/equipment');
+                const result = await res.json();
+                serverData = result.data;
+                document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
+                document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
+            } catch (err) {
+                document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-950 border border-rose-800 text-rose-300";
+                document.getElementById('serverStatusBadge').innerText = "✕ خطا در اتصال به سرور";
+            }
+        };
+
+        function cleanCode(code) {
+            if (!code || code === '-') return '';
+            return String(code).replace(/[-–\s]/g, '').trim();
+        }
+
+        function handleGlobalAssetSearch(query) {
+            const q = cleanCode(query);
+            const box = document.getElementById('globalSearchResultBox');
+            const content = document.getElementById('globalSearchResultContent');
+
+            if (!q || q.length < 4) {
+                box.classList.add('hidden');
+                content.innerHTML = '';
+                return;
+            }
+
+            const matches = serverData.filter(item => {
+                const cleanAsset = cleanCode(item.assetNo);
+                const cleanSer = cleanCode(item.serial);
+                return cleanAsset === q || cleanSer === q || cleanAsset.includes(q) || cleanSer.includes(q);
+            });
+
+            box.classList.remove('hidden');
+            if (matches.length === 0) {
+                content.innerHTML = `<p class="text-rose-400">هیچ تجهیزی با شماره اموال یا سریال «${query}» یافت نشد.</p>`;
+                return;
+            }
+
+            let html = '';
+            matches.forEach(m => {
+                const formattedDesc = m.desc.replace(/([a-zA-Z0-9_-]+)/g, ' $1 ');
+                html += `
+                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-xl flex flex-wrap justify-between items-center gap-2">
+                        <div>
+                            <span class="text-orange-400 font-bold">فروشگاه: ${m.storeName} (کد: ${m.plant})</span>
+                            <p class="text-white mt-1 text-mixed">${formattedDesc}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">اموال:</span>
+                                <span class="asset-text text-xs">${m.assetNo}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">سریال:</span>
+                                <span class="asset-text text-xs">${m.serial}</span>
+                            </div>
+                            <button onclick="selectStoreFromSearch('${m.plant}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg transition font-medium">
+                                نمایش فروشگاه ➔
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            content.innerHTML = html;
+        }
+
+        function selectStoreFromSearch(plantCode) {
+            document.getElementById('storeCodeInput').value = plantCode;
+            document.getElementById('globalAssetSearchInput').value = '';
+            document.getElementById('globalSearchResultBox').classList.add('hidden');
+            handleStoreInput(plantCode);
+        }
+
+        async function handleStoreInput(value) {
+            currentPlant = value.trim();
+            if (currentPlant.length < 4) {
+                document.getElementById('resultsContainer').classList.add('hidden');
+                document.getElementById('lockBanner').classList.add('hidden');
+                document.getElementById('statusBox').classList.add('hidden');
+                return;
+            }
+
+            if (currentPlant.length === 4) {
+                document.getElementById('resultsContainer').classList.add('hidden');
+                document.getElementById('lockBanner').classList.add('hidden');
+                
+                const statusBox = document.getElementById('statusBox');
+                const progressBar = document.getElementById('progressBar');
+                const statusMsg = document.getElementById('statusMessage');
+                const statusPct = document.getElementById('statusPercentage');
+                
+                statusBox.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                progressBar.className = "bg-orange-500 h-full transition-all duration-150";
+                statusMsg.innerText = `در حال اتصال و جستجوی کد ${currentPlant}...`;
+                statusPct.innerText = '0%';
+
+                let progress = 0;
+                const interval = setInterval(async () => {
+                    progress += 25;
+                    progressBar.style.width = progress + '%';
+                    statusPct.innerText = progress + '%';
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        await processSearchAndDisplay();
+                    }
+                }, 80);
+            }
+        }
+
+        async function processSearchAndDisplay() {
+            const progressBar = document.getElementById('progressBar');
+            const statusMsg = document.getElementById('statusMessage');
+            const statusBox = document.getElementById('statusBox');
+
+            try {
+                const auditRes = await fetch(`/api/audit/${currentPlant}`);
+                if (!auditRes.ok) throw new Error('خطا در پاسخ سرور');
+                const auditInfo = await auditRes.json();
+
+                const filteredItems = serverData.filter(i => i.plant === currentPlant);
+
+                if (filteredItems.length === 0) {
+                    progressBar.className = "bg-rose-600 h-full transition-all duration-150";
+                    statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${currentPlant} یافت نشد!</span>`;
+                    return;
+                }
+
+                // استخراج نام فروشگاه
+                currentStoreName = filteredItems[0].storeName || `فروشگاه ${currentPlant}`;
+                document.getElementById('storeTitleName').innerText = `${currentStoreName} (کد پلنت: ${currentPlant})`;
+
+                progressBar.className = "bg-emerald-500 h-full transition-all duration-150";
+                statusMsg.innerHTML = `<span class="text-emerald-400 font-bold">✅ فروشگاه «${currentStoreName}» با موفقیت بارگذاری شد (${filteredItems.length} تجهیز)</span>`;
+
+                isCurrentLocked = auditInfo.statusData.isLocked;
+                localAuditData = auditInfo.auditItems || {};
+
+                // چک وجود فایل گزارش برای نمایش دکمه دانلود
+                checkReport();
+
+                const banner = document.getElementById('lockBanner');
+                const draftBtn = document.getElementById('draftBtn');
+                const finalizeBtn = document.getElementById('finalizeBtn');
+                const downloadBtn = document.getElementById('downloadBtn');
+
+                if (isCurrentLocked) {
+                    banner.classList.remove('hidden');
+                    document.getElementById('lockBannerTitle').innerText = `انبارگردانی فروشگاه ${currentStoreName} در تاریخ ${auditInfo.statusData.auditDate} تایید شده است.`;
+                    document.getElementById('lockInfo').innerText = `انبارگردان: ${auditInfo.statusData.auditor}`;
+                    draftBtn.classList.add('hidden');
+                    finalizeBtn.classList.add('hidden');
+                    downloadBtn.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                    draftBtn.classList.remove('hidden');
+                    finalizeBtn.classList.remove('hidden');
+                    downloadBtn.classList.add('hidden');
+                }
+
+                setTimeout(() => {
+                    statusBox.classList.add('hidden');
+                    document.getElementById('resultsContainer').classList.remove('hidden');
+                    renderTable(filteredItems);
+                }, 400);
+
+            } catch (e) {
+                progressBar.className = "bg-rose-600 h-full transition-all duration-150";
+                statusMsg.innerHTML = `<span class="text-rose-400 font-bold">🚨 خطا: اتصال به سرور برقرار نشد!</span>`;
+            }
+        }
+
+        function renderTable(items) {
+            const tbody = document.getElementById('equipmentTableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('totalEquipCount').innerText = items.length;
+
+            items.forEach((item, idx) => {
+                const itemId = item.eqId || ('item_' + idx);
+                const saved = localAuditData[itemId] || {};
+                const disabledAttr = isCurrentLocked ? 'disabled' : '';
+                const formattedDesc = item.desc.replace(/([a-zA-Z0-9_-]+)/g, ' $1 ');
+                const currentStatus = saved.status || 'present';
+                const newAssetVal = saved.newAsset || '';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-700/40">
+                        <td class="p-3 text-center">
+                            <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
+                        </td>
+                        <td class="p-3 text-white font-medium text-mixed">${formattedDesc}</td>
+                        <td class="p-3"><span class="asset-text">${item.assetNo}</span></td>
+                        <td class="p-3"><span class="asset-text">${item.serial}</span></td>
+                        <td class="p-3">
+                            <div id="container_${itemId}">
+                                ${getNewAssetDisplayHtml(itemId, newAssetVal, isCurrentLocked)}
+                            </div>
+                        </td>
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <div class="inline-flex rounded-xl p-0.5 bg-slate-900 border border-slate-700 text-xs">
+                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'present', this)" 
+                                    class="px-3 py-1 rounded-lg transition font-medium ${currentStatus === 'present' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-white'}">
+                                    موجود ✅
+                                </button>
+                                <button type="button" ${disabledAttr} onclick="setPresenceStatus('${itemId}', 'missing', this)" 
+                                    class="px-3 py-1 rounded-lg transition font-medium ${currentStatus === 'missing' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}">
+                                    فاقد ❌
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                if (!localAuditData[itemId]) {
+                    localAuditData[itemId] = { desc: item.desc, assetNo: item.assetNo, serial: item.serial, checked: false, status: 'present', newAsset: '' };
+                }
+            });
+
+            updateProgressCounter(items);
+        }
+
+        function getNewAssetDisplayHtml(itemId, val, locked) {
+            if (locked) {
+                return `<span class="asset-text">${val || '-'}</span>`;
+            }
+            if (!val) {
+                return `<span onclick="switchToInput('${itemId}')" class="asset-text text-slate-500 cursor-pointer hover:text-orange-400 italic">+ ثبت کد جدید...</span>`;
+            }
+            return `<span onclick="switchToInput('${itemId}')" class="asset-text editable-asset" title="برای ویرایش کلیک کنید">${val}</span>`;
+        }
+
+        function switchToInput(itemId) {
+            if (isCurrentLocked) return;
+            const container = document.getElementById(`container_${itemId}`);
+            const currentVal = localAuditData[itemId] && localAuditData[itemId].newAsset ? localAuditData[itemId].newAsset : '';
+
+            container.innerHTML = `
+                <input type="text" id="input_${itemId}" value="${currentVal}" placeholder="کد جدید..." 
+                    onblur="saveInputVal('${itemId}')" onkeydown="if(event.key==='Enter') saveInputVal('${itemId}')" 
+                    class="bg-slate-900 border border-orange-500 rounded-xl px-3 py-1.5 text-xs text-white font-mono w-36 focus:outline-none">
+            `;
+            const inputElem = document.getElementById(`input_${itemId}`);
+            inputElem.focus();
+            inputElem.select();
+        }
+
+        function saveInputVal(itemId) {
+            const inputElem = document.getElementById(`input_${itemId}`);
+            if (!inputElem) return;
+            const newVal = inputElem.value.trim();
+
+            if (!localAuditData[itemId]) localAuditData[itemId] = {};
+            localAuditData[itemId].newAsset = newVal;
+
+            const container = document.getElementById(`container_${itemId}`);
+            container.innerHTML = getNewAssetDisplayHtml(itemId, newVal, isCurrentLocked);
+        }
+
+        function updateMemory(id, field, value) {
+            if (!localAuditData[id]) localAuditData[id] = {};
+            localAuditData[id][field] = value;
+            updateProgressCounter(serverData.filter(i => i.plant === currentPlant));
+        }
+
+        function setPresenceStatus(itemId, status, btnElement) {
+            if (isCurrentLocked) return;
+            if (!localAuditData[itemId]) localAuditData[itemId] = {};
+            localAuditData[itemId].status = status;
+
+            const parent = btnElement.parentElement;
+            parent.querySelectorAll('button').forEach(btn => {
+                btn.className = "px-3 py-1 rounded-lg transition font-medium text-slate-400 hover:text-white";
+            });
+            if (status === 'present') {
+                btnElement.className = "px-3 py-1 rounded-lg transition font-medium bg-emerald-600 text-white shadow";
+            } else {
+                btnElement.className = "px-3 py-1 rounded-lg transition font-medium bg-rose-600 text-white shadow";
+            }
+        }
+
+        function updateProgressCounter(items) {
+            let checkedCount = 0;
+            items.forEach((item, idx) => {
+                const itemId = item.eqId || ('item_' + idx);
+                if (localAuditData[itemId] && localAuditData[itemId].checked) {
+                    checkedCount++;
+                }
+            });
+            const total = items.length;
+            const percent = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+            document.getElementById('auditProgressCount').innerText = `${percent}٪ (${checkedCount} از ${total})`;
+        }
+
+        async function checkReport() {
+            try {
+                const res = await fetch(`/api/audit/report-exists/${currentPlant}`);
+                const data = await res.json();
+                document.getElementById('downloadBtn').classList.toggle('hidden', !data.exists);
+            } catch (e) { }
+        }
+
+        function downloadReport() {
+            window.location.href = `/api/audit/download/${currentPlant}`;
+        }
+
+        async function saveDraft() {
+            const res = await fetch('/api/audit/draft', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('downloadBtn').classList.remove('hidden');
+                alert('💾 ذخیره موقت اطلاعات با موفقیت انجام شد.\nفایل اکسل گزارش کنار دکمه ذخیره قرار گرفت.');
+            }
+        }
+
+        function unlockStore() {
+            if (confirm(`آیا مایلید قفل انبارگردانی فروشگاه ${currentStoreName} را برای ویرایش باز کنید؟`)) {
+                isCurrentLocked = false;
+                document.getElementById('lockBanner').classList.add('hidden');
+                document.getElementById('draftBtn').classList.remove('hidden');
+                document.getElementById('finalizeBtn').classList.remove('hidden');
+                renderTable(serverData.filter(i => i.plant === currentPlant));
+            }
+        }
+
+        async function finalizeAndLock() {
+            if (confirm(`آیا از تایید نهایی و قفل انبارگردانی فروشگاه ${currentStoreName} (${currentPlant}) اطمینان دارید؟`)) {
+                const res = await fetch('/api/audit/finalize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        plant: currentPlant,
+                        storeName: currentStoreName,
+                        auditItems: localAuditData,
+                        auditorName: 'علی قنبری (پشتیبانی IT)',
+                        managerEmail: 'manager@haftstores.ir'
+                    })
+                });
+                const resData = await res.json();
+                if (resData.success) {
+                    alert(resData.message + '\n\n📥 فایل گزارش تولید شد. در حال دانلود...');
+                    window.location.href = resData.downloadLink; // شروع دانلود خودکار
+                    handleStoreInput(currentPlant);
+                } else {
+                    alert('خطا در ثبت نهایی!');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

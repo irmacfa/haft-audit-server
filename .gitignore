@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Secrets - never commit credentials
+.env
+.env.local
+.env.*.local
+
+# Data files (large Excel + generated audit records)
+data/*
+!data/.gitkeep
+db/*.json
+!db/.gitkeep
+
+# Generated Excel reports
+public/reports/*
+!public/reports/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
