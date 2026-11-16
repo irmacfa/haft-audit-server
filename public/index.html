@@ -39,7 +39,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <a href="/monitoring.html" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">📊 صفحه مانیتورینگ</a>
+                <a href="/monitoring.html" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">📊 مانیتورینگ</a>
+                <a href="/admin.html" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🛡️ پنل مدیریت</a>
                 <div id="serverStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300">
                     ● متصل به سرور مرکزی
                 </div>
@@ -177,6 +178,13 @@
                 serverData = result.data;
                 document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
                 document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
+
+                // ورود مستقیم به فروشگاه از طریق لینک ?plant=xxxx
+                const urlPlant = new URLSearchParams(window.location.search).get('plant');
+                if (urlPlant) {
+                    document.getElementById('storeCodeInput').value = urlPlant;
+                    handleStoreInput(urlPlant);
+                }
             } catch (err) {
                 document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-950 border border-rose-800 text-rose-300";
                 document.getElementById('serverStatusBadge').innerText = "✕ خطا در اتصال به سرور";
@@ -483,7 +491,7 @@
             const res = await fetch('/api/audit/draft', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData })
+                body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData, storeName: currentStoreName, auditorName: document.getElementById('auditorNameInput').value.trim() })
             });
             const data = await res.json();
             if (data.success) {

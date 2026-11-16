@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 const XLSX = require('xlsx');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
@@ -36,6 +37,33 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     }
 });
+
+// ارسال نوتیفیکیشن تلگرام (در صورت تنظیم بودن توکن و چت آیدی)
+function sendTelegramNotification(text) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (!token || !chatId) {
+        console.log('[Telegram] Not configured, skipping notification.');
+        return;
+    }
+    const data = JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' });
+    const req = https.request({
+        hostname: 'api.telegram.org',
+        path: `/bot${token}/sendMessage`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) }
+    }, res => {
+        let body = '';
+        res.on('data', c => body += c);
+        res.on('end', () => {
+            if (res.statusCode !== 200) console.error('[Telegram] Error:', body);
+            else console.log('[Telegram] Notification sent.');
+        });
+    });
+    req.on('error', e => console.error('[Telegram] Request error:', e.message));
+    req.write(data);
+    req.end();
+}
 
 function cleanExcelCode(code) {
     if (!code || code === '-') return '-';
@@ -181,13 +209,21 @@ app.get('/api/monitoring/status', (req, res) => {
         const db = JSON.parse(fs.readFileSync(DB_PATH));
         const stores = getStoresFromExcel();
 
-        const result = Object.keys(stores).map(plant => ({
-            plant: plant,
-            storeName: stores[plant],
-            isLocked: db.plant_status[plant]?.isLocked || false,
-            auditDate: db.plant_status[plant]?.auditDate || null,
-            auditor: db.plant_status[plant]?.auditor || null
-        }));
+        const result = Object.keys(stores).map(plant => {
+            const status = db.plant_status[plant];
+            const auditItems = db.audit_records[plant] || {};
+            const items = Object.values(auditItems);
+            return {
+                plant: plant,
+                storeName: stores[plant],
+                isLocked: status?.isLocked || false,
+                auditDate: status?.auditDate || null,
+                auditor: status?.auditor || null,
+                equipmentCount: items.length,
+                checkedCount: items.filter(i => i.checked).length,
+                missingCount: items.filter(i => i.status === 'missing').length
+            };
+        });
 
         res.json(result);
     } catch (e) {
@@ -208,18 +244,23 @@ app.get('/api/monitoring/export', (req, res) => {
 
         const rows = Object.keys(stores).map(plant => {
             const status = db.plant_status[plant];
+            const auditItems = db.audit_records[plant] || {};
+            const items = Object.values(auditItems);
             return {
                 'کد فروشگاه': plant,
                 'نام فروشگاه': stores[plant],
                 'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال انجام' : 'در انتظار'),
                 'تاریخ انبارگردانی': status?.auditDate || '-',
-                'انبارگردان': status?.auditor || '-'
+                'انبارگردان': status?.auditor || '-',
+                'تعداد تجهیزات': items.length,
+                'تعداد تایید شده': items.filter(i => i.checked).length,
+                'تعداد فاقد': items.filter(i => i.status === 'missing').length
             };
         }).sort((a, b) => a['کد فروشگاه'].localeCompare(b['کد فروشگاه']));
 
         const ws = XLSX.utils.json_to_sheet(rows);
         ws['!dir'] = 'rtl';
-        ws['!cols'] = [{ wch: 14 }, { wch: 35 }, { wch: 18 }, { wch: 22 }, { wch: 28 }];
+        ws['!cols'] = [{ wch: 14 }, { wch: 35 }, { wch: 18 }, { wch: 22 }, { wch: 28 }, { wch: 16 }, { wch: 18 }, { wch: 14 }];
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'وضعیت انبارگردانی');
 
@@ -262,13 +303,22 @@ app.get('/api/audit/download/:plant', (req, res) => {
 
 app.post('/api/audit/draft', (req, res) => {
     try {
-        const { plant, auditItems } = req.body;
+        const { plant, auditItems, storeName, auditorName } = req.body;
         const db = JSON.parse(fs.readFileSync(DB_PATH));
         db.audit_records[plant] = auditItems;
         fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
 
         // ساخت فایل اکسل موقع ذخیره موقت
         const fileName = writeReportFile(plant, auditItems);
+
+        // نوتیفیکیشن تلگرام
+        const auditor = auditorName || db.plant_status[plant]?.auditor || 'کارشناس IT';
+        sendTelegramNotification(
+            `💾 <b>ذخیره موقت انبارگردانی</b>\n` +
+            `فروشگاه: ${plant} (${storeName || 'نامشخص'})\n` +
+            `انبارگردان: ${auditor}\n` +
+            `تجهیزات ثبت شده: ${Object.keys(auditItems).length}`
+        );
 
         res.json({ success: true, downloadLink: `/reports/${fileName}` });
     } catch (e) {
@@ -327,6 +377,16 @@ app.post('/api/audit/finalize', async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
+
+        // نوتیفیکیشن تلگرام
+        const auditor = auditorName || 'کارشناس IT';
+        sendTelegramNotification(
+            `✅ <b>تکمیل انبارگردانی</b>\n` +
+            `فروشگاه: ${plant} (${storeName})\n` +
+            `تاریخ: ${currentDate}\n` +
+            `انبارگردان: ${auditor}\n` +
+            `تجهیزات: ${Object.keys(auditItems).length} مورد`
+        );
 
         res.json({
             success: true,
