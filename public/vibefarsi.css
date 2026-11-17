@@ -29,19 +29,21 @@
 }
 .vf-btn:active { transform: var(--press); }
 .vf-btn:disabled { opacity: .5; pointer-events: none; }
+.vf-btn:hover { filter: brightness(1.12); }
+.vf-btn-primary:hover, .vf-btn-ghost:hover { filter: none; }
 .vf-btn-sm { min-height: 2rem; padding: 0.3rem 0.7rem; font-size: 0.75rem; }
 .vf-btn-lg { min-height: 3rem; padding: 0.7rem 1.5rem; font-size: 0.9375rem; }
 .vf-btn-icon { width: 2.5rem; padding: 0; }
 .vf-btn-primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary) !important; }
 .vf-btn-primary:hover { opacity: .85; }
-.vf-btn-secondary { background: var(--secondary); border-color: var(--border) !important; }
-.vf-btn-outline { background: transparent; border-color: var(--input) !important; }
-.vf-btn-outline:hover { background: var(--accent); }
-.vf-btn-ghost { background: transparent; border-color: transparent !important; }
-.vf-btn-ghost:hover { background: var(--accent); }
-.vf-btn-brand { background: var(--brand); color: var(--brand-foreground); border-color: var(--brand) !important; }
-.vf-btn-danger { background: var(--destructive); color: white; border-color: var(--destructive) !important; }
-.vf-btn-success { background: var(--success); color: #052e16; border-color: var(--success) !important; }
+.vf-btn-secondary { background: var(--secondary) !important; color: var(--foreground) !important; border-color: var(--border) !important; }
+.vf-btn-outline { background: transparent !important; color: var(--foreground) !important; border-color: var(--input) !important; }
+.vf-btn-outline:hover { background: var(--accent) !important; }
+.vf-btn-ghost { background: transparent !important; color: var(--muted-foreground) !important; border-color: transparent !important; }
+.vf-btn-ghost:hover { background: var(--accent) !important; color: var(--foreground) !important; }
+.vf-btn-brand { background: var(--brand) !important; color: var(--brand-foreground) !important; border-color: var(--brand) !important; }
+.vf-btn-danger { background: var(--destructive) !important; color: white !important; border-color: var(--destructive) !important; }
+.vf-btn-success { background: var(--success) !important; color: #052e16 !important; border-color: var(--success) !important; }
 
 /* ---------- Inputs: input / textarea / select / search / password / phone / iban / otp / number / amount / price / postal / national-id / card-number / plate ---------- */
 .vf-input, .vf-textarea, .vf-select, .vf-search-input, .vf-password-input,

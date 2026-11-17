@@ -439,8 +439,8 @@
         function updateFilterButtons() {
             ['all', 'unchecked', 'checked', 'missing'].forEach(f => {
                 const btn = document.getElementById('af-' + f);
-                if (btn) btn.className = 'af-btn px-3 py-1.5 rounded-lg text-[11px] font-bold ' +
-                    (f === auditFilter ? 'bg-orange-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600');
+                if (btn) btn.className = 'af-btn vf-btn vf-btn-sm px-3 py-1.5 rounded-lg text-[11px] font-bold ' +
+                    (f === auditFilter ? 'bg-orange-600 text-white vf-btn-brand' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 vf-btn-ghost');
             });
         }
 

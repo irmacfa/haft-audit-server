@@ -378,8 +378,8 @@
 
         function updateRegionButtons(regions) {
             document.getElementById('regionButtons').innerHTML = regions.map(r =>
-                `<button onclick="toggleRegion('${r}')" class="px-3 py-1 rounded-lg text-[11px] transition ${currentRegionName === r ? 'bg-orange-600 text-white ring-1 ring-orange-400' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">${r}: ${allStores.filter(s => s.region === r).length}</button>`
-            ).join('') + (currentRegionName !== 'all' ? `<button onclick="setActiveRegion('all')" class="px-3 py-1 rounded-lg text-[11px] bg-rose-700 text-white hover:bg-rose-600">✕ نمایش همه</button>` : '');
+                `<button onclick="toggleRegion('${r}')" class="vf-btn vf-btn-sm px-3 py-1 rounded-lg text-[11px] ${currentRegionName === r ? 'bg-orange-600 text-white vf-btn-brand' : 'bg-slate-700 text-slate-300 vf-btn-ghost'}">${r}: ${allStores.filter(s => s.region === r).length}</button>`
+            ).join('') + (currentRegionName !== 'all' ? `<button onclick="setActiveRegion('all')" class="vf-btn vf-btn-sm px-3 py-1 rounded-lg text-[11px] bg-rose-700 text-white vf-btn-danger">✕ نمایش همه</button>` : '');
         }
 
         // کلیک روی منطقه: فیلتر میکند و دوباره کلیک، فیلتر را برمیدارد
@@ -404,10 +404,10 @@
         function setView(view) {
             document.getElementById('tableView').classList.toggle('hidden', view !== 'table');
             document.getElementById('gridView').classList.toggle('hidden', view !== 'grid');
-            document.getElementById('viewTableBtn').className = 'px-4 py-2 rounded-xl text-xs font-bold ' +
-                (view === 'table' ? 'bg-indigo-700 text-white' : 'bg-slate-700 text-slate-300');
-            document.getElementById('viewGridBtn').className = 'px-4 py-2 rounded-xl text-xs font-bold ' +
-                (view === 'grid' ? 'bg-indigo-700 text-white' : 'bg-slate-700 text-slate-300');
+            document.getElementById('viewTableBtn').className = 'vf-btn vf-btn-sm px-4 py-2 rounded-xl text-xs font-bold ' +
+                (view === 'table' ? 'bg-indigo-700 text-white vf-btn-brand' : 'bg-slate-700 text-slate-300 vf-btn-ghost');
+            document.getElementById('viewGridBtn').className = 'vf-btn vf-btn-sm px-4 py-2 rounded-xl text-xs font-bold ' +
+                (view === 'grid' ? 'bg-indigo-700 text-white vf-btn-brand' : 'bg-slate-700 text-slate-300 vf-btn-ghost');
             if (view === 'grid') renderAdminGrid();
         }
 

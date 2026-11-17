@@ -4,9 +4,41 @@
         if (!root || !root.querySelectorAll) return;
 
         root.querySelectorAll('button').forEach(btn => {
+            if (btn.classList.contains('vf-btn-brand') || btn.classList.contains('vf-btn-danger') || btn.classList.contains('vf-btn-primary')) {
+                btn.classList.add('vf-btn');
+                return;
+            }
             btn.classList.add('vf-btn');
-            if (btn.id === 'finalizeBtn' || btn.classList.contains('vf-primary')) btn.classList.add('vf-btn-primary');
+            const id = btn.id || '';
+            const label = btn.textContent || '';
+
+            // سلسلهمراتب بصری: اصلی / ثانویه / مشخصشده / شفاف
+            if (id === 'finalizeBtn' || btn.classList.contains('vf-primary')) {
+                btn.classList.add('vf-btn-primary', 'vf-btn-lg');
+            } else if (id === 'draftBtn') {
+                btn.classList.add('vf-btn-secondary');
+            } else if (id === 'downloadBtn') {
+                btn.classList.add('vf-btn-outline');
+            } else if (label.includes('آپلود') || label.includes('ذخیره تنظیمات') || label.includes('ذخیره مناطق')) {
+                btn.classList.add('vf-btn-brand');
+            } else if (id.startsWith('af-')) {
+                btn.classList.add('vf-btn-sm');
+                if (btn.classList.contains('bg-orange-600') || btn.getAttribute('aria-pressed') === 'true') {
+                    btn.classList.add('vf-btn-brand');
+                } else {
+                    btn.classList.add('vf-btn-ghost');
+                }
+            } else if (btn.closest('#regionButtons')) {
+                btn.classList.add('vf-btn-sm', 'vf-btn-ghost');
+            } else if (btn.classList.contains('filter-btn') || btn.id === 'loadMoreBtn') {
+                btn.classList.add('vf-btn-sm', 'vf-btn-outline');
+            } else if (btn.id.startsWith('view') && btn.classList.contains('bg-indigo-700')) {
+                btn.classList.add('vf-btn-sm', 'vf-btn-brand');
+            }
         });
+
+        // لینکهای نوار بالا شبیه دکمههای شفاف میشوند
+        root.querySelectorAll('header a[href]').forEach(a => a.classList.add('vf-btn', 'vf-btn-sm', 'vf-btn-ghost'));
 
         root.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea')
             .forEach(el => el.classList.add('vf-input'));
