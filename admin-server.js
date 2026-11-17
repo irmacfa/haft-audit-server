@@ -18,6 +18,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
+app.use('/vibefarsi.css', express.static(path.join(__dirname, 'public', 'vibefarsi.css')));
+app.use('/vf-apply.js', express.static(path.join(__dirname, 'public', 'vf-apply.js')));
 
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
 app.post('/api/reload', (req, res) => {

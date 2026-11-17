@@ -1,0 +1,234 @@
+/* ============================================================
+   VibeFarsi UI — vanilla port of the registry component vocabulary
+   Components: button, input, textarea, select, combobox, otp-field,
+   number-field, checkbox, radio, switch, slider, range, rating,
+   file-upload, calendar, date-picker, command, dialog, dropdown,
+   tooltip, sheet, tabs, pagination, breadcrumb, stepper, toast,
+   alert, progress, skeleton, empty-state, badge, avatar, table,
+   stat, price, timeline, accordion, kbd, card, data-table, chart,
+   popover, hover-card, password/phone/iban/national-id inputs,
+   search-input, tags-input, multi-select, segmented-control,
+   separator, spinner, collapsible, scroll-area, copy-button,
+   drawer, tree-view, sortable-list, color-picker, qr-code,
+   and more — all driven by the Graphite tokens in style.css.
+   ============================================================ */
+
+/* ---------- Button ---------- */
+.vf-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem; white-space: nowrap; font-weight: 600;
+    border: var(--line) solid var(--border) !important;
+    border-radius: var(--shape-control) !important;
+    padding: 0.5rem 1rem; min-height: 2.5rem; font-size: 0.8125rem;
+    /* رنگ از کلاسهای موجود حفظ میشود؛ اینجا فقط شکل و حرکت است */
+    transition: background-color var(--motion) var(--motion-ease),
+                border-color var(--motion) var(--motion-ease),
+                transform var(--motion) var(--motion-ease),
+                opacity var(--motion) var(--motion-ease) !important;
+    cursor: pointer;
+}
+.vf-btn:active { transform: var(--press); }
+.vf-btn:disabled { opacity: .5; pointer-events: none; }
+.vf-btn-sm { min-height: 2rem; padding: 0.3rem 0.7rem; font-size: 0.75rem; }
+.vf-btn-lg { min-height: 3rem; padding: 0.7rem 1.5rem; font-size: 0.9375rem; }
+.vf-btn-icon { width: 2.5rem; padding: 0; }
+.vf-btn-primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary) !important; }
+.vf-btn-primary:hover { opacity: .85; }
+.vf-btn-secondary { background: var(--secondary); border-color: var(--border) !important; }
+.vf-btn-outline { background: transparent; border-color: var(--input) !important; }
+.vf-btn-outline:hover { background: var(--accent); }
+.vf-btn-ghost { background: transparent; border-color: transparent !important; }
+.vf-btn-ghost:hover { background: var(--accent); }
+.vf-btn-brand { background: var(--brand); color: var(--brand-foreground); border-color: var(--brand) !important; }
+.vf-btn-danger { background: var(--destructive); color: white; border-color: var(--destructive) !important; }
+.vf-btn-success { background: var(--success); color: #052e16; border-color: var(--success) !important; }
+
+/* ---------- Inputs: input / textarea / select / search / password / phone / iban / otp / number / amount / price / postal / national-id / card-number / plate ---------- */
+.vf-input, .vf-textarea, .vf-select, .vf-search-input, .vf-password-input,
+.vf-phone-input, .vf-iban-input, .vf-otp-field, .vf-number-field,
+.vf-amount-input, .vf-price, .vf-postal-code-input, .vf-national-id-input,
+.vf-card-number-input, .vf-plate-input, .vf-prompt-input, .vf-bill-input,
+.vf-legal-id-input, .vf-address-picker, .vf-date-picker, .vf-time-picker,
+.vf-date-range-picker, .vf-wheel-date-picker, .vf-birthday-picker,
+.vf-combobox, .vf-combobox-async, .vf-tags-input, .vf-mention-input {
+    width: 100%; min-width: 0; min-height: 2.5rem;
+    border: var(--line) solid var(--input) !important;
+    border-radius: var(--shape-field) !important;
+    background: var(--field) !important; color: var(--foreground);
+    padding: 0.45rem 0.75rem; font-size: 0.8125rem;
+    transition: border-color var(--motion) var(--motion-ease), box-shadow var(--motion) var(--motion-ease);
+}
+.vf-textarea { min-height: 5rem; padding-block: 0.6rem; resize: vertical; }
+.vf-select { appearance: none; background-image: none; cursor: pointer; }
+.vf-input:focus, .vf-textarea:focus, .vf-select:focus, .vf-search-input:focus,
+.vf-combobox:focus, .vf-password-input:focus, .vf-tags-input:focus {
+    outline: none; border-color: transparent !important; box-shadow: 0 0 0 2px var(--ring);
+}
+.vf-input[aria-invalid='true'], .vf-input-error { border-color: var(--destructive) !important; }
+.vf-field-label { display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--foreground); }
+.vf-field-hint { font-size: 0.6875rem; color: var(--muted-foreground); margin-top: 0.3rem; }
+.vf-field-error { font-size: 0.75rem; color: var(--destructive); margin-top: 0.3rem; }
+.vf-input-ltr { direction: ltr; text-align: left; font-family: monospace; }
+
+/* ---------- Checkbox / radio / switch / toggle ---------- */
+.vf-checkbox, .vf-radio { width: 1.15rem; height: 1.15rem; accent-color: var(--brand); cursor: pointer; }
+.vf-checkbox-group, .vf-radio-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.vf-switch, .vf-toggle {
+    position: relative; display: inline-block; width: 2.5rem; height: 1.4rem;
+    border-radius: 999px; background: var(--input); border: var(--line) solid var(--border); cursor: pointer;
+    transition: background var(--motion) var(--motion-ease);
+}
+.vf-switch::after, .vf-toggle::after {
+    content: ''; position: absolute; inset-inline-start: 2px; top: 2px;
+    width: 1rem; height: 1rem; border-radius: 999px; background: var(--foreground);
+    transition: transform var(--motion) var(--motion-ease);
+}
+.vf-switch[aria-checked='true'], .vf-switch.is-on, .vf-toggle.is-on { background: var(--brand); }
+.vf-switch[aria-checked='true']::after, .vf-switch.is-on::after, .vf-toggle.is-on::after { transform: translateX(1.1rem); }
+
+/* ---------- Slider / range / rating ---------- */
+.vf-slider, .vf-range-slider { width: 100%; accent-color: var(--brand); height: 0.4rem; }
+.vf-rating { display: inline-flex; gap: 0.15rem; color: var(--warning); cursor: pointer; font-size: 1.1rem; }
+
+/* ---------- File upload ---------- */
+.vf-file-upload {
+    border: 1px dashed var(--input); border-radius: var(--shape-field);
+    padding: 1rem; text-align: center; color: var(--muted-foreground);
+    background: var(--field); cursor: pointer; transition: border-color var(--motion) var(--motion-ease);
+}
+.vf-file-upload:hover { border-color: var(--brand); color: var(--foreground); }
+
+/* ---------- Calendar / date picker / wheel / countdown ---------- */
+.vf-calendar, .vf-date-range-picker, .vf-wheel-date-picker {
+    border: var(--line) solid var(--border); border-radius: var(--shape-surface);
+    background: var(--popover); padding: 0.75rem; min-width: 14rem;
+}
+.vf-calendar-day { width: 2rem; height: 2rem; border-radius: var(--shape-control); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; }
+.vf-calendar-day:hover { background: var(--accent); }
+.vf-calendar-day[aria-selected='true'] { background: var(--brand); color: var(--brand-foreground); }
+.vf-countdown { font-variant-numeric: tabular-nums; font-family: monospace; }
+
+/* ---------- Command / dialog / sheet / drawer / dropdown / popover / hover-card / context-menu / menubar / navigation-menu ---------- */
+.vf-command, .vf-popover, .vf-dropdown-menu, .vf-hover-card, .vf-context-menu,
+.vf-sheet, .vf-drawer, .vf-menubar, .vf-navigation-menu, .vf-bottom-nav {
+    border: var(--line) solid var(--border); border-radius: var(--shape-overlay, 0.9rem);
+    background: var(--popover); box-shadow: 0 20px 50px -20px oklch(0 0 0 / 80%);
+    padding: 0.5rem; z-index: 100;
+}
+.vf-dialog, .vf-alert-dialog {
+    border: var(--line) solid var(--border); border-radius: var(--shape-surface);
+    background: var(--popover); padding: 1.25rem; max-width: 28rem; width: 90%;
+    box-shadow: 0 20px 50px -20px oklch(0 0 0 / 80%);
+}
+.vf-dialog-overlay { position: fixed; inset: 0; background: oklch(0 0 0 / 70%); display: grid; place-items: center; z-index: 200; }
+.vf-menu-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.65rem; border-radius: var(--shape-control); font-size: 0.8125rem; cursor: pointer; }
+.vf-menu-item:hover { background: var(--accent); }
+.vf-menu-separator { height: 1px; background: var(--border); margin: 0.35rem 0; }
+
+/* ---------- Tooltip ---------- */
+.vf-tooltip { position: relative; }
+.vf-tooltip::after {
+    content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); inset-inline-start: 50%;
+    transform: translateX(50%); white-space: nowrap; pointer-events: none; opacity: 0;
+    background: var(--popover); color: var(--foreground); border: var(--line) solid var(--border);
+    border-radius: var(--shape-control); padding: 0.25rem 0.5rem; font-size: 0.6875rem;
+    transition: opacity var(--motion) var(--motion-ease); z-index: 150;
+}
+.vf-tooltip:hover::after { opacity: 1; }
+
+/* ---------- Tabs / segmented control / stepper / breadcrumb / pagination ---------- */
+.vf-tabs, .vf-segmented-control { display: inline-flex; gap: 0.25rem; background: var(--muted); border-radius: var(--shape-control); padding: 0.25rem; }
+.vf-tab, .vf-segment { padding: 0.35rem 0.75rem; border-radius: calc(var(--shape-control) - 2px); font-size: 0.75rem; cursor: pointer; color: var(--muted-foreground); }
+.vf-tab[aria-selected='true'], .vf-segment.is-active { background: var(--primary); color: var(--primary-foreground); }
+.vf-stepper { display: flex; align-items: center; gap: 0.5rem; }
+.vf-step { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--muted-foreground); }
+.vf-step.is-active { color: var(--brand); }
+.vf-breadcrumb { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--muted-foreground); }
+.vf-pagination { display: inline-flex; gap: 0.25rem; align-items: center; }
+.vf-page { min-width: 2rem; height: 2rem; border-radius: var(--shape-control); display: inline-grid; place-items: center; font-size: 0.75rem; cursor: pointer; }
+.vf-page[aria-current='page'] { background: var(--primary); color: var(--primary-foreground); }
+
+/* ---------- Alert / toast / badge / stat / empty-state / skeleton / spinner ---------- */
+.vf-alert, .vf-toast {
+    border: var(--line) solid var(--border); border-radius: var(--shape-field);
+    background: var(--card); padding: 0.75rem 1rem; font-size: 0.8125rem;
+}
+.vf-alert-success { border-color: var(--success); color: var(--success); }
+.vf-alert-warning { border-color: var(--warning); color: var(--warning); }
+.vf-alert-danger { border-color: var(--destructive); color: var(--destructive); }
+.vf-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.55rem; border-radius: 999px; border: var(--line) solid var(--border); font-size: 0.6875rem; font-weight: 600; background: var(--muted); }
+.vf-badge-success { background: color-mix(in oklch, var(--success) 20%, transparent); color: var(--success); border-color: var(--success); }
+.vf-badge-warning { background: color-mix(in oklch, var(--warning) 20%, transparent); color: var(--warning); border-color: var(--warning); }
+.vf-badge-danger { background: color-mix(in oklch, var(--destructive) 20%, transparent); color: var(--destructive); border-color: var(--destructive); }
+.vf-stat { border: var(--line) solid var(--border); border-radius: var(--shape-surface); background: var(--card); padding: 1rem; text-align: center; }
+.vf-stat-value { font-size: 1.4rem; font-weight: 700; }
+.vf-stat-label { font-size: 0.7rem; color: var(--muted-foreground); }
+.vf-empty-state { display: grid; place-items: center; gap: 0.5rem; padding: 2.5rem 1rem; color: var(--muted-foreground); text-align: center; }
+.vf-skeleton { background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%); background-size: 200% 100%; border-radius: var(--shape-control); animation: vf-shimmer 1.4s infinite; }
+@keyframes vf-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.vf-spinner { width: 1.1rem; height: 1.1rem; border: 2px solid var(--input); border-top-color: var(--brand); border-radius: 999px; animation: vf-spin .7s linear infinite; display: inline-block; }
+@keyframes vf-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Progress / avatar / kbd / separator ---------- */
+.vf-progress { width: 100%; height: 0.5rem; border-radius: 999px; background: var(--muted); overflow: hidden; border: var(--line) solid var(--border); }
+.vf-progress-bar { height: 100%; background: var(--brand); border-radius: 999px; transition: width var(--motion) var(--motion-ease); }
+.vf-avatar { width: 2.25rem; height: 2.25rem; border-radius: 999px; display: inline-grid; place-items: center; background: var(--secondary); font-size: 0.75rem; font-weight: 700; }
+.vf-kbd { font-family: monospace; font-size: 0.6875rem; padding: 0.1rem 0.35rem; border: var(--line) solid var(--input); border-radius: 4px; background: var(--muted); }
+.vf-separator { height: 1px; background: var(--border); margin: 0.75rem 0; }
+
+/* ---------- Card / table / data-table / chart / timeline ---------- */
+.vf-card { border: var(--line) solid var(--border); border-radius: var(--shape-surface); background: var(--card); box-shadow: inset 0 1px 0 oklch(1 0 0 / 6%); }
+.vf-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.vf-table th { text-align: right; font-weight: 600; color: var(--muted-foreground); border-bottom: var(--line) solid var(--border); padding: 0.6rem 0.75rem; white-space: nowrap; }
+.vf-table td { border-bottom: var(--line) solid var(--border); padding: 0.55rem 0.75rem; }
+.vf-table tbody tr:hover { background: var(--accent); }
+.vf-chart { width: 100%; min-height: 10rem; border: var(--line) solid var(--border); border-radius: var(--shape-surface); background: var(--card); padding: 0.75rem; }
+.vf-timeline { display: flex; flex-direction: column; gap: 0.6rem; border-inline-start: 2px solid var(--border); padding-inline-start: 0.9rem; }
+.vf-timeline-item { position: relative; font-size: 0.75rem; }
+.vf-timeline-item::before { content: ''; position: absolute; inset-inline-start: -1.15rem; top: 0.35rem; width: 0.5rem; height: 0.5rem; border-radius: 999px; background: var(--brand); }
+
+/* ---------- Accordion / collapsible / tree / sortable / resizable / scroll-area ---------- */
+.vf-accordion, .vf-collapsible { border: var(--line) solid var(--border); border-radius: var(--shape-field); background: var(--card); }
+.vf-accordion-trigger { width: 100%; text-align: right; padding: 0.7rem 0.9rem; font-weight: 600; cursor: pointer; }
+.vf-accordion-content { padding: 0 0.9rem 0.9rem; font-size: 0.8125rem; color: var(--muted-foreground); }
+.vf-tree-view, .vf-sortable-list { display: flex; flex-direction: column; gap: 0.2rem; }
+.vf-tree-node, .vf-sortable-item { padding: 0.35rem 0.6rem; border-radius: var(--shape-control); font-size: 0.8125rem; cursor: grab; }
+.vf-tree-node:hover, .vf-sortable-item:hover { background: var(--accent); }
+.vf-resizable { resize: both; overflow: auto; border: var(--line) solid var(--border); border-radius: var(--shape-field); }
+.vf-scroll-area { overflow: auto; scrollbar-width: thin; scrollbar-color: var(--input) transparent; }
+
+/* ---------- Color picker / QR / image cropper / signature ---------- */
+.vf-color-picker { width: 2.5rem; height: 2.5rem; padding: 0; border: var(--line) solid var(--input); border-radius: var(--shape-control); background: var(--field); cursor: pointer; }
+.vf-qr-code { background: white; padding: 0.75rem; border-radius: var(--shape-control); display: inline-block; }
+.vf-image-cropper, .vf-signature-pad { border: 1px dashed var(--input); border-radius: var(--shape-field); background: var(--field); }
+
+/* ---------- Copy button / notification inbox / product tour / chat / markdown / code ---------- */
+.vf-copy-button { font-family: monospace; }
+.vf-notification-inbox { max-height: 22rem; overflow: auto; }
+.vf-notification-item { padding: 0.6rem 0.75rem; border-bottom: var(--line) solid var(--border); font-size: 0.75rem; }
+.vf-product-tour { border: var(--line) solid var(--brand); border-radius: var(--shape-surface); background: var(--popover); padding: 1rem; }
+.vf-chat-message { max-width: 80%; padding: 0.6rem 0.8rem; border-radius: var(--shape-surface); background: var(--muted); font-size: 0.8125rem; }
+.vf-chat-message.is-mine { background: var(--brand); color: var(--brand-foreground); margin-inline-start: auto; }
+.vf-markdown { line-height: 1.8; font-size: 0.875rem; }
+.vf-code-block, .vf-tool-call { font-family: monospace; font-size: 0.75rem; background: var(--muted); border: var(--line) solid var(--border); border-radius: var(--shape-field); padding: 0.75rem; overflow: auto; direction: ltr; text-align: left; }
+.vf-sources { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.vf-model-picker { min-width: 10rem; }
+
+/* ---------- Form / shipping / payment / methods / calculator / toggle group ---------- */
+.vf-form { display: flex; flex-direction: column; gap: 1rem; }
+.vf-shipping-methods, .vf-payment-methods { display: grid; gap: 0.5rem; }
+.vf-method { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem; border: var(--line) solid var(--border); border-radius: var(--shape-field); cursor: pointer; }
+.vf-method:hover { border-color: var(--brand); }
+.vf-installment-calculator { border: var(--line) solid var(--border); border-radius: var(--shape-surface); padding: 1rem; }
+.vf-currency-toggle { display: inline-flex; gap: 0.25rem; }
+.vf-relative-time { font-size: 0.7rem; color: var(--muted-foreground); }
+
+/* ---------- Course / lesson / quiz / hotspot / function plot / video ---------- */
+.vf-course-outline, .vf-lesson-note { border: var(--line) solid var(--border); border-radius: var(--shape-field); padding: 0.75rem; font-size: 0.8125rem; }
+.vf-quiz { border: var(--line) solid var(--border); border-radius: var(--shape-surface); padding: 1rem; }
+.vf-hotspot-figure, .vf-function-plot { position: relative; border: var(--line) solid var(--border); border-radius: var(--shape-field); background: var(--card); }
+.vf-video-player { width: 100%; border-radius: var(--shape-field); background: black; }
+
+/* Compact density helper */
+.vf-compact { --spacing: 0.2rem; }
+.vf-compact .vf-btn, .vf-compact .vf-input { min-height: 2rem; padding-block: 0.25rem; }
