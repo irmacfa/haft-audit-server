@@ -67,7 +67,8 @@
 
         /* ساختار کلی */
         root.querySelectorAll('header').forEach(h => h.classList.add('ds-topbar'));
-        root.querySelectorAll('header > div:first-child > div:first-child').forEach(m => m.classList.add('ds-brand-mark'));
+        // فقط لوگوی نارنجی، نه کل کانتینر عنوان
+        root.querySelectorAll('header .bg-orange-600').forEach(m => m.classList.add('ds-brand-mark'));
         root.querySelectorAll('#serverStatusBadge').forEach(b => b.classList.add('ds-status-pill'));
 
         /* کارتها — فقط ظاهر، بدون تغییر فاصلهگذاری قبلی */
