@@ -70,20 +70,13 @@
         root.querySelectorAll('header > div:first-child > div:first-child').forEach(m => m.classList.add('ds-brand-mark'));
         root.querySelectorAll('#serverStatusBadge').forEach(b => b.classList.add('ds-status-pill'));
 
-        /* کارتها */
-        root.querySelectorAll('[class*="rounded-3xl"]').forEach(c => {
-            c.classList.add('ds-card');
-            if (c.querySelector('h2') && c.querySelector('input')) c.classList.add('ds-step');
-        });
-        root.querySelectorAll('.ds-step').forEach(c => {
-            if (!c.querySelector('.ds-step-num')) {
-                const old = [...c.querySelectorAll('span')].find(s => /^[۱۲۳۴]$/.test(s.textContent.trim()));
-                const n = document.createElement('span');
-                n.className = 'ds-step-num';
-                n.textContent = old ? old.textContent.trim() : '•';
-                if (old) old.style.display = 'none';
-                c.prepend(n);
-            }
+        /* کارتها — فقط ظاهر، بدون تغییر فاصلهگذاری قبلی */
+        root.querySelectorAll('[class*="rounded-3xl"]').forEach(c => c.classList.add('ds-card'));
+
+        /* سه کارت مرحله در پنل انبارگردان */
+        ['storeCodeInput', 'auditorNameInput', 'globalAssetSearchInput'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.closest('[class*="rounded-3xl"]')?.classList.add('ds-step');
         });
 
         /* آمار */
