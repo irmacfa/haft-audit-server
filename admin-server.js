@@ -19,6 +19,12 @@ app.use(express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
 
+// تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
+app.post('/api/reload', (req, res) => {
+    core.invalidateCache();
+    res.json({ success: true });
+});
+
 // وضعیت سلامت سرور管理者
 app.get('/api/health', (req, res) => {
     res.json({

@@ -20,11 +20,13 @@ if (!fs.existsSync(DB_PATH)) {
 let _workbook = null;
 let _stores = null;
 let _equipment = null;
+let _settings = null;
 
 function invalidateCache() {
     _workbook = null;
     _stores = null;
     _equipment = null;
+    _settings = null;
     console.log('[Cache] Cleared.');
 }
 
@@ -58,7 +60,9 @@ const DEFAULT_SETTINGS = {
 };
 
 function getSettings() {
-    return readDb().settings || {};
+    if (_settings) return _settings;
+    _settings = readDb().settings || {};
+    return _settings;
 }
 
 function getEffectiveSettings() {
@@ -95,6 +99,7 @@ function saveSettings(settings) {
     }
     writeDb(db);
     invalidateCache();
+    _settings = db.settings;
     return getEffectiveSettings();
 }
 
@@ -179,7 +184,8 @@ function getEquipmentData() {
             const fields = {};
             settings.columns.forEach(c => { fields[c] = allValues[c] !== undefined ? allValues[c] : ''; });
 
-            const uniqueKey = `${plant}_${allValues['شماره اموال تجهیز'] || ''}_${allValues['شماره سریال کارت دارایی'] || ''}_${i}`;
+            // کلید پایدار بدون شماره ردیف تا ردیفهای تکراری واقعاً حذف شوند
+            const uniqueKey = `${plant}_${allValues['شماره اموال تجهیز'] || ''}_${allValues['شماره سریال کارت دارایی'] || ''}_${allValues['شماره تجهیز'] || ''}`;
             if (seen.has(uniqueKey)) continue;
             seen.add(uniqueKey);
 

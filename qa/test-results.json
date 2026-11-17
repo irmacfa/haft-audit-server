@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-17T17:24:43.744Z",
+  "total": 8,
+  "passed": 8,
+  "failed": 0,
+  "screenshotEvidence": "NOT AVAILABLE (browser screenshot requires visible desktop window)",
+  "results": [
+    {
+      "name": "health:user-panel",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "ms": 19,
+        "service": "user-panel",
+        "regions": [
+          "تهران",
+          "گیلان",
+          "مازندران",
+          "همدان",
+          "کرمانشاه",
+          "مشهد",
+          "کرمان"
+        ]
+      }
+    },
+    {
+      "name": "health:admin-panel",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "ms": 2,
+        "service": "admin-panel",
+        "regions": [
+          "تهران",
+          "گیلان",
+          "مازندران",
+          "همدان",
+          "کرمانشاه",
+          "مشهد",
+          "کرمان"
+        ]
+      }
+    },
+    {
+      "name": "equipment: deduplicated",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "ms": 40,
+        "total": 15524,
+        "duplicates": 0
+      }
+    },
+    {
+      "name": "monitoring: stores and regions",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "ms": 3,
+        "stores": 714,
+        "byRegion": {
+          "تهران": 342,
+          "گیلان": 100,
+          "مازندران": 42,
+          "همدان": 68,
+          "کرمانشاه": 48,
+          "مشهد": 73,
+          "کرمان": 33,
+          "سایر": 8
+        }
+      }
+    },
+    {
+      "name": "export: xlsx bytes",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "ms": 34,
+        "bytes": 272911,
+        "contentType": "xlsx"
+      }
+    },
+    {
+      "name": "page:user: font+width",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "linksStyle": true,
+        "hasMaxWidth": false,
+        "globalFontCss": true
+      }
+    },
+    {
+      "name": "page:monitoring: font+width",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "linksStyle": true,
+        "hasMaxWidth": false,
+        "globalFontCss": true
+      }
+    },
+    {
+      "name": "page:admin: font+width",
+      "status": "PASS",
+      "evidence": {
+        "status": 200,
+        "linksStyle": true,
+        "hasMaxWidth": false,
+        "globalFontCss": true
+      }
+    }
+  ]
+}

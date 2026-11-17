@@ -188,8 +188,12 @@ app.post('/api/audit/finalize', async (req, res) => {
             `,
             attachments: [{ filename: fileName, path: path.join(core.REPORTS_DIR, fileName) }]
         };
+        let mailSent = true;
         try { await transporter.sendMail(mailOptions); }
-        catch (mailErr) { console.error('Mail Error:', mailErr.message); }
+        catch (mailErr) {
+            mailSent = false;
+            console.error('Mail Error:', mailErr.message);
+        }
 
         core.sendTelegramNotification(
             `✅ <b>تکمیل انبارگردانی</b>\nفروشگاه: ${plant} (${storeName})\n` +
@@ -198,7 +202,10 @@ app.post('/api/audit/finalize', async (req, res) => {
         );
         res.json({
             success: true,
-            message: `انبارگردانی فروشگاه ${plant} (${storeName}) قفل و گزارش ایمیل شد.`,
+            message: mailSent
+                ? `انبارگردانی فروشگاه ${plant} (${storeName}) قفل و گزارش ایمیل شد.`
+                : `انبارگردانی فروشگاه ${plant} (${storeName}) قفل و فایل گزارش ذخیره شد، اما ارسال ایمیل ناموفق بود.`,
+            mailSent,
             auditDate: currentDate,
             downloadLink: `/reports/${fileName}`
         });

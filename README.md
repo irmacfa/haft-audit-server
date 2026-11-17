@@ -150,6 +150,16 @@ db/audit_db.json     # دیتابیس ذخیره وضعیتها (به صورت �
 | GET | `/api/monitoring/status` | وضعیت تمام فروشگاهها (با آمار تجهیزات) |
 | GET | `/api/monitoring/export` | خروجی اکسل وضعیت تمام فروشگاهها |
 
+## کنترل واقعیت و کیفیت
+
+اسکیلهای `Reality Checker` و `Evidence Collector` از مخزن [agency-agents](https://github.com/msitarzewski/agency-agents) در `.opencode/agents/` نصب شدهاند.
+
+```bash
+node qa/reality-check.js      # اجرای تستها → qa/test-results.json
+```
+
+گزارش صادقانه وضعیت: `qa/REALITY-CHECK.md` (وضعیت فعلی: **NEEDS WORK**).
+
 ## لایسنس
 
 ISC
