@@ -8,7 +8,43 @@
     font-display: swap;
 }
 
-/* فونت Iran Sans X در تمام عناصر تمام صفحات */
+/* ============================================================
+   VibeFarsi — Graphite design tokens (اقتباس از رجیستری رسمی)
+   ============================================================ */
+:root {
+    color-scheme: dark;
+
+    --background: oklch(0.115 0.002 285);
+    --foreground: oklch(0.975 0 0);
+    --card: oklch(0.14 0.002 285);
+    --popover: oklch(0.16 0.002 285);
+    --primary: oklch(0.975 0 0);
+    --primary-foreground: oklch(0.13 0 0);
+    --secondary: oklch(0.2 0.002 285);
+    --muted: oklch(0.175 0.002 285);
+    --muted-foreground: oklch(0.63 0.004 285);
+    --accent: oklch(0.2 0.002 285);
+    --border: oklch(1 0 0 / 8%);
+    --input: oklch(1 0 0 / 11%);
+    --ring: oklch(0.7 0 0);
+    --brand: oklch(0.8 0.165 65);
+    --brand-foreground: oklch(0.22 0.06 60);
+    --destructive: oklch(0.65 0.2 25);
+    --success: oklch(0.75 0.16 160);
+    --warning: oklch(0.82 0.16 80);
+
+    --radius: 0.625rem;
+    --shape-control: calc(var(--radius) - 2px);
+    --shape-field: calc(var(--radius) - 2px);
+    --shape-surface: calc(var(--radius) + 12px);
+    --line: 1px;
+    --field: color-mix(in oklch, var(--background) 60%, transparent);
+    --motion: 200ms;
+    --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+    --press: scale(0.98);
+}
+
+/* فونت IRANSansX در تمام عناصر تمام صفحات */
 html, body, *, *::before, *::after {
     font-family: 'IRANSansX', Tahoma, Arial, sans-serif !important;
 }
@@ -18,8 +54,104 @@ body {
     text-align: right;
     margin: 0;
     padding: 0;
+    background: var(--background);
+    color: var(--foreground);
 }
 
-input, button, select, textarea, table, th, td, code, kbd, pre {
-    font-family: 'IRANSansX', Tahoma, Arial, sans-serif !important;
+/* رنگهای خنثای Graphite جایگزین آبیِ Tailwind میشود */
+body.bg-slate-900 { background: var(--background) !important; }
+[class~='bg-slate-800'] { background: var(--card) !important; }
+[class~='bg-slate-900']:not(body) { background: var(--muted) !important; }
+
+/* ---------- دکمهها (VibeFarsi button) ---------- */
+button,
+.filter-btn,
+a.vf-btn {
+    border: var(--line) solid var(--border) !important;
+    border-radius: var(--shape-control) !important;
+    font-weight: 600;
+    transition: background-color var(--motion) var(--motion-ease),
+                border-color var(--motion) var(--motion-ease),
+                transform var(--motion) var(--motion-ease),
+                box-shadow var(--motion) var(--motion-ease) !important;
+    cursor: pointer;
+}
+button:active,
+.filter-btn:active,
+a.vf-btn:active { transform: var(--press); }
+
+button:disabled { opacity: 0.5; pointer-events: none; }
+
+/* دکمه اصلی سفید (Graphite) و تاکید کهربایی */
+.vf-primary {
+    background: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+    border-color: var(--primary) !important;
+}
+.vf-primary:hover { opacity: 0.85; }
+
+.vf-brand {
+    background: var(--brand) !important;
+    color: var(--brand-foreground) !important;
+    border-color: var(--brand) !important;
+}
+
+/* ---------- ورودیها (VibeFarsi input) ---------- */
+input:not([type='checkbox']):not([type='radio']):not([type='file']),
+select,
+textarea {
+    min-height: 40px;
+    border: var(--line) solid var(--input);
+    border-radius: var(--shape-field);
+    background: var(--field);
+    color: var(--foreground);
+    padding: 0 12px;
+    transition: border-color var(--motion) var(--motion-ease),
+                box-shadow var(--motion) var(--motion-ease);
+}
+input::placeholder,
+textarea::placeholder { color: var(--muted-foreground); opacity: 0.75; }
+
+input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: 0 0 0 2px var(--ring);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+/* جلوگیری از زوم خودکار Safari در iOS */
+@supports (-webkit-touch-callout: none) {
+    input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    select, textarea { font-size: 16px; }
+}
+
+/* ---------- سطوح: خط مویی، بدون سایه بیرونی ---------- */
+[class*='rounded-3xl'] {
+    border-radius: var(--shape-surface) !important;
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 6%) !important;
+}
+.shadow-xl, .shadow-2xl, .shadow-lg, .shadow {
+    box-shadow: none !important;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+    accent-color: var(--brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }

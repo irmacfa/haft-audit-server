@@ -150,6 +150,16 @@ db/audit_db.json     # دیتابیس ذخیره وضعیتها (به صورت �
 | GET | `/api/monitoring/status` | وضعیت تمام فروشگاهها (با آمار تجهیزات) |
 | GET | `/api/monitoring/export` | خروجی اکسل وضعیت تمام فروشگاهها |
 
+## طراحی رابط (VibeFarsi / Graphite)
+
+پکیج `vibefarsi` بهعنوان devDependency نصب شده است. این CLI کامپوننتهای **React/TSX** تولید میکند (`components/ui/button.tsx` و ...) و پروژه ما HTML ساده است، بنابراین دستورات `init` و `add` بهصورت پیشفرض اجرا نشدند (با `--dry-run` بررسی شدند). به جای آن، **طراحی Graphite** از رجیستری رسمی (`https://vibefarsi.ir/r/themes/graphite.json`) در `public/style.css` پیادهسازی شد:
+
+- رنگ خنثای نزدیک به سیاه، خطهای مویی ۱پیکسلی، هیچ سایه بیرونی
+- دکمهها: گوشه ۸پیکسل، فشار `scale(0.98)`، حرکت ۲۰۰ms، دکمه اصلی سفید
+- ورودیها: گوشه ۸پیکسل، حاشیه نازک، حلقه فوکوس، حداقل ۱۶px در iOS
+- کارتها: گوشه ۲۲پیکسل + هایلایت داخلی ۱پیکسلی
+- فونت پروژه **IRANSansX** باقی ماند (VibeFarsi پیشفرض Vazirmatn است)
+
 ## کنترل واقعیت و کیفیت
 
 اسکیلهای `Reality Checker` و `Evidence Collector` از مخزن [agency-agents](https://github.com/msitarzewski/agency-agents) در `.opencode/agents/` نصب شدهاند.
