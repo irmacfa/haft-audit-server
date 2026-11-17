@@ -1,0 +1,236 @@
+/* ============================================================
+   Haft Audit — Design System layer (UI Designer / VibeFarsi)
+   سطح طراحی نهایی بر روی Graphite tokens
+   ============================================================ */
+
+:root {
+    /* فاصلهگذاری ۸ نقطهای */
+    --ds-1: 0.25rem;
+    --ds-2: 0.5rem;
+    --ds-3: 0.75rem;
+    --ds-4: 1rem;
+    --ds-6: 1.5rem;
+    --ds-8: 2rem;
+    --ds-12: 3rem;
+
+    /* تایپوگرافی */
+    --ds-text-xs: 0.6875rem;
+    --ds-text-sm: 0.8125rem;
+    --ds-text-base: 0.9375rem;
+    --ds-text-lg: 1.125rem;
+    --ds-text-xl: 1.5rem;
+    --ds-text-2xl: 2rem;
+
+    /* رنگها از Graphite */
+    --ds-surface: var(--card);
+    --ds-surface-2: var(--muted);
+    --ds-line: var(--border);
+    --ds-ink: var(--foreground);
+    --ds-ink-muted: var(--muted-foreground);
+    --ds-accent: var(--brand);
+    --ds-ok: var(--success);
+    --ds-warn: var(--warning);
+    --ds-bad: var(--destructive);
+}
+
+/* ---------- نوار بالا ---------- */
+header.ds-topbar {
+    padding-inline: var(--ds-6);
+    padding-block: var(--ds-3);
+    background: color-mix(in oklch, var(--background) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-bottom: var(--line) solid var(--border);
+}
+header.ds-topbar h1 {
+    font-size: var(--ds-text-lg);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+header.ds-topbar p { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); }
+
+.ds-brand-mark {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
+    background: var(--ds-accent);
+    color: var(--brand-foreground);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 25%);
+}
+.ds-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--ds-text-xs);
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: var(--line) solid var(--border);
+    background: color-mix(in oklch, var(--ds-ok) 12%, transparent);
+    color: var(--ds-ok);
+}
+.ds-status-pill::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 999px; background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in oklch, currentColor 25%, transparent);
+}
+
+/* ---------- کارتها ---------- */
+.ds-card {
+    border: var(--line) solid var(--border);
+    border-radius: var(--shape-surface);
+    background: var(--ds-surface);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 6%);
+    padding: var(--ds-6);
+    transition: border-color var(--motion) var(--motion-ease), transform var(--motion) var(--motion-ease);
+}
+.ds-card:hover { border-color: color-mix(in oklch, var(--ds-accent) 40%, var(--border)); }
+
+.ds-eyebrow {
+    font-size: var(--ds-text-xs);
+    color: var(--ds-accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    margin-bottom: var(--ds-2);
+}
+.ds-section-title { font-size: var(--ds-text-lg); font-weight: 700; }
+.ds-section-sub { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); margin-top: 2px; }
+
+/* ---------- کارتهای مرحله ---------- */
+.ds-step {
+    position: relative;
+    padding-inline-start: 3.6rem;
+    min-height: 5.5rem;
+}
+.ds-step-num {
+    position: absolute;
+    inset-inline-start: var(--ds-4);
+    top: var(--ds-4);
+    width: 2rem; height: 2rem;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: var(--ds-text-sm);
+    font-weight: 800;
+    background: var(--ds-surface-2);
+    color: var(--ds-ink);
+    border: var(--line) solid var(--border);
+}
+.ds-step h2 { font-size: var(--ds-text-base); font-weight: 700; }
+.ds-step p { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); margin-top: 2px; }
+
+/* ---------- آمار ---------- */
+.ds-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--ds-3) var(--ds-4);
+    border: var(--line) solid var(--border);
+    border-radius: 14px;
+    background: var(--ds-surface-2);
+    min-width: 5.5rem;
+}
+.ds-stat-label { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); }
+.ds-stat-value { font-size: var(--ds-text-xl); font-weight: 800; line-height: 1.1; }
+.ds-stat-value.ok { color: var(--ds-ok); }
+.ds-stat-value.warn { color: var(--ds-warn); }
+.ds-stat-value.bad { color: var(--ds-bad); }
+
+/* ---------- جدول ---------- */
+.ds-table-wrap { border-radius: var(--shape-surface); overflow: hidden; }
+table.vf-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--ds-surface-2);
+    backdrop-filter: blur(8px);
+}
+table.vf-table tbody tr { transition: background var(--motion) var(--motion-ease); }
+table.vf-table tbody tr:hover { background: color-mix(in oklch, var(--ds-accent) 8%, transparent); }
+table.vf-table td { vertical-align: middle; }
+.ds-code {
+    font-family: ui-monospace, monospace;
+    font-size: var(--ds-text-xs);
+    color: var(--ds-ink-muted);
+    direction: ltr;
+    text-align: right;
+}
+.ds-pill {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.15rem 0.5rem; border-radius: 999px;
+    font-size: var(--ds-text-xs); font-weight: 700;
+    border: var(--line) solid var(--border);
+}
+.ds-pill.ok { color: var(--ds-ok); border-color: color-mix(in oklch, var(--ds-ok) 40%, transparent); background: color-mix(in oklch, var(--ds-ok) 10%, transparent); }
+.ds-pill.warn { color: var(--ds-warn); border-color: color-mix(in oklch, var(--ds-warn) 40%, transparent); background: color-mix(in oklch, var(--ds-warn) 10%, transparent); }
+.ds-pill.bad { color: var(--ds-bad); border-color: color-mix(in oklch, var(--ds-bad) 40%, transparent); background: color-mix(in oklch, var(--ds-bad) 10%, transparent); }
+
+/* ---------- المانهای گرید ---------- */
+.ds-tile {
+    position: relative;
+    border-radius: 12px;
+    border: var(--line) solid var(--border);
+    background: var(--ds-surface);
+    overflow: hidden;
+    transition: transform var(--motion) var(--motion-ease), border-color var(--motion) var(--motion-ease);
+}
+.ds-tile::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 0; inset-inline-start: 0; inset-inline-end: 0;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.65;
+}
+.ds-tile:hover { transform: translateY(-3px); border-color: currentColor; }
+.ds-tile.ok { color: var(--ds-ok); background: color-mix(in oklch, var(--ds-ok) 10%, var(--ds-surface)); }
+.ds-tile.warn { color: var(--ds-warn); background: color-mix(in oklch, var(--ds-warn) 10%, var(--ds-surface)); }
+.ds-tile.bad { color: var(--ds-bad); background: color-mix(in oklch, var(--ds-bad) 8%, var(--ds-surface)); }
+.ds-tile .ds-tile-name { color: var(--ds-ink); font-weight: 800; }
+.ds-tile .ds-tile-sub { color: var(--ds-ink-muted); }
+
+/* ---------- آیکون SVG ---------- */
+.ds-icon { width: 1rem; height: 1rem; flex: 0 0 auto; stroke-width: 1.8; }
+
+/* ---------- نوتیفیکیشن Toast ---------- */
+.ds-toast-host {
+    position: fixed;
+    inset-block-end: var(--ds-6);
+    inset-inline-end: var(--ds-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-2);
+    z-index: 500;
+    max-width: min(24rem, 90vw);
+}
+.ds-toast {
+    display: flex; align-items: flex-start; gap: var(--ds-2);
+    border: var(--line) solid var(--border);
+    border-radius: 14px;
+    background: var(--popover);
+    color: var(--ds-ink);
+    padding: var(--ds-3) var(--ds-4);
+    font-size: var(--ds-text-sm);
+    line-height: 1.6;
+    box-shadow: 0 20px 50px -20px oklch(0 0 0 / 80%);
+    animation: ds-toast-in 220ms var(--motion-ease);
+}
+.ds-toast.ok { border-color: var(--ds-ok); }
+.ds-toast.warn { border-color: var(--ds-warn); }
+.ds-toast.bad { border-color: var(--ds-bad); }
+@keyframes ds-toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- بار پیشرفت ---------- */
+.ds-progress { height: 6px; border-radius: 999px; background: var(--ds-surface-2); overflow: hidden; border: var(--line) solid var(--border); }
+.ds-progress > div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--ds-accent), color-mix(in oklch, var(--ds-accent) 60%, var(--ds-ok))); transition: width var(--motion) var(--motion-ease); }
+
+/* ---------- واکنشگرا ---------- */
+@media (max-width: 640px) {
+    header.ds-topbar { padding-inline: var(--ds-4); }
+    header.ds-topbar h1 { font-size: var(--ds-text-base); }
+    .ds-stat { min-width: 4.5rem; padding: var(--ds-2) var(--ds-3); }
+    .ds-stat-value { font-size: var(--ds-text-lg); }
+}

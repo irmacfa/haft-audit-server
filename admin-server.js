@@ -20,6 +20,7 @@ app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
 app.use('/vibefarsi.css', express.static(path.join(__dirname, 'public', 'vibefarsi.css')));
 app.use('/vf-apply.js', express.static(path.join(__dirname, 'public', 'vf-apply.js')));
+app.use('/design.css', express.static(path.join(__dirname, 'public', 'design.css')));
 
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
 app.post('/api/reload', (req, res) => {
