@@ -28,7 +28,7 @@ app.post('/api/reload', (req, res) => {
     res.json({ success: true });
 });
 
-// وضعیت سلامت سرور管理者
+// وضعیت سلامت سرورمدیریت
 app.get('/api/health', (req, res) => {
     res.json({
         ok: true,

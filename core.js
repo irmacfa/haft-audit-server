@@ -16,7 +16,7 @@ if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ audit_records: {}, plant_status: {}, settings: {} }));
 }
 
-// ===================== کش数据进行 =====================
+// ===================== کشداده‌ها =====================
 let _workbook = null;
 let _stores = null;
 let _equipment = null;
