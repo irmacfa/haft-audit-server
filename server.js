@@ -12,6 +12,27 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '50mb' }));
+
+// APIهای کش قبل از static تا پاسخ JSON تضمین شود
+app.get('/api/cache/status', (req, res) => {
+    res.json(core.getCacheStatus());
+});
+
+app.post('/api/cache/warmup', async (req, res) => {
+    try {
+        core.ensureMasterCache().catch(e => console.error('[Warmup]', e.message));
+        res.json({ started: true, ...core.getCacheStatus() });
+    } catch (e) {
+        res.status(500).json({ started: false, error: e.message, ...core.getCacheStatus() });
+    }
+});
+
+app.post('/api/reload', (req, res) => {
+    core.invalidateCache();
+    core.ensureMasterCache().catch(e => console.error('[Reload warmup]', e.message));
+    res.json({ success: true, ...core.getCacheStatus() });
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const transporter = nodemailer.createTransport({
@@ -33,22 +54,64 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// تجهیزات از فایل مادر (کش شده)
-app.get('/api/equipment', (req, res) => {
+// تجهیزات: فقط فروشگاه درخواستی برای جلوگیری از payload بزرگ
+app.get('/api/equipment', async (req, res) => {
     try {
         if (!require('fs').existsSync(core.getExcelPath())) {
             return res.status(404).json({ error: 'فایل مادر یافت نشد.' });
         }
-        res.json(core.getEquipmentData());
+        const plant = String(req.query.plant || '').trim();
+        if (!plant) {
+            return res.status(400).json({ error: 'پارامتر plant الزامی است.', code: 'PLANT_REQUIRED' });
+        }
+
+        const progress = core.getCacheProgress();
+        if (!progress.ready) {
+            core.ensureMasterCache().catch(e => console.error('[Equipment warmup]', e.message));
+            return res.status(202).json({ loading: true, message: 'فایل مادر در حال پردازش است...', progress: core.getCacheProgress() });
+        }
+
+        const equipment = core.getEquipmentData();
+        const data = equipment.data.filter(i => i.plant === plant);
+        res.json({ total: data.length, columns: equipment.columns, data, cache: core.getCacheProgress() });
     } catch (e) {
+        if (e.code === 'CACHE_LOADING') {
+            core.ensureMasterCache().catch(() => {});
+            return res.status(202).json({ loading: true, message: 'فایل مادر در حال پردازش است...', progress: core.getCacheProgress() });
+        }
         console.error(e);
         res.status(500).json({ error: 'خطا: ' + e.message });
     }
 });
 
-// وضعیت فروشگاهها (برای نمای خانهای سمت کاربر)
-app.get('/api/monitoring/status', (req, res) => {
+// جستجوی سراسری پس از آماده شدن کش
+app.get('/api/equipment/search', (req, res) => {
     try {
+        const q = String(req.query.q || '').replace(/[-–\s]/g, '').trim();
+        if (q.length < 4) return res.json({ data: [] });
+        const progress = core.getCacheProgress();
+        if (!progress.ready) return res.status(202).json({ loading: true, progress });
+        const equipment = core.getEquipmentData();
+        const data = equipment.data.filter(item => {
+            const a = String(item.assetNo || '').replace(/[-–\s]/g, '');
+            const s = String(item.serial || '').replace(/[-–\s]/g, '');
+            return a === q || s === q || a.includes(q) || s.includes(q);
+        }).slice(0, 50);
+        res.json({ total: data.length, data });
+    } catch (e) {
+        if (e.code === 'CACHE_LOADING') return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// وضعیت فروشگاهها (برای نمای خانهای سمت کاربر)
+app.get('/api/monitoring/status', async (req, res) => {
+    try {
+        const progress = core.getCacheProgress();
+        if (!progress.ready) {
+            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.message));
+            return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
+        }
         const db = core.readDb();
         const stores = core.getStores();
         const result = Object.keys(stores).map(plant => {
@@ -68,6 +131,7 @@ app.get('/api/monitoring/status', (req, res) => {
         });
         res.json(result);
     } catch (e) {
+        if (e.code === 'CACHE_LOADING') return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
         res.status(500).json({ error: e.message });
     }
 });
@@ -217,4 +281,6 @@ app.post('/api/audit/finalize', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`[USER PANEL] http://localhost:${PORT}`);
+    // پیش‌بارگذاری در پس‌زمینه تا اولین کاربر منتظر نماند
+    core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.message));
 });

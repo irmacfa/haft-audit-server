@@ -65,8 +65,12 @@
         async function loadMonitoring() {
             try {
                 const res = await fetch('/api/monitoring/status');
+                if (res.status === 202) {
+                    document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-16 text-amber-300 bg-slate-800 rounded-2xl border border-slate-700">در حال آماده‌سازی فایل مادر... لطفاً چند ثانیه صبر کنید.</div>`;
+                    return;
+                }
                 const data = await res.json();
-                allStores = data.sort((a, b) => a.plant.localeCompare(b.plant));
+                allStores = (Array.isArray(data) ? data : []).sort((a, b) => a.plant.localeCompare(b.plant));
 
                 // پر کردن لیست مناطق
                 const select = document.getElementById('regionFilter');

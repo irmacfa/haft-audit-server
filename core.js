@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const { Worker } = require('worker_threads');
 const XLSX = require('xlsx');
 
 const DATA_DIR = path.join(__dirname, 'data');
@@ -16,17 +17,29 @@ if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ audit_records: {}, plant_status: {}, settings: {} }));
 }
 
-// ===================== کشداده‌ها =====================
-let _workbook = null;
+// ===================== کش داده‌ها + وضعیت پیشرفت =====================
 let _stores = null;
 let _equipment = null;
+let _masterColumns = null;
 let _settings = null;
+let _cachePromise = null;
+let _cacheProgress = { state: 'idle', percent: 0, message: 'کش آماده نیست', detail: '', ready: false, error: null, updatedAt: Date.now() };
+
+function setCacheProgress(patch) {
+    _cacheProgress = { ..._cacheProgress, ...patch, updatedAt: Date.now() };
+}
+
+function getCacheProgress() {
+    return { ..._cacheProgress, ready: !!_equipment };
+}
 
 function invalidateCache() {
-    _workbook = null;
     _stores = null;
     _equipment = null;
+    _masterColumns = null;
     _settings = null;
+    _cachePromise = null;
+    setCacheProgress({ state: 'idle', percent: 0, message: 'کش پاک شد، نیاز به بارگذاری مجدد', detail: '', ready: false, error: null });
     console.log('[Cache] Cleared.');
 }
 
@@ -103,106 +116,99 @@ function saveSettings(settings) {
     return getEffectiveSettings();
 }
 
-// خواندن اکسل یک بار و نگه داشتن در حافظه
-function getWorkbook() {
-    if (_workbook) return _workbook;
-    const t = Date.now();
-    _workbook = XLSX.readFile(getExcelPath());
-    console.log('[Cache] Workbook loaded in', Date.now() - t, 'ms');
-    return _workbook;
+function ensureMasterCache(force = false) {
+    if (_equipment && !force) {
+        setCacheProgress({ state: 'ready', percent: 100, message: 'کش آماده است', detail: `${_equipment.total} تجهیز`, ready: true, error: null });
+        return Promise.resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+    }
+    if (_cachePromise && !force) return _cachePromise;
+
+    const excelPath = getExcelPath();
+    if (!fs.existsSync(excelPath)) {
+        const err = new Error('فایل مادر یافت نشد.');
+        setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
+        return Promise.reject(err);
+    }
+
+    const settings = getEffectiveSettings();
+    setCacheProgress({ state: 'loading', percent: 1, message: 'در حال آماده‌سازی پردازش فایل مادر...', detail: path.basename(excelPath), ready: false, error: null });
+
+    _cachePromise = new Promise((resolve, reject) => {
+        const worker = new Worker(path.join(__dirname, 'cache-worker.js'), {
+            workerData: { excelPath, settings }
+        });
+
+        worker.on('message', (msg) => {
+            if (msg.type === 'progress') {
+                setCacheProgress({
+                    state: 'loading',
+                    percent: Math.max(1, Math.min(99, Number(msg.percent) || 1)),
+                    message: msg.message || 'در حال پردازش...',
+                    detail: msg.detail || '',
+                    ready: false,
+                    error: null
+                });
+                return;
+            }
+            if (msg.type === 'result') {
+                _stores = msg.stores;
+                _masterColumns = msg.columns;
+                _equipment = msg.equipment;
+                setCacheProgress({ state: 'ready', percent: 100, message: 'کش آماده است', detail: `${_equipment.total} تجهیز در ${Object.keys(_stores).length} فروشگاه`, ready: true, error: null });
+                console.log('[Cache] Ready:', _equipment.total, 'rows');
+                resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+                return;
+            }
+            if (msg.type === 'error') {
+                const err = new Error(msg.error || 'خطا در پردازش فایل مادر');
+                setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
+                reject(err);
+            }
+        });
+
+        worker.on('error', (err) => {
+            setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
+            reject(err);
+        });
+
+        worker.on('exit', (code) => {
+            if (code !== 0 && !_equipment) {
+                const err = new Error(`پردازش فایل مادر با کد ${code} متوقف شد`);
+                setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
+                reject(err);
+            }
+        });
+    }).finally(() => {
+        if (_equipment) _cachePromise = Promise.resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+        else _cachePromise = null;
+    });
+
+    return _cachePromise;
 }
 
 function getMasterColumns() {
-    const sheet = getWorkbook().Sheets[getWorkbook().SheetNames[0]];
+    if (_masterColumns) return _masterColumns;
+    if (_cacheProgress.state === 'loading') throw Object.assign(new Error('CACHE_LOADING'), { code: 'CACHE_LOADING' });
+    // fallback sync for rare admin paths
+    const wb = XLSX.readFile(getExcelPath());
+    const sheet = wb.Sheets[wb.SheetNames[0]];
     const firstRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0] || [];
-    const cols = firstRow.filter(h => h && String(h).trim());
-    // اگر فایل/setup دوم ستون کمتری داشت، از برگه دوم هم اضافه کن
-    if (cols.length < 10 && getWorkbook().SheetNames.length > 1) {
-        const sheet2 = getWorkbook().Sheets[getWorkbook().SheetNames[1]];
-        const row2 = XLSX.utils.sheet_to_json(sheet2, { header: 1 })[0] || [];
-        row2.forEach(h => { if (h && String(h).trim() && !cols.includes(h)) cols.push(h); });
-    }
-    return cols;
+    _masterColumns = firstRow.filter(h => h && String(h).trim());
+    return _masterColumns;
 }
 
-function cleanExcelCode(code) {
-    if (!code || code === '-') return '-';
-    return String(code).replace(/[-–\s]/g, '').trim();
-}
-
-// لیست فروشگاهها (کش شده)
 function getStores() {
     if (_stores) return _stores;
-    const settings = getEffectiveSettings();
-    const wb = getWorkbook();
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    const headers = raw[0];
-    const pIdx = headers.indexOf(settings.plantColumn);
-    const nIdx = headers.indexOf(settings.nameColumn);
-    const stores = {};
-    for (let i = 1; i < raw.length; i++) {
-        const row = raw[i];
-        const plant = pIdx >= 0 && row[pIdx] ? String(row[pIdx]).trim() : null;
-        if (plant && plant !== 'Equipment Maintenance Plant') {
-            stores[plant] = nIdx >= 0 && row[nIdx] ? String(row[nIdx]).trim() : 'نامشخص';
-        }
-    }
-    _stores = stores;
-    return stores;
+    if (_cacheProgress.state === 'loading') throw Object.assign(new Error('CACHE_LOADING'), { code: 'CACHE_LOADING' });
+    ensureMasterCache();
+    throw Object.assign(new Error('CACHE_LOADING'), { code: 'CACHE_LOADING' });
 }
 
-// تجهیزات سری متریال (کش شده)
 function getEquipmentData() {
     if (_equipment) return _equipment;
-    const settings = getEffectiveSettings();
-    const wb = getWorkbook();
-    const dataRows = [];
-    const seen = new Set();
-
-    wb.SheetNames.forEach(sheetName => {
-        const sheet = wb.Sheets[sheetName];
-        const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        if (raw.length < 2) return;
-        const headers = raw[0];
-        const mIdx = headers.indexOf(settings.materialColumn);
-        const pIdx = headers.indexOf(settings.plantColumn);
-        const nIdx = headers.indexOf(settings.nameColumn);
-
-        for (let i = 1; i < raw.length; i++) {
-            const row = raw[i];
-            const material = mIdx >= 0 ? String(row[mIdx] || '') : '';
-            if (!material.startsWith(settings.materialPrefix)) continue;
-
-            const plant = pIdx >= 0 ? String(row[pIdx] || '').trim() : '';
-            const storeName = nIdx >= 0 ? String(row[nIdx] || '').trim() : `فروشگاه ${plant}`;
-            const allValues = {};
-            headers.forEach((h, idx) => {
-                if (h) allValues[h] = row[idx] === undefined || row[idx] === null ? '' : String(row[idx]);
-            });
-            // فقط ستونهای انتخابشده را به کلاینت میفرستیم (کاهش حجم پاسخ)
-            const fields = {};
-            settings.columns.forEach(c => { fields[c] = allValues[c] !== undefined ? allValues[c] : ''; });
-
-            // کلید پایدار بدون شماره ردیف تا ردیفهای تکراری واقعاً حذف شوند
-            const uniqueKey = `${plant}_${allValues['شماره اموال تجهیز'] || ''}_${allValues['شماره سریال کارت دارایی'] || ''}_${allValues['شماره تجهیز'] || ''}`;
-            if (seen.has(uniqueKey)) continue;
-            seen.add(uniqueKey);
-
-            dataRows.push({
-                plant,
-                storeName,
-                eqId: allValues['شماره تجهیز'] || '',
-                desc: allValues['شرح کارت دارایی'] || allValues['شرح تجهیز'] || 'بدون شرح',
-                assetNo: cleanExcelCode(allValues['شماره اموال تجهیز'] || '-'),
-                serial: cleanExcelCode(allValues['شماره سریال کارت دارایی'] || '-'),
-                fields
-            });
-        }
-    });
-
-    _equipment = { total: dataRows.length, columns: settings.columns, data: dataRows };
-    return _equipment;
+    if (_cacheProgress.state === 'loading') throw Object.assign(new Error('CACHE_LOADING'), { code: 'CACHE_LOADING' });
+    ensureMasterCache();
+    throw Object.assign(new Error('CACHE_LOADING'), { code: 'CACHE_LOADING' });
 }
 
 function buildReportRows(auditItems) {
@@ -260,18 +266,19 @@ function getCacheStatus() {
     return {
         masterFile: getExcelPath(),
         masterFileReady: fsAvailable,
-        workbookCached: !!_workbook,
+        workbookCached: !!_equipment,
         storesCached: !!_stores,
         equipmentCached: !!_equipment,
         storeCount: _stores ? Object.keys(_stores).length : null,
-        equipmentCount: _equipment ? _equipment.total : null
+        equipmentCount: _equipment ? _equipment.total : null,
+        progress: getCacheProgress()
     };
 }
 
 module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR,
-    invalidateCache, getExcelPath, readDb, writeDb,
+    invalidateCache, ensureMasterCache, getExcelPath, readDb, writeDb,
     getSettings, getEffectiveSettings, saveSettings, getRegion,
-    getWorkbook, getMasterColumns, getStores, getEquipmentData,
-    writeReportFile, sendTelegramNotification, getCacheStatus
+    getMasterColumns, getStores, getEquipmentData,
+    writeReportFile, sendTelegramNotification, getCacheStatus, getCacheProgress
 };

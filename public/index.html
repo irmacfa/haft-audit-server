@@ -10,26 +10,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .text-mixed { direction: rtl; unicode-bidi: plaintext; text-align: right; }
-        .asset-text {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 14px;
-            font-weight: 600;
-            color: #cbd5e1;
-            letter-spacing: 0.5px;
-        }
-        .editable-asset {
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .editable-asset:hover {
-            background-color: rgba(51, 65, 85, 0.4);
-            color: #f97316;
-        }
+        .asset-text { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; font-weight: 600; color: #cbd5e1; letter-spacing: 0.5px; }
+        .editable-asset { cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: all 0.2s; }
+        .editable-asset:hover { background-color: rgba(51, 65, 85, 0.4); color: #f97316; }
+        #loadingOverlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,.62); backdrop-filter: blur(6px); }
+        #loadingOverlay.show { display: flex; }
+        #loadingCard { width: min(560px, calc(100vw - 32px)); background: var(--card, #0f172a); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 20px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+        #loadingTrack { height: 14px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; border: 1px solid rgba(255,255,255,.06); }
+        #loadingBar { height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #fb923c); transition: width .25s ease; }
+        .app-busy { filter: blur(2px) grayscale(.15); opacity: .55; pointer-events: none; user-select: none; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased w-full">
+    <div id="loadingOverlay" aria-live="polite">
+        <div id="loadingCard">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+                <div>
+                    <div style="font-size:16px;font-weight:800;color:#fff;">در حال آماده‌سازی اطلاعات</div>
+                    <div id="loadingMsg" style="font-size:12px;color:#94a3b8;margin-top:4px;">لطفاً صبر کنید...</div>
+                </div>
+                <div id="loadingPct" style="font-size:28px;font-weight:900;color:#f59e0b;min-width:72px;text-align:left;">0%</div>
+            </div>
+            <div id="loadingTrack"><div id="loadingBar"></div></div>
+            <div id="loadingDetail" style="font-size:11px;color:#64748b;margin-top:10px;direction:ltr;text-align:right;"></div>
+        </div>
+    </div>
+    <div id="appShell">
 
     <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/60 shadow-lg py-4 px-6 sticky top-0 z-50 w-full">
         <div class="w-full flex justify-between items-center">
@@ -200,30 +206,114 @@
             </div>
         </div>
     </main>
+    </div>
 
     <script>
-        let serverData = [];
         let currentPlant = '';
         let currentStoreName = '';
         let isCurrentLocked = false;
         let localAuditData = {};
-        let currentColumns = [];
+        let currentColumns = ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'];
         let auditFilter = 'all';
         let currentItems = [];
         let visibleRows = [];
+        let loadingTimer = null;
+        let loadingActive = false;
+
+        function setAppBusy(busy) {
+            document.getElementById('appShell').classList.toggle('app-busy', !!busy);
+        }
+
+        function showLoading(message, percent, detail) {
+            loadingActive = true;
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('show');
+            setAppBusy(true);
+            updateLoading(message, percent, detail);
+            if (!loadingTimer) loadingTimer = setInterval(pollCacheProgress, 900);
+        }
+
+        function updateLoading(message, percent, detail) {
+            const p = Math.max(0, Math.min(100, Number(percent) || 0));
+            document.getElementById('loadingMsg').textContent = message || 'در حال پردازش...';
+            document.getElementById('loadingPct').textContent = p + '%';
+            document.getElementById('loadingBar').style.width = p + '%';
+            document.getElementById('loadingDetail').textContent = detail || '';
+        }
+
+        function hideLoading() {
+            loadingActive = false;
+            document.getElementById('loadingOverlay').classList.remove('show');
+            setAppBusy(false);
+            if (loadingTimer) { clearInterval(loadingTimer); loadingTimer = null; }
+        }
+
+        async function pollCacheProgress() {
+            try {
+                const res = await fetch('/api/cache/status');
+                const st = await res.json();
+                const pr = st.progress || st.cache?.progress || st;
+                if (pr && pr.state === 'loading') {
+                    showLoading(pr.message, pr.percent, pr.detail);
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-amber-950 border border-amber-800 text-amber-300";
+                    document.getElementById('serverStatusBadge').innerText = `● در حال آماده‌سازی ${pr.percent || 0}%`;
+                    return pr;
+                }
+                if (pr && pr.state === 'ready') {
+                    if (loadingActive) hideLoading();
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
+                    document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
+                    return pr;
+                }
+                if (pr && pr.state === 'error') {
+                    updateLoading(pr.message || 'خطا در آماده‌سازی', pr.percent || 0, pr.detail || '');
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-950 border border-rose-800 text-rose-300";
+                    document.getElementById('serverStatusBadge').innerText = "✕ خطا در آماده‌سازی داده";
+                    return pr;
+                }
+            } catch (e) {
+                if (loadingActive) updateLoading('در انتظار پاسخ سرور...', 0, '');
+            }
+            return null;
+        }
+
+        async function ensureCacheReady() {
+            const pr = await pollCacheProgress();
+            if (pr && pr.ready) return true;
+            showLoading((pr && pr.message) || 'در حال آماده‌سازی فایل مادر...', (pr && pr.percent) || 1, (pr && pr.detail) || '');
+            try { fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {}); } catch (_) {}
+            for (let i = 0; i < 600; i++) {
+                await new Promise(r => setTimeout(r, 1000));
+                const p = await pollCacheProgress();
+                if (p && p.ready) return true;
+                if (p && p.state === 'error') throw new Error(p.message || 'خطا در آماده‌سازی کش');
+            }
+            throw new Error('زمان آماده‌سازی فایل مادر طولانی شد');
+        }
+
+        async function fetchEquipmentForPlant(plant) {
+            const res = await fetch(`/api/equipment?plant=${encodeURIComponent(plant)}`);
+            if (res.status === 202) {
+                const body = await res.json();
+                const pr = body.progress || {};
+                showLoading(pr.message || body.message || 'در حال پردازش فایل مادر...', pr.percent || 1, pr.detail || '');
+                await ensureCacheReady();
+                return fetchEquipmentForPlant(plant);
+            }
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'خطا در دریافت تجهیزات');
+            currentColumns = result.columns || currentColumns;
+            renderDynamicHeader();
+            return (result.data || []).map((item, i) => ({ ...item, _uid: item.eqId || ('row_' + i) }));
+        }
 
         window.onload = async function() {
+            renderDynamicHeader();
             try {
-                const res = await fetch('/api/equipment');
-                const result = await res.json();
-                serverData = result.data;
-                serverData.forEach((item, i) => { item._uid = item.eqId || ('row_' + i); });
-                currentColumns = result.columns || ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'];
-                renderDynamicHeader();
-                document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
-                document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
+                fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {});
+                const pr = await pollCacheProgress();
+                if (pr && pr.state === 'loading') showLoading(pr.message, pr.percent, pr.detail);
 
-                // ورود مستقیم به فروشگاه از طریق لینک ?plant=xxxx
                 const urlPlant = new URLSearchParams(window.location.search).get('plant');
                 if (urlPlant) {
                     document.getElementById('storeCodeInput').value = urlPlant;
@@ -268,55 +358,30 @@
             return String(code).replace(/[-–\s]/g, '').trim();
         }
 
-        function handleGlobalAssetSearch(query) {
+        async function handleGlobalAssetSearch(query) {
             const q = cleanCode(query);
             const box = document.getElementById('globalSearchResultBox');
             const content = document.getElementById('globalSearchResultContent');
-
-            if (!q || q.length < 4) {
-                box.classList.add('hidden');
-                content.innerHTML = '';
-                return;
-            }
-
-            const matches = serverData.filter(item => {
-                const cleanAsset = cleanCode(item.assetNo);
-                const cleanSer = cleanCode(item.serial);
-                return cleanAsset === q || cleanSer === q || cleanAsset.includes(q) || cleanSer.includes(q);
-            });
-
+            if (!q || q.length < 4) { box.classList.add('hidden'); content.innerHTML = ''; return; }
             box.classList.remove('hidden');
-            if (matches.length === 0) {
-                content.innerHTML = `<p class="text-rose-400">هیچ تجهیزی با شماره اموال یا سریال «${query}» یافت نشد.</p>`;
-                return;
-            }
-
-            let html = '';
-            matches.forEach(m => {
-                const formattedDesc = m.desc.replace(/([a-zA-Z0-9_-]+)/g, ' $1 ');
-                html += `
+            content.innerHTML = `<p class="text-slate-400">در حال جستجو...</p>`;
+            try {
+                const pr = await pollCacheProgress();
+                if (!pr || !pr.ready) { content.innerHTML = `<p class="text-amber-300">داده‌ها هنوز در حال آماده‌سازی هستند. بعد از تکمیل بارگذاری دوباره جستجو کنید.</p>`; return; }
+                const res = await fetch(`/api/equipment/search?q=${encodeURIComponent(q)}`);
+                const result = await res.json();
+                const matches = result.data || [];
+                if (matches.length === 0) { content.innerHTML = `<p class="text-rose-400">هیچ تجهیزی با شماره اموال یا سریال «${query}» یافت نشد.</p>`; return; }
+                content.innerHTML = matches.slice(0, 30).map(m => `
                     <div class="bg-slate-900 border border-slate-700 p-3 rounded-xl flex flex-wrap justify-between items-center gap-2">
-                        <div>
-                            <span class="text-orange-400 font-bold">فروشگاه: ${m.storeName} (کد: ${m.plant})</span>
-                            <p class="text-white mt-1 text-mixed">${formattedDesc}</p>
-                        </div>
+                        <div><span class="text-orange-400 font-bold">فروشگاه: ${m.storeName} (کد: ${m.plant})</span><p class="text-white mt-1 text-mixed">${(m.desc||'').replace(/([a-zA-Z0-9_-]+)/g,' $1 ')}</p></div>
                         <div class="flex items-center gap-3">
-                            <div>
-                                <span class="text-slate-400 text-[10px] block">اموال:</span>
-                                <span class="asset-text text-xs">${m.assetNo}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 text-[10px] block">سریال:</span>
-                                <span class="asset-text text-xs">${m.serial}</span>
-                            </div>
-                            <button onclick="selectStoreFromSearch('${m.plant}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg transition font-medium">
-                                نمایش فروشگاه ➔
-                            </button>
+                            <div><span class="text-slate-400 text-[10px] block">اموال:</span><span class="asset-text text-xs">${m.assetNo||'-'}</span></div>
+                            <div><span class="text-slate-400 text-[10px] block">سریال:</span><span class="asset-text text-xs">${m.serial||'-'}</span></div>
+                            <button onclick="selectStoreFromSearch('${m.plant}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg transition font-medium">نمایش فروشگاه ➔</button>
                         </div>
-                    </div>
-                `;
-            });
-            content.innerHTML = html;
+                    </div>`).join('');
+            } catch (e) { content.innerHTML = `<p class="text-rose-400">خطا در جستجو.</p>`; }
         }
 
         function selectStoreFromSearch(plantCode) {
@@ -327,107 +392,97 @@
         }
 
         async function handleStoreInput(value) {
+            const statusBox = document.getElementById('statusBox');
+            const statusMsg = document.getElementById('statusMessage');
+            const progBar = document.getElementById('progressBar');
+            const percTxt = document.getElementById('statusPercentage');
+            const tableBody = document.getElementById('equipmentTableBody');
+
+            document.getElementById('resultsContainer').classList.add('hidden');
+            document.getElementById('lockBanner').classList.add('hidden');
+
             currentPlant = value.trim();
             if (currentPlant.length < 4) {
-                document.getElementById('resultsContainer').classList.add('hidden');
-                document.getElementById('lockBanner').classList.add('hidden');
-                document.getElementById('statusBox').classList.add('hidden');
+                statusBox.classList.add('hidden');
+                tableBody.innerHTML = '';
+                currentItems = [];
                 return;
             }
 
             if (currentPlant.length === 4) {
+                tableBody.innerHTML = '';
                 document.getElementById('resultsContainer').classList.add('hidden');
-                document.getElementById('lockBanner').classList.add('hidden');
-                
-                const statusBox = document.getElementById('statusBox');
-                const progressBar = document.getElementById('progressBar');
-                const statusMsg = document.getElementById('statusMessage');
-                const statusPct = document.getElementById('statusPercentage');
-                
+                const z = '۰';
+                ['totalEquipCount','countChecked','countMissing','auditProgressCount'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = id === 'auditProgressCount' ? '۰٪' : z; });
+                const b = document.getElementById('auditProgressBar'); if (b) b.style.width = '0%';
+                const q = document.getElementById('tableSearchInput'); if (q) q.value = '';
+                auditFilter = 'all';
+                updateFilterButtons();
+
                 statusBox.classList.remove('hidden');
-                progressBar.style.width = '0%';
-                progressBar.className = "bg-orange-500 h-full transition-all duration-150";
-                statusMsg.innerText = `در حال اتصال و جستجوی کد ${currentPlant}...`;
-                statusPct.innerText = '0%';
-
-                let progress = 0;
-                const interval = setInterval(async () => {
-                    progress += 25;
-                    progressBar.style.width = progress + '%';
-                    statusPct.innerText = progress + '%';
-
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        await processSearchAndDisplay();
-                    }
-                }, 80);
+                statusMsg.innerText = `در حال آماده‌سازی اطلاعات فروشگاه ${currentPlant}...`;
+                progBar.style.width = '15%';
+                percTxt.innerText = '15%';
+                await searchAndLoadTable(currentPlant);
             }
         }
 
-        async function processSearchAndDisplay() {
-            const progressBar = document.getElementById('progressBar');
+        async function searchAndLoadTable(plantCode) {
+            const progBar = document.getElementById('progressBar');
+            const percTxt = document.getElementById('statusPercentage');
             const statusMsg = document.getElementById('statusMessage');
             const statusBox = document.getElementById('statusBox');
-
             try {
-                const auditRes = await fetch(`/api/audit/${currentPlant}`);
-                if (!auditRes.ok) throw new Error('خطا در پاسخ سرور');
+                progBar.style.width = '25%'; percTxt.innerText = '25%';
+                await ensureCacheReady();
+                progBar.style.width = '55%'; percTxt.innerText = '55%';
+
+                const [auditRes, filteredItems] = await Promise.all([
+                    fetch(`/api/audit/${plantCode}`),
+                    fetchEquipmentForPlant(plantCode)
+                ]);
                 const auditInfo = await auditRes.json();
+                progBar.style.width = '85%'; percTxt.innerText = '85%';
 
-                const filteredItems = serverData.filter(i => i.plant === currentPlant);
-
-                if (filteredItems.length === 0) {
-                    progressBar.className = "bg-rose-600 h-full transition-all duration-150";
-                    statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${currentPlant} یافت نشد!</span>`;
+                if (!filteredItems.length) {
+                    statusBox.classList.remove('hidden');
+                    statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${plantCode} یافت نشد!</span>`;
+                    hideLoading();
                     return;
                 }
 
-                // استخراج نام فروشگاه
-                currentStoreName = filteredItems[0].storeName || `فروشگاه ${currentPlant}`;
-                document.getElementById('storeTitleName').innerText = `${currentStoreName} (کد پلنت: ${currentPlant})`;
-
-                progressBar.className = "bg-emerald-500 h-full transition-all duration-150";
-                statusMsg.innerHTML = `<span class="text-emerald-400 font-bold">✅ فروشگاه «${currentStoreName}» با موفقیت بارگذاری شد (${filteredItems.length} تجهیز)</span>`;
+                currentStoreName = filteredItems[0].storeName || `فروشگاه ${plantCode}`;
+                document.getElementById('storeTitleName').innerText = `${currentStoreName} (کد پلنت: ${plantCode})`;
+                document.getElementById('resultsContainer').classList.remove('hidden');
 
                 isCurrentLocked = auditInfo.statusData.isLocked;
                 localAuditData = auditInfo.auditItems || {};
+                progBar.style.width = '100%'; percTxt.innerText = '100%';
 
-                // چک وجود فایل گزارش برای نمایش دکمه دانلود
-                checkReport();
-
-                const banner = document.getElementById('lockBanner');
-                const draftBtn = document.getElementById('draftBtn');
-                const finalizeBtn = document.getElementById('finalizeBtn');
+                const lockBanner = document.getElementById('lockBanner');
                 const downloadBtn = document.getElementById('downloadBtn');
-
                 if (isCurrentLocked) {
-                    banner.classList.remove('hidden');
-                    document.getElementById('lockBannerTitle').innerText = `انبارگردانی فروشگاه ${currentStoreName} در تاریخ ${auditInfo.statusData.auditDate} تایید شده است.`;
-                    document.getElementById('lockInfo').innerText = `انبارگردان: ${auditInfo.statusData.auditor}`;
-                    draftBtn.classList.add('hidden');
-                    finalizeBtn.classList.add('hidden');
-                    downloadBtn.classList.remove('hidden');
+                    lockBanner.classList.remove('hidden');
+                    document.getElementById('lockBannerTitle').innerText = 'انبارگردانی این فروشگاه نهایی شده و قفل است.';
+                    document.getElementById('lockInfo').innerText = `تاریخ ثبت: ${auditInfo.statusData.auditDate} — انبارگردان: ${auditInfo.statusData.auditor || 'نامشخص'}`;
+                    ['finalizeBtn','draftBtn'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+                    document.getElementById('unlockBtn')?.classList.remove('hidden');
+                    downloadBtn?.classList.remove('hidden');
                 } else {
-                    banner.classList.add('hidden');
-                    draftBtn.classList.remove('hidden');
-                    finalizeBtn.classList.remove('hidden');
-                    downloadBtn.classList.add('hidden');
+                    lockBanner.classList.add('hidden');
+                    ['finalizeBtn','draftBtn'].forEach(id => document.getElementById(id)?.classList.remove('hidden'));
+                    document.getElementById('unlockBtn')?.classList.add('hidden');
+                    checkReport();
                 }
 
-                setTimeout(() => {
-                    statusBox.classList.add('hidden');
-                    document.getElementById('resultsContainer').classList.remove('hidden');
-                    currentItems = filteredItems;
-                    currentItems.forEach((it, i) => { it._rowNo = i + 1; });
-                    auditFilter = 'all';
-                    document.getElementById('tableSearchInput').value = '';
-                    updateFilterButtons();
-                    renderFilteredTable();
-                }, 400);
-
+                currentItems = filteredItems.map((it, i) => ({ ...it, _rowNo: i + 1 }));
+                renderFilteredTable();
+                statusMsg.innerText = `✅ ${filteredItems.length} رکورد تجهیز با موفقیت بارگذاری شد.`;
+                hideLoading();
             } catch (e) {
-                progressBar.className = "bg-rose-600 h-full transition-all duration-150";
-                statusMsg.innerHTML = `<span class="text-rose-400 font-bold">🚨 خطا: اتصال به سرور برقرار نشد!</span>`;
+                console.error(e);
+                hideLoading();
+                statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا در بارگذاری اطلاعات: ${e.message || ''}</span>`;
             }
         }
 
@@ -581,19 +636,25 @@
         }
 
         function updateProgressCounter(items) {
-            let checkedCount = 0;
-            let missingCount = 0;
-            items.forEach(item => {
-                const saved = localAuditData[item._uid];
-                if (saved && saved.checked) checkedCount++;
-                if (saved && saved.status === 'missing') missingCount++;
+            let checked = 0, missing = 0;
+            (items || []).forEach(item => {
+                const saved = localAuditData[item._uid] || {};
+                if (saved.checked) checked++;
+                if (saved.status === 'missing') missing++;
             });
-            const total = items.length;
-            const percent = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
-            document.getElementById('countChecked').innerText = checkedCount;
-            document.getElementById('countMissing').innerText = missingCount;
-            document.getElementById('auditProgressCount').innerText = `${percent}٪`;
-            document.getElementById('auditProgressBar').style.width = percent + '%';
+            const total = (items || []).length;
+            const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
+            const fa = n => Number(n).toLocaleString('fa-IR');
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('totalCount', fa(total));
+            set('checkedCount', fa(checked));
+            set('missingCount', fa(missing));
+            set('progressPercentSmall', percent + '٪');
+            set('countChecked', fa(checked));
+            set('countMissing', fa(missing));
+            set('auditProgressCount', percent + '٪');
+            const bar = document.getElementById('auditProgressBar');
+            if (bar) bar.style.width = percent + '%';
         }
 
         async function checkReport() {
@@ -627,7 +688,6 @@
                 document.getElementById('lockBanner').classList.add('hidden');
                 document.getElementById('draftBtn').classList.remove('hidden');
                 document.getElementById('finalizeBtn').classList.remove('hidden');
-                currentItems = serverData.filter(i => i.plant === currentPlant);
                 currentItems.forEach((it, i) => { it._rowNo = i + 1; });
                 renderFilteredTable();
             }

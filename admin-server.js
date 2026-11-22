@@ -25,7 +25,14 @@ app.use('/design.css', express.static(path.join(__dirname, 'public', 'design.css
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
 app.post('/api/reload', (req, res) => {
     core.invalidateCache();
-    res.json({ success: true });
+    core.ensureMasterCache().catch(e => console.error('[Admin reload warmup]', e.message));
+    res.json({ success: true, ...core.getCacheStatus() });
+});
+
+app.get('/api/cache/status', (req, res) => res.json(core.getCacheStatus()));
+app.post('/api/cache/warmup', (req, res) => {
+    core.ensureMasterCache().catch(e => console.error('[Admin warmup]', e.message));
+    res.json({ started: true, ...core.getCacheStatus() });
 });
 
 // وضعیت سلامت سرورمدیریت
@@ -58,13 +65,13 @@ const upload = multer({
     limits: { fileSize: 200 * 1024 * 1024 }
 });
 
-app.post('/api/admin/upload-master', upload.single('file'), (req, res) => {
+app.post('/api/admin/upload-master', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'فایلی آپلود نشد.' });
         core.invalidateCache();
         notifyUserServer();
-        const columns = core.getMasterColumns();
-        res.json({ success: true, fileName: req.file.originalname, columns, count: columns.length });
+        core.ensureMasterCache().catch(e => console.error('[Upload warmup]', e.message));
+        res.json({ success: true, fileName: req.file.originalname, processing: true, progress: core.getCacheProgress() });
     } catch (e) {
         console.error('Upload Error:', e);
         res.status(500).json({ error: 'خطا در پردازش فایل: ' + e.message });
@@ -100,8 +107,13 @@ app.post('/api/admin/settings', (req, res) => {
     }
 });
 
-app.get('/api/monitoring/status', (req, res) => {
+app.get('/api/monitoring/status', async (req, res) => {
     try {
+        const progress = core.getCacheProgress();
+        if (!progress.ready) {
+            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.message));
+            return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
+        }
         const db = core.readDb();
         const stores = core.getStores();
         const result = Object.keys(stores).map(plant => {
@@ -124,6 +136,7 @@ app.get('/api/monitoring/status', (req, res) => {
         });
         res.json(result);
     } catch (e) {
+        if (e.code === 'CACHE_LOADING') return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
         console.error('Monitoring Error:', e);
         res.status(500).json({ error: e.message });
     }
@@ -167,4 +180,5 @@ app.get('/api/monitoring/export', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`[ADMIN PANEL] http://localhost:${PORT}`);
+    core.ensureMasterCache().catch(e => console.error('[Admin startup warmup]', e.message));
 });

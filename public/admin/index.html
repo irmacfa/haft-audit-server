@@ -316,8 +316,9 @@
         async function loadAdmin() {
             try {
                 const res = await fetch('/api/monitoring/status');
+                if (res.status === 202) { return; }
                 const data = await res.json();
-                allStores = data.sort((a, b) => a.plant.localeCompare(b.plant));
+                allStores = (Array.isArray(data) ? data : []).sort((a, b) => a.plant.localeCompare(b.plant));
 
                 document.getElementById('statTotal').innerText = allStores.length;
                 document.getElementById('statDone').innerText = allStores.filter(s => s.isLocked).length;
