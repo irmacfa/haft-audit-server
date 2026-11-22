@@ -10,6 +10,7 @@ require('dotenv').config();
 const core = require('./core');
 const auth = require('./auth');
 const directory = require('./ad-directory');
+const activity = require('./live-activity');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 2031;
@@ -147,6 +148,16 @@ app.post('/api/admin/region-links', (req, res) => {
     } catch (e) {
         res.status(400).json({ error: e.message, code: e.code });
     }
+});
+
+// فعالیت زنده کاربران (فروشگاه در حال انبارگردانی + مدت زمان)
+app.get('/api/admin/live-activity', (req, res) => {
+    res.json(activity.list());
+});
+
+// تنظیمات پیشنهادی برای هر بخش از تنظیمات
+app.get('/api/admin/suggested-settings', (req, res) => {
+    res.json(core.DEFAULT_SETTINGS);
 });
 
 app.post('/api/admin/regions', (req, res) => {

@@ -65,7 +65,7 @@
     <main class="w-full px-2 sm:px-4 py-5 flex-1">
         
         <!-- Search Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
             <!-- مرحله ۱ -->
             <div class="bg-white border border-orange-700/40 rounded-3xl p-5 shadow-xl">
                 <div class="flex items-center gap-3 mb-3">
@@ -79,32 +79,36 @@
             </div>
 
             <!-- مرحله ۲ -->
-            <div class="bg-white border border-sky-700/40 rounded-3xl p-5 shadow-xl">
-                <div class="flex items-center gap-3 mb-3">
-                    <span class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">۲</span>
-                    <div>
-                        <h2 class="text-sm font-bold text-sky-700">ایمیل مدیر فروشگاه</h2>
-                        <p class="text-[10px] text-slate-500">گزارش نهایی به این ایمیل ارسال میشود</p>
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <input type="email" id="managerEmailInput" value="manager@haftstores.ir" placeholder="ایمیل مدیر فروشگاه" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-sky-500">
-                    <p class="text-[10px] text-slate-500">انبارگردان همان حساب واردشده شماست و نیازی به وارد کردن دستی ندارد.</p>
-                </div>
-            </div>
-
-            <!-- مرحله ۳ -->
             <div class="bg-white border border-emerald-700/40 rounded-3xl p-5 shadow-xl">
                 <div class="flex items-center gap-3 mb-3">
-                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">۳</span>
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">۲</span>
                     <div>
-                        <h2 class="text-sm font-bold text-emerald-700">جستجوی سراسری</h2>
-                        <p class="text-[10px] text-slate-500">جستجوی اموال یا سریال در تمام فروشگاهها</p>
+                        <h2 class="text-sm font-bold text-emerald-700">جستجوی سراسری تجهیز</h2>
+                        <p class="text-[10px] text-slate-500">جستجوی اموال یا سریال در مناطق تحت پوشش شما</p>
                     </div>
                 </div>
                 <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثال: 217910401171" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 text-xs font-mono focus:outline-none focus:border-emerald-500">
             </div>
         </div>
+
+        <!-- شبکه فروشگاههای تحت پوشش کاربر -->
+        <section id="myStoresPanel" class="w-full mb-8 bg-white border border-slate-700/60 rounded-3xl p-5 shadow-xl">
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                <div>
+                    <h2 class="text-base font-bold text-slate-100">🏪 شبکه فروشگاههای من</h2>
+                    <p id="myStoresHint" class="text-[11px] text-slate-400 mt-1">فروشگاههای مناطق لینکشده به حساب شما</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="hidden sm:inline-flex items-center gap-1 text-[10px] text-slate-400">
+                        <i class="inline-block w-2 h-2 rounded-full bg-emerald-500"></i> تکمیل
+                        <i class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></i> در حال انجام
+                        <i class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></i> در انتظار
+                    </span>
+                    <button data-admin-only onclick="location.href='/monitoring.html'" class="hidden bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">📊 مانیتورینگ کل</button>
+                </div>
+            </div>
+            <div id="myStoresGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-1.5 sm:gap-2"></div>
+        </section>
 
         <!-- Global Asset Search Results Dropdown / Box -->
         <div id="globalSearchResultBox" class="hidden w-full mb-8 bg-white border border-emerald-600/60 rounded-3xl p-5 shadow-2xl">
@@ -225,6 +229,109 @@
         let visibleRows = [];
         let loadingTimer = null;
         let loadingActive = false;
+        let myAccess = { authenticated: true, all: false, regions: [] };
+        let activityTimer = null;
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[ch]);
+        }
+
+        async function loadMyAccess() {
+            try {
+                const res = await fetch('/api/my-access', { credentials: 'same-origin' });
+                myAccess = await res.json();
+            } catch (e) {
+                myAccess = { authenticated: true, all: false, regions: [] };
+            }
+            loadMyStores();
+        }
+
+        async function loadMyStores() {
+            const grid = document.getElementById('myStoresGrid');
+            const hint = document.getElementById('myStoresHint');
+            if (!myAccess.all && (!myAccess.regions || !myAccess.regions.length)) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">شما به هیچ منطقهای لینک نشدهاید. لطفاً با ادمین سامانه تماس بگیرید.</div>';
+                hint.textContent = 'دسترسی منطقهای تنظیم نشده است';
+                return;
+            }
+            try {
+                const res = await fetch('/api/monitoring/status');
+                if (res.status === 202) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">در حال آمادهسازی فایل مادر...</div>';
+                    return;
+                }
+                const data = await res.json();
+                const stores = (Array.isArray(data) ? data : []).filter(s =>
+                    myAccess.all || myAccess.regions.includes(s.region));
+                hint.textContent = myAccess.all
+                    ? `همه مناطق — ${stores.length} فروشگاه`
+                    : `مناطق: ${myAccess.regions.join(' · ')} — ${stores.length} فروشگاه`;
+                renderMyStores(stores);
+            } catch (e) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-rose-500 text-xs">خطا: ${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        function renderMyStores(stores) {
+            const grid = document.getElementById('myStoresGrid');
+            if (!stores.length) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">فروشگاهی در مناطق شما یافت نشد.</div>';
+                return;
+            }
+            grid.innerHTML = stores.map(s => {
+                const done = !!s.isLocked;
+                const inProgress = !done && !!s.auditor;
+                const cls = done ? 'tile-done' : inProgress ? 'tile-progress' : 'tile-pending';
+                const label = done ? 'تکمیل' : inProgress ? 'در حال انجام' : 'در انتظار';
+                const date = done && s.auditDate
+                    ? `<span class="tile-date">📅 ${escapeHtml(s.auditDate)}</span>` : '';
+                return `<button type="button" class="store-tile ${cls}" onclick="openStoreFromGrid('${escapeHtml(s.plant)}')"
+                    title="${escapeHtml(s.plant)} - ${escapeHtml(s.storeName || '')} (${label})">
+                    <span class="tile-code">${escapeHtml(s.plant)}</span>
+                    <span class="tile-name">${escapeHtml(s.storeName || '')}</span>
+                    <span class="tile-label">${label}</span>
+                    ${date}
+                </button>`;
+            }).join('');
+        }
+
+        function openStoreFromGrid(plant) {
+            document.getElementById('storeCodeInput').value = plant;
+            handleStoreInput(plant);
+        }
+
+        function activityPost(path, payload) {
+            try {
+                fetch(path, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload || {}),
+                    keepalive: true
+                }).catch(() => {});
+            } catch (_) { /* نادیده گرفته میشود */ }
+        }
+
+        function notifyActivityStart(plant, storeName) {
+            activityPost('/api/activity/start', { plant, storeName });
+            if (activityTimer) clearInterval(activityTimer);
+            activityTimer = setInterval(() => {
+                const bar = document.getElementById('auditProgressBar');
+                const pct = bar ? (parseInt(bar.style.width, 10) || 0) : 0;
+                const total = currentItems.length;
+                activityPost('/api/activity/heartbeat', {
+                    plant: currentPlant,
+                    checked: Math.round(total * pct / 100),
+                    total
+                });
+            }, 15000);
+        }
+
+        function notifyActivityStop() {
+            if (activityTimer) { clearInterval(activityTimer); activityTimer = null; }
+            activityPost('/api/activity/stop', {});
+        }
 
         function setAppBusy(busy) {
             document.getElementById('appShell').classList.toggle('app-busy', !!busy);
@@ -315,6 +422,8 @@
 
         window.onload = async function() {
             renderDynamicHeader();
+            loadMyAccess();
+            window.addEventListener('beforeunload', notifyActivityStop);
             try {
                 fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {});
                 const pr = await pollCacheProgress();
@@ -412,6 +521,7 @@
                 statusBox.classList.add('hidden');
                 tableBody.innerHTML = '';
                 currentItems = [];
+                notifyActivityStop();
                 return;
             }
 
@@ -485,6 +595,8 @@
                 renderFilteredTable();
                 statusMsg.innerText = `✅ ${filteredItems.length} رکورد تجهیز با موفقیت بارگذاری شد.`;
                 hideLoading();
+                if (isCurrentLocked) notifyActivityStop();
+                else notifyActivityStart(currentPlant, currentStoreName);
             } catch (e) {
                 console.error(e);
                 hideLoading();
@@ -707,8 +819,7 @@
                     body: JSON.stringify({
                         plant: currentPlant,
                         storeName: currentStoreName,
-                        auditItems: localAuditData,
-                        managerEmail: document.getElementById('managerEmailInput').value.trim() || 'manager@haftstores.ir'
+                        auditItems: localAuditData
                     })
                 });
                 const resData = await res.json();

@@ -6,6 +6,8 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const core = require('./core');
 const auth = require('./auth');
+const regionAccess = require('./region-access');
+const activity = require('./live-activity');
 
 const app = express();
 const PORT = process.env.PORT || 2030;
@@ -70,6 +72,11 @@ app.get('/api/public-config', (req, res) => {
     });
 });
 
+// محدوده دسترسی کاربر فعلی (مناطق لینکشده / دسترسی کل)
+app.get('/api/my-access', (req, res) => {
+    res.json(regionAccess.getAccess(req.user));
+});
+
 // وضعیت سلامت سرور
 app.get('/api/health', (req, res) => {
     res.json({
@@ -91,6 +98,9 @@ app.get('/api/equipment', async (req, res) => {
         const plant = String(req.query.plant || '').trim();
         if (!plant) {
             return res.status(400).json({ error: 'پارامتر plant الزامی است.', code: 'PLANT_REQUIRED' });
+        }
+        if (!regionAccess.isPlantAllowed(req.user, plant)) {
+            return res.status(403).json({ error: 'شما به منطقهٔ این فروشگاه دسترسی ندارید.', code: 'REGION_FORBIDDEN' });
         }
 
         const progress = core.getCacheProgress();
@@ -119,8 +129,11 @@ app.get('/api/equipment/search', (req, res) => {
         if (q.length < 4) return res.json({ data: [] });
         const progress = core.getCacheProgress();
         if (!progress.ready) return res.status(202).json({ loading: true, progress });
+        const access = regionAccess.getAccess(req.user);
+        const allowedRegions = access.all ? null : new Set(access.regions);
         const equipment = core.getEquipmentData();
         const data = equipment.data.filter(item => {
+            if (allowedRegions && !allowedRegions.has(core.getRegion(item.plant))) return false;
             const a = String(item.assetNo || '').replace(/[-–\s]/g, '');
             const s = String(item.serial || '').replace(/[-–\s]/g, '');
             return a === q || s === q || a.includes(q) || s.includes(q);
@@ -164,7 +177,16 @@ app.get('/api/monitoring/status', async (req, res) => {
     }
 });
 
+function requirePlantAccess(req, res, plant) {
+    if (!regionAccess.isPlantAllowed(req.user, plant)) {
+        res.status(403).json({ error: 'شما به منطقهٔ این فروشگاه دسترسی ندارید.', code: 'REGION_FORBIDDEN' });
+        return false;
+    }
+    return true;
+}
+
 app.get('/api/audit/:plant', (req, res) => {
+    if (!requirePlantAccess(req, res, req.params.plant)) return;
     const db = core.readDb();
     res.json({
         statusData: db.plant_status[req.params.plant] || { isLocked: false, auditDate: null, auditor: null },
@@ -226,6 +248,7 @@ app.get('/api/monitoring/export', (req, res) => {
 app.post('/api/audit/draft', (req, res) => {
     try {
         const { plant, auditItems, storeName } = req.body;
+        if (!requirePlantAccess(req, res, plant)) return;
         const auditor = getAuditor(req);
         const db = core.readDb();
         db.audit_records[plant] = auditItems;
@@ -246,6 +269,7 @@ app.post('/api/audit/draft', (req, res) => {
 app.post('/api/audit/finalize', async (req, res) => {
     try {
         const { plant, storeName, auditItems, managerEmail } = req.body;
+        if (!requirePlantAccess(req, res, plant)) return;
         const auditorInfo = getAuditor(req);
         const auditor = auditorInfo.name;
         const db = core.readDb();
@@ -310,6 +334,25 @@ app.post('/api/audit/finalize', async (req, res) => {
         console.error(e);
         res.status(500).json({ error: 'خطا در ثبت نهایی.' });
     }
+});
+
+// ===================== فعالیّت زنده انبارگردانها =====================
+app.post('/api/activity/start', (req, res) => {
+    const { plant, storeName } = req.body || {};
+    if (!plant) return res.status(400).json({ error: 'کد فروشگاه الزامی است.' });
+    if (!requirePlantAccess(req, res, plant)) return;
+    res.json({ ok: true, activity: activity.start(req.user, plant, storeName) });
+});
+
+app.post('/api/activity/heartbeat', (req, res) => {
+    const { plant, checked, total } = req.body || {};
+    activity.heartbeat(req.user, plant, checked, total);
+    res.json({ ok: true });
+});
+
+app.post('/api/activity/stop', (req, res) => {
+    activity.stop(req.user);
+    res.json({ ok: true });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

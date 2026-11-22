@@ -25,6 +25,7 @@
             <button onclick="toggleSettings()" class="bg-orange-700 hover:bg-orange-600 px-4 py-2 rounded-xl text-xs font-bold">⚙️ فایل مادر و ستونها</button>
             <button onclick="toggleMembers()" class="bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">👥 اعضا و مناطق</button>
             <a href="/api/monitoring/export" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded-xl text-xs font-bold">📥 خروجی اکسل کلی</a>
+            <a data-user-link="/monitoring.html" href="#" class="bg-indigo-700 hover:bg-indigo-600 px-4 py-2 rounded-xl text-xs font-bold">📊 مانیتورینگ کامل</a>
             <button onclick="setView('grid')" id="viewGridBtn" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">🏠 نمای خانه ای</button>
             <button onclick="setView('table')" id="viewTableBtn" class="bg-indigo-700 px-4 py-2 rounded-xl text-xs font-bold">📋 جدول تفصیلی</button>
             <button onclick="loadAdmin()" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
@@ -90,6 +91,17 @@
             <button onclick="saveRegions()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold">💾 ذخیره مناطق</button>
             <p id="regionsStatus" class="text-xs mt-3 text-slate-500"></p>
         </div>
+
+        <!-- تنظیمات پیشنهادی -->
+        <div class="bg-slate-900/50 border border-indigo-700/60 rounded-2xl p-5 mt-6">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                <h3 class="text-sm font-bold text-sky-300">💡 تنظیمات پیشنهادی سامانه</h3>
+                <button onclick="applySuggested()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">⚡ اعمال تنظیمات پیشنهادی</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-3">مقادیر پیشنهادی سامانه در زیر نمایش داده میشوند؛ در صورت تمایل آنها را یکجا اعمال کنید.</p>
+            <ul id="suggestedSettings" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] text-slate-300"></ul>
+            <p id="suggestedStatus" class="text-xs mt-3 text-slate-400"></p>
+        </div>
     </section>
 
     <!-- لینک اعضای گروه ITSUP به مناطق برنامه -->
@@ -142,6 +154,21 @@
             <p class="text-xs text-indigo-700 mt-1">کل انبارگردانیها</p>
         </div>
     </div>
+
+    <!-- فعالیت زنده -->
+    <section class="w-full mb-8 bg-white border border-sky-700/60 rounded-3xl p-5 shadow-xl">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-100">🔴 فعالیت زنده انبارگردانی</h2>
+                <p class="text-[11px] text-slate-400 mt-1">چه کسی همآکنون در کدام فروشگاه مشغول است و چقدر زمان صرف کرده است</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="liveUpdated" class="text-[10px] text-slate-500"></span>
+                <button onclick="loadLiveActivity()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">🔄 بروزرسانی</button>
+            </div>
+        </div>
+        <div id="liveActivity" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
 
     <!-- فیلترها -->
     <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 flex flex-wrap gap-3 items-center justify-between">
@@ -230,6 +257,79 @@
             })[ch]);
         }
 
+        let suggested = null;
+
+        async function loadLiveActivity() {
+            try {
+                const res = await fetch('/api/admin/live-activity');
+                const list = await res.json();
+                const box = document.getElementById('liveActivity');
+                document.getElementById('liveUpdated').textContent =
+                    `آخرین بروزرسانی: ${new Date().toLocaleTimeString('fa-IR')}`;
+                if (!list.length) {
+                    box.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400 text-xs">در حال حاضر کسی مشغول انبارگردانی نیست.</div>';
+                    return;
+                }
+                box.innerHTML = list.map(a => {
+                    const mm = Math.floor(a.elapsedSeconds / 60);
+                    const ss = a.elapsedSeconds % 60;
+                    const time = `${mm}:${String(ss).padStart(2, '0')}`;
+                    return `<div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4">
+                        <div class="flex justify-between items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-slate-100">👤 ${esc(a.displayName || a.username)}</span>
+                            <span class="text-[10px] font-bold text-amber-400" dir="ltr">⏱ ${time}</span>
+                        </div>
+                        <p class="text-xs text-sky-300" dir="ltr">فروشگاه ${esc(a.plant)}</p>
+                        <p class="text-[11px] text-slate-400 truncate" title="${esc(a.storeName || '')}">${esc(a.storeName || '')}</p>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-3">
+                            <div class="bg-emerald-500 h-full" style="width:${a.progress}%"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1">پیشرفت ${a.progress}٪ · ${a.checked}/${a.total} تجهیز</p>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                document.getElementById('liveActivity').innerHTML =
+                    `<div class="col-span-full text-center py-8 text-rose-400 text-xs">خطا: ${esc(e.message)}</div>`;
+            }
+        }
+
+        async function loadSuggested() {
+            try {
+                const res = await fetch('/api/admin/suggested-settings');
+                suggested = await res.json();
+                const items = [
+                    ['ستون کد فروشگاه', suggested.plantColumn],
+                    ['ستون نام فروشگاه', suggested.nameColumn],
+                    ['ستون فیلتر متریال', suggested.materialColumn],
+                    ['پیشوند متریال', suggested.materialPrefix],
+                    ['ستونهای نمایشی', (suggested.columns || []).join(' | ')],
+                    ['مناطق پیشنهادی', (suggested.regions || []).map(r => r.name).join(' · ')]
+                ];
+                document.getElementById('suggestedSettings').innerHTML = items.map(([k, v]) =>
+                    `<li class="bg-slate-800/60 border border-slate-700 rounded-lg px-3 py-2"><b class="text-slate-200">${esc(k)}:</b> <span class="text-slate-400">${esc(v)}</span></li>`).join('');
+            } catch (e) {
+                document.getElementById('suggestedStatus').textContent = 'خطا: ' + e.message;
+            }
+        }
+
+        async function applySuggested() {
+            if (!suggested) await loadSuggested();
+            if (!suggested) return;
+            if (!confirm('تنظیمات پیشنهادی اعمال شود؟ تنظیمات فعلی ستونها و مناطق جایگزین میشوند.')) return;
+            try {
+                const res = await fetch('/api/admin/settings', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(suggested)
+                });
+                const data = await res.json();
+                document.getElementById('suggestedStatus').textContent = data.success
+                    ? '✅ تنظیمات پیشنهادی اعمال شد.' : 'خطا: ' + data.error;
+                if (data.success) { await loadSettings(); loadAdmin(); }
+            } catch (e) {
+                document.getElementById('suggestedStatus').textContent = 'خطا: ' + e.message;
+            }
+        }
+
         function toggleMembers() {
             const panel = document.getElementById('membersPanel');
             panel.classList.toggle('hidden');
@@ -260,10 +360,12 @@
             const tbody = document.getElementById('membersTableBody');
             tbody.innerHTML = visibleMembers.map((m, i) => {
                 const chips = (m.regions || []).map(r =>
-                    `<button data-member-unlink="${i}" data-region="${esc(r)}" title="حذف لینک" class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded-lg text-[11px] ml-1">${esc(r)} ✕</button>`
+                    `<button data-member-unlink="${i}" data-region="${esc(r)}" title="حذف لینک" class="inline-flex items-center gap-1 bg-slate-700 text-sky-300 border border-slate-600 px-2 py-1 rounded-lg text-[11px] ml-1">${r === '*' ? '🌐 دسترسی کل مناطق' : esc(r)} ✕</button>`
                 ).join('');
-                const options = memberRegions.map(r =>
-                    `<option value="${esc(r)}" ${(m.regions || []).includes(r) ? 'disabled' : ''}>${esc(r)}</option>`).join('');
+                const allRegionsLinked = (m.regions || []).includes('*');
+                const options = `<option value="*" ${allRegionsLinked ? 'disabled' : ''}>🌐 دسترسی کل مناطق</option>` +
+                    memberRegions.map(r =>
+                        `<option value="${esc(r)}" ${allRegionsLinked || (m.regions || []).includes(r) ? 'disabled' : ''}>${esc(r)}</option>`).join('');
                 return `<tr>
                     <td class="p-3 font-bold text-slate-900">${esc(m.displayName)}</td>
                     <td class="p-3 text-left" dir="ltr">${esc(m.username)}</td>
@@ -318,7 +420,7 @@
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden')) loadSettings();
+            if (!panel.classList.contains('hidden')) { loadSettings(); loadSuggested(); }
         }
 
         async function loadSettings() {
@@ -553,21 +655,17 @@
             shown.forEach(store => {
                 const isDone = store.isLocked;
                 const isInProgress = !isDone && store.auditor;
-                const cls = isDone
-                    ? 'bg-emerald-600/25 border-emerald-500 hover:bg-emerald-600/40'
-                    : isInProgress
-                        ? 'bg-amber-600/25 border-amber-500 hover:bg-amber-600/40'
-                        : 'bg-rose-50 border-rose-200 hover:bg-rose-900/50';
-                const dot = isDone ? 'bg-emerald-400' : isInProgress ? 'bg-amber-400' : 'bg-rose-500';
-                const txt = isDone ? 'text-emerald-700' : isInProgress ? 'text-amber-700' : 'text-rose-700';
+                const cls = isDone ? 'tile-done' : isInProgress ? 'tile-progress' : 'tile-pending';
                 const label = isDone ? 'تکمیل' : isInProgress ? 'در حال اجرا' : 'در انتظار';
+                const date = isDone && store.auditDate
+                    ? `<span class="tile-date">📅 ${esc(store.auditDate)}</span>` : '';
                 grid.innerHTML += `
                     <a data-user-link="/?plant=${store.plant}" href="#" title="${store.plant} - ${store.storeName} (${label})"
-                       class="aspect-square min-h-[64px] border ${cls} rounded-xl p-1.5 flex flex-col items-center justify-center gap-0.5 transition-all hover:scale-105 hover:shadow-lg relative overflow-hidden">
-                        <span class="absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${dot}"></span>
-                        <span class="font-bold text-[13px] text-slate-900 leading-none">${store.plant}</span>
-                        <span class="text-[8px] truncate w-full text-center opacity-70 leading-none mt-0.5">${store.storeName}</span>
-                        <span class="text-[8px] font-bold ${txt} leading-none">${label}</span>
+                       class="store-tile ${cls}">
+                        <span class="tile-code">${store.plant}</span>
+                        <span class="tile-name">${esc(store.storeName || '')}</span>
+                        <span class="tile-label">${label}</span>
+                        ${date}
                     </a>
                 `;
             });
@@ -647,7 +745,9 @@
         }
 
         loadAdmin();
+        loadLiveActivity();
         setInterval(loadAdmin, 15000);
+        setInterval(loadLiveActivity, 5000);
     </script>
     <script src="/auth-ui.js"></script>
     <script src="vf-apply.js"></script>

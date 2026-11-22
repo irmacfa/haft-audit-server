@@ -276,7 +276,7 @@ function getCacheStatus() {
 }
 
 module.exports = {
-    DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR,
+    DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR, DEFAULT_SETTINGS,
     invalidateCache, ensureMasterCache, getExcelPath, readDb, writeDb,
     getSettings, getEffectiveSettings, saveSettings, getRegion,
     getMasterColumns, getStores, getEquipmentData,

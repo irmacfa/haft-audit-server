@@ -65,6 +65,15 @@
         <div id="regionProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </div>
 
+    <!-- پیشرفت به تفکیک کارشناس -->
+    <div class="w-full mb-8 bg-white border border-slate-200 rounded-3xl p-5 shadow-xl">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+            <h2 class="text-sm font-bold text-slate-900">👷 پیشرفت انبارگردانی به تفکیک کارشناس</h2>
+            <span class="text-[10px] text-slate-500">بر اساس آخرین انبارگردان ثبتشده هر فروشگاه</span>
+        </div>
+        <div id="expertProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+    </div>
+
     <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
 
     <script>
@@ -107,6 +116,7 @@
             document.getElementById('countPending').innerText = filtered.filter(s => !s.isLocked && !s.auditor).length;
 
             renderRegionProgress();
+            renderExpertProgress(filtered);
             renderGrid(filtered);
         }
 
@@ -141,6 +151,44 @@
             }).join('');
         }
 
+        function renderExpertProgress(stores) {
+            const box = document.getElementById('expertProgress');
+            const byExpert = {};
+            stores.forEach(s => {
+                const name = s.auditor || 'انبارگردان نامشخص';
+                if (!byExpert[name]) byExpert[name] = { total: 0, done: 0, progress: 0 };
+                byExpert[name].total++;
+                if (s.isLocked) byExpert[name].done++;
+                else if (s.auditor) byExpert[name].progress++;
+            });
+            const entries = Object.entries(byExpert).sort((a, b) => b[1].done - a[1].done);
+            if (!entries.length) {
+                box.innerHTML = '<p class="text-xs text-slate-400 col-span-full">کارشناسی یافت نشد.</p>';
+                return;
+            }
+            box.innerHTML = entries.map(([name, v]) => {
+                const pct = v.total ? Math.round(v.done / v.total * 100) : 0;
+                const barColor = pct === 100 ? 'bg-emerald-500' : pct >= 50 ? 'bg-sky-500' : 'bg-orange-500';
+                return `
+                    <div class="bg-slate-900/50 border border-slate-700/60 rounded-2xl p-3">
+                        <div class="flex justify-between items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-slate-100 truncate" title="${escapeHtml(name)}">👤 ${escapeHtml(name)}</span>
+                            <span class="text-xs font-bold ${pct === 100 ? 'text-emerald-400' : 'text-amber-400'}">${pct}٪</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                            <div class="${barColor} h-full transition-all duration-500" style="width:${pct}%"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2">${v.done} تکمیل · ${v.progress} در حال اجرا · ${v.total} کل</p>
+                    </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[ch]);
+        }
+
         function onMonitorRegionChange() {
             document.getElementById('regionHint').innerText = document.getElementById('regionFilter').value === 'all'
                 ? 'برای فیلتر، روی منطقه کلیک کنید'
@@ -168,33 +216,24 @@
 
         function renderGrid(stores) {
             const grid = document.getElementById('statsGrid');
-            grid.innerHTML = '';
-            stores.forEach(store => {
-                const isDone = store.isLocked;
-                const isInProgress = !isDone && (store.auditor !== null);
-
-                let bgColor = 'bg-rose-50 border-rose-200';
-                let textColor = 'text-rose-700';
-                let label = 'در انتظار';
-
-                if (isDone) {
-                    bgColor = 'bg-emerald-600/20 border-emerald-500';
-                    textColor = 'text-emerald-700';
-                    label = 'تکمیل';
-                } else if (isInProgress) {
-                    bgColor = 'bg-amber-600/20 border-amber-500';
-                    textColor = 'text-amber-700';
-                    label = 'در حال انجام';
-                }
-
-                grid.innerHTML += `
-                    <div class="status-card border ${bgColor} rounded-xl p-3 shadow-sm text-center">
-                        <div class="font-bold text-lg mb-1">${store.plant}</div>
-                        <div class="text-[10px] truncate opacity-70">${store.storeName}</div>
-                        <div class="mt-2 text-[9px] font-bold ${textColor}">${label}</div>
-                    </div>
-                `;
-            });
+            grid.innerHTML = stores.map(store => {
+                const isDone = !!store.isLocked;
+                const isInProgress = !isDone && !!store.auditor;
+                const cls = isDone ? 'tile-done' : isInProgress ? 'tile-progress' : 'tile-pending';
+                const label = isDone ? 'تکمیل' : isInProgress ? 'در حال انجام' : 'در انتظار';
+                const date = isDone && store.auditDate
+                    ? `<span class="tile-date">📅 ${escapeHtml(store.auditDate)}</span>` : '';
+                return `
+                    <div class="store-tile status-card ${cls}" title="${escapeHtml(store.plant)} - ${escapeHtml(store.storeName || '')} (${label})">
+                        <span class="tile-code">${escapeHtml(store.plant)}</span>
+                        <span class="tile-name">${escapeHtml(store.storeName || '')}</span>
+                        <span class="tile-label">${label}</span>
+                        ${date}
+                    </div>`;
+            }).join('');
+            if (!stores.length) {
+                grid.innerHTML = '<div class="col-span-full text-center py-16 text-slate-400">فروشگاهی یافت نشد.</div>';
+            }
         }
 
         loadMonitoring();

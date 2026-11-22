@@ -20,21 +20,22 @@
             justify-content: center;
             padding: 24px;
             font-family: IRANSansX, Tahoma, sans-serif;
-            color: #182033;
+            color: #e8eef8;
             background:
-                radial-gradient(circle at 18% 12%, rgba(255,255,255,.95) 0, transparent 42%),
-                radial-gradient(circle at 88% 88%, rgba(203,220,245,.75) 0, transparent 46%),
-                linear-gradient(145deg, #f7f9fc 0%, #eaf0f8 100%);
+                radial-gradient(1000px 600px at 12% -10%, rgba(245,158,11,.13), transparent 62%),
+                radial-gradient(900px 560px at 92% 8%, rgba(59,130,246,.14), transparent 62%),
+                linear-gradient(160deg, #070b14 0%, #0b1220 55%, #070b14 100%);
+            background-attachment: fixed;
         }
         .card {
             width: 100%;
             max-width: 440px;
-            background: rgba(255,255,255,.94);
-            border: 1px solid #e3e9f2;
+            background: rgba(15,23,42,.9);
+            border: 1px solid #26334b;
             border-radius: 26px;
             padding: 34px 30px 30px;
-            box-shadow: 0 22px 60px rgba(23,45,90,.10), inset 0 1px 0 rgba(255,255,255,.9);
-            backdrop-filter: blur(6px);
+            box-shadow: 0 26px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+            backdrop-filter: blur(14px);
         }
         .brand {
             display: flex;
@@ -48,39 +49,39 @@
             width: min(300px, 72vw);
             height: auto;
             display: block;
-            filter: drop-shadow(0 8px 16px rgba(11,47,148,.16));
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,.5));
         }
         h1 {
             font-size: 17px;
             line-height: 1.7;
             margin: 0;
             font-weight: 600;
-            color: #141b2c;
+            color: #f1f5f9;
         }
-        .sub { color: #758095; font-size: 12px; margin-top: 2px; }
-        label { display: block; font-size: 13px; margin: 16px 0 7px; color: #3b4354; font-weight: 500; }
+        .sub { color: #93a3ba; font-size: 12px; margin-top: 2px; }
+        label { display: block; font-size: 13px; margin: 16px 0 7px; color: #cbd5e1; font-weight: 500; }
         input[type=text], input[type=password] {
             width: 100%;
             height: 46px;
             padding: 0 13px;
-            background: #f8fafc;
-            color: #182033;
-            border: 1px solid #d9dfeb;
+            background: #0b1424;
+            color: #e8eef8;
+            border: 1px solid #2a3852;
             border-radius: 10px;
             font-family: inherit;
             font-size: 14px;
             outline: none;
             transition: border-color .2s, box-shadow .2s, background .2s;
         }
-        input::placeholder { color: #a6aebe; }
+        input::placeholder { color: #64748b; }
         input:focus {
-            border-color: #0b2f96;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(11,47,148,.10);
+            border-color: #f59e0b;
+            background: #0f172a;
+            box-shadow: 0 0 0 4px rgba(245,158,11,.14);
         }
-        .row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-size: 12px; color: #758095; gap: 10px; }
-        .row label { margin: 0; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; color: #5b6475; }
-        .row input[type=checkbox] { accent-color: #0b2f96; width: 15px; height: 15px; }
+        .row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-size: 12px; color: #93a3ba; gap: 10px; }
+        .row label { margin: 0; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; color: #a9b6ca; }
+        .row input[type=checkbox] { accent-color: #f59e0b; width: 15px; height: 15px; }
         button {
             width: 100%;
             min-height: 46px;
@@ -89,26 +90,27 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: linear-gradient(135deg, #0b2f96 0%, #1450c8 100%);
-            color: #fff;
-            border: 0;
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+            color: #1a1206;
+            border: 1px solid #fbbf24;
             border-radius: 10px;
             font-family: inherit;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 10px 24px rgba(11,47,148,.22);
-            transition: transform .2s, filter .2s, opacity .2s;
+            box-shadow: 0 12px 28px rgba(245,158,11,.2), inset 0 1px 0 rgba(255,255,255,.35);
+            transition: transform .18s, filter .18s, opacity .2s, box-shadow .18s;
         }
-        button:hover { filter: brightness(1.06); }
+        button:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 16px 34px rgba(245,158,11,.28); }
         button:active { transform: scale(.98); }
+        button:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
         button:disabled { opacity: .75; cursor: wait; }
         .spinner {
             display: none;
             width: 16px;
             height: 16px;
-            border: 2px solid rgba(255,255,255,.45);
-            border-top-color: #fff;
+            border: 2px solid rgba(26,18,6,.35);
+            border-top-color: #1a1206;
             border-radius: 50%;
             animation: spin .7s linear infinite;
         }
@@ -117,7 +119,7 @@
             display: none;
             height: 3px;
             margin-top: 14px;
-            background: #e7ecf5;
+            background: #1e293b;
             border-radius: 999px;
             overflow: hidden;
         }
@@ -126,7 +128,7 @@
             height: 100%;
             width: 35%;
             border-radius: 999px;
-            background: linear-gradient(90deg, #0b2f96, #3b82f6);
+            background: linear-gradient(90deg, #f59e0b, #fb923c);
             animation: slide 1.05s infinite ease-in-out;
         }
         @keyframes slide {
@@ -137,10 +139,10 @@
             display: none;
             margin-top: 16px;
             padding: 11px 13px;
-            background: #fff1f2;
-            border: 1px solid #fecdd3;
+            background: rgba(244,63,94,.12);
+            border: 1px solid rgba(251,113,133,.45);
             border-radius: 10px;
-            color: #9f1239;
+            color: #fda4af;
             font-size: 12.5px;
             line-height: 1.7;
         }

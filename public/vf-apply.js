@@ -75,7 +75,7 @@
         root.querySelectorAll('[class*="rounded-3xl"]').forEach(c => c.classList.add('ds-card'));
 
         /* سه کارت مرحله در پنل انبارگردان */
-        ['storeCodeInput', 'managerEmailInput', 'globalAssetSearchInput'].forEach(id => {
+        ['storeCodeInput', 'globalAssetSearchInput'].forEach(id => {
             const input = document.getElementById(id);
             if (input) input.closest('[class*="rounded-3xl"]')?.classList.add('ds-step');
         });
@@ -97,8 +97,8 @@
         root.querySelectorAll('#statsGrid > div, #adminStatsGrid > a').forEach(t => {
             t.classList.add('ds-tile');
             const c = t.className;
-            if (/emerald/.test(c)) t.classList.add('ok');
-            else if (/amber/.test(c)) t.classList.add('warn');
+            if (/tile-done|emerald/.test(c)) t.classList.add('ok');
+            else if (/tile-progress|amber/.test(c)) t.classList.add('warn');
             else t.classList.add('bad');
         });
 

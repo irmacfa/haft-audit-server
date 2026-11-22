@@ -10,6 +10,8 @@ const { execFile } = require('child_process');
 const GROUP = process.env.LDAP_ALLOWED_GROUP || 'Oshanak-ITSUP';
 const LINKS_PATH = path.join(__dirname, 'db', 'region_members.json');
 const CACHE_MS = 5 * 60 * 1000;
+// مقدار ویژه «دسترسی کل منطقه»: کاربر تمام فروشگاهها را میبیند
+const ALL_REGIONS = '*';
 
 let membersCache = { at: 0, data: [] };
 
@@ -74,6 +76,12 @@ function getLinks() {
     return readLinks();
 }
 
+function getRegionsForUser(username) {
+    const key = String(username || '').trim().toLowerCase();
+    const value = readLinks()[key];
+    return Array.isArray(value) ? value.slice() : [];
+}
+
 function setLink(username, region, assigned) {
     const user = String(username || '').trim().toLowerCase();
     const reg = String(region || '').trim();
@@ -94,4 +102,4 @@ function invalidate() {
     membersCache = { at: 0, data: [] };
 }
 
-module.exports = { GROUP, listMembers, getLinks, setLink, invalidate };
+module.exports = { GROUP, ALL_REGIONS, listMembers, getLinks, getRegionsForUser, setLink, invalidate };

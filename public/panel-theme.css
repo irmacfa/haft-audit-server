@@ -1,46 +1,340 @@
-/* پنلها با همان پالت رنگی صفحه ورود */
+/* ============================================================
+   Haft Audit — تم تیره یکپارچه تمام پنلها
+   جایگزین کامل تم روشن موقت؛ پالت Gradient تیره + تاکید کهربایی
+   ============================================================ */
 :root {
-    color-scheme: light;
-    --background: #f7f9fc;
-    --foreground: #182033;
-    --card: #ffffff;
-    --popover: #ffffff;
-    --primary: #0b2f96;
-    --primary-foreground: #ffffff;
-    --secondary: #eef2f8;
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    --accent: #e8eefb;
-    --border: #d9e1ee;
-    --input: #d9e1ee;
-    --ring: #0b2f96;
-    --brand: #0b2f96;
-    --brand-foreground: #ffffff;
-    --destructive: #be123c;
-    --success: #047857;
-    --warning: #b45309;
-    --field: #f8fafc;
-    --line: 1px;
+    color-scheme: dark;
+
+    /* توکنهای اصلی (روی مقادیر Graphite در style.css سوار میشود) */
+    --background: #070b14;
+    --foreground: #e8eef8;
+    --card: #0f172a;
+    --popover: #131d31;
+    --primary: #f8fafc;
+    --primary-foreground: #0b1220;
+    --secondary: #1b2639;
+    --muted: #131e30;
+    --muted-foreground: #93a3ba;
+    --accent: #24314a;
+    --border: #26334b;
+    --input: #2a3852;
+    --ring: #f59e0b;
+
+    --brand: #f59e0b;
+    --brand-foreground: #1a1206;
+    --destructive: #fb7185;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --info: #60a5fa;
+
+    /* رنگهای سطحی اختصاصی پنل */
+    --p-surface: #0f172a;
+    --p-surface-2: #131e30;
+    --p-surface-3: #1a2539;
+    --p-line: #26334b;
+    --p-line-soft: #1d293e;
+    --p-ink: #e8eef8;
+    --p-muted: #93a3ba;
+    --p-ok: #34d399;
+    --p-warn: #fbbf24;
+    --p-bad: #fb7185;
+    --p-info: #60a5fa;
 }
 
+/* ---------- پسزمنامه کلی ---------- */
 body.panel-body {
     background:
-        radial-gradient(circle at 18% 12%, rgba(255,255,255,.95) 0, transparent 42%),
-        radial-gradient(circle at 88% 88%, rgba(203,220,245,.75) 0, transparent 46%),
-        linear-gradient(145deg, #f7f9fc 0%, #eaf0f8 100%) !important;
-    color: #182033;
+        radial-gradient(1100px 620px at 10% -12%, rgba(245, 158, 11, .11), transparent 62%),
+        radial-gradient(900px 540px at 94% 4%, rgba(59, 130, 246, .12), transparent 62%),
+        radial-gradient(700px 500px at 50% 110%, rgba(16, 185, 129, .06), transparent 60%),
+        linear-gradient(165deg, #070b14 0%, #0a1120 52%, #070b14 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--p-ink) !important;
     min-height: 100vh;
 }
 
-/* سایه نرم کارتها مطابق صفحه ورود */
-.shadow-xl, .shadow-2xl, .shadow-lg {
-    box-shadow: 0 18px 45px rgba(23,45,90,.08) !important;
+::selection { background: rgba(245, 158, 11, .32); color: #fff; }
+
+/* ---------- تبدیل classهای روشن باقیمانده به تیره ---------- */
+.bg-white,
+.bg-white\/70,
+.bg-white\/90,
+.bg-slate-100,
+.bg-slate-200,
+.bg-blue-50,
+.bg-indigo-50,
+.bg-emerald-50,
+.bg-emerald-100,
+.bg-amber-50,
+.bg-amber-100,
+.bg-rose-50,
+.bg-rose-100,
+.bg-sky-50,
+.bg-teal-50 {
+    background-color: var(--p-surface) !important;
 }
 
+.bg-white\/70 { background-color: rgba(15, 23, 42, .72) !important; }
+.bg-white\/90 { background-color: rgba(15, 23, 42, .9) !important; }
+
+.text-slate-950,
+.text-slate-900,
+.text-slate-800,
+.text-slate-700 {
+    color: var(--p-ink) !important;
+}
+.text-slate-600,
+.text-slate-500,
+.text-slate-400 {
+    color: var(--p-muted) !important;
+}
+
+.text-orange-700,
+.text-orange-400,
+.text-amber-700,
+.text-amber-400,
+.text-amber-300,
+.text-amber-200 {
+    color: #fbbf24 !important;
+}
+.text-sky-700,
+.text-sky-400,
+.text-indigo-700,
+.text-indigo-400,
+.text-indigo-300,
+.text-blue-700 {
+    color: #7dd3fc !important;
+}
+.text-emerald-700,
+.text-emerald-400,
+.text-emerald-300 {
+    color: #6ee7b7 !important;
+}
+.text-rose-700,
+.text-rose-400,
+.text-rose-300 {
+    color: #fda4af !important;
+}
+
+.border-slate-300,
+.border-slate-200,
+.border-slate-700,
+.border-slate-600,
+.border-emerald-200,
+.border-emerald-800,
+.border-amber-200,
+.border-amber-800,
+.border-rose-200,
+.border-rose-800,
+.border-indigo-200,
+.border-blue-200,
+.border-sky-200,
+.border-orange-200 {
+    border-color: var(--p-line) !important;
+}
+.divide-slate-200,
+.divide-slate-700 { border-color: var(--p-line-soft) !important; }
+
+/* ---------- کارتها و سطوح ---------- */
+.rounded-3xl,
+.shadow-xl,
+.shadow-2xl,
+.shadow-lg { box-shadow: 0 18px 48px rgba(0, 0, 0, .32) !important; }
+
+header,
+section[class*="rounded-3xl"],
+[class*="rounded-3xl"][class*="border"] {
+    backdrop-filter: blur(12px);
+}
+
+/* باکس نتایج و جستجو حتماً زمینه تیره داشته باشند */
+#resultsContainer,
+#globalSearchResultBox,
+#statusBox,
+#myStoresPanel,
+#statsGrid,
+#adminStatsGrid,
+#regionProgress,
+#expertProgress,
+#adminRegionProgress,
+#liveActivity,
+#membersPanel,
+#settingsPanel,
+#tableView > div,
+#gridView > div,
+header {
+    background-color: rgba(15, 23, 42, .78) !important;
+    border-color: var(--p-line) !important;
+}
+
+#globalSearchResultBox [class*="bg-white"],
+#resultsContainer [class*="bg-white"],
+#membersPanel [class*="bg-white"],
+#settingsPanel [class*="bg-white"],
+header [class*="bg-slate-100"] {
+    background-color: var(--p-surface-2) !important;
+    border-color: var(--p-line) !important;
+}
+
+/* نوار پیشرفت و جدول */
+#progressBar,
+#auditProgressBar { background: linear-gradient(90deg, #f59e0b, #fb923c) !important; }
+
+thead tr,
+[class*="bg-slate-100"] { background-color: var(--p-surface-2) !important; }
+
+table.vf-table thead th {
+    background: var(--p-surface-2) !important;
+    color: var(--p-muted) !important;
+}
+
+/* ---------- دکمهها: یکدست، برجستهتر، واکنشگرا ---------- */
+button,
+a.vf-btn,
+.filter-btn,
+.af-btn {
+    border-radius: 11px !important;
+    letter-spacing: .01em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 6px 16px rgba(0, 0, 0, .26);
+    transition: transform .16s ease, filter .16s ease, border-color .16s ease,
+                box-shadow .16s ease, background-color .16s ease !important;
+}
+
+button:hover:not(:disabled),
+a.vf-btn:hover,
+.filter-btn:hover,
+.af-btn:hover {
+    filter: brightness(1.14) !important;
+    border-color: var(--p-brand) !important;
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 10px 24px rgba(0, 0, 0, .38);
+}
+
+button:active:not(:disabled),
+a.vf-btn:active { transform: translateY(0) scale(.975) !important; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ring) !important;
+    outline-offset: 2px;
+}
+
+button:disabled { opacity: .5; cursor: not-allowed; filter: grayscale(.35); }
+
+/* دکمههای اصلی گرادینت دار */
+.vf-btn-brand,
+.vf-primary,
+[id="finalizeBtn"] {
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+    color: #1a1206 !important;
+    border-color: #f59e0b !important;
+    font-weight: 800 !important;
+}
+.vf-btn-brand:hover,
+.vf-primary:hover { color: #1a1206 !important; }
+
+.vf-btn-success,
+.bg-emerald-600,
+.bg-emerald-700 {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ecfdf5 !important;
+    border-color: #10b981 !important;
+}
+
+.vf-btn-danger,
+.bg-rose-600,
+.bg-rose-700 {
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+    color: #fff !important;
+    border-color: #fb7185 !important;
+}
+
+.bg-indigo-600,
+.bg-indigo-700,
+.bg-blue-600,
+.bg-blue-700 {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    color: #eff6ff !important;
+    border-color: #60a5fa !important;
+}
+
+.bg-sky-600,
+.bg-sky-700 {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    color: #f0f9ff !important;
+    border-color: #7dd3fc !important;
+}
+
+/* فیلدها */
 input:not([type='checkbox']):not([type='radio']):not([type='file']),
-select, textarea {
-    background-color: var(--field) !important;
-    color: var(--foreground) !important;
+select,
+textarea {
+    background-color: var(--p-surface-2) !important;
+    color: var(--p-ink) !important;
+    border-color: var(--p-line) !important;
+    border-radius: 10px !important;
 }
+input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
+select:focus,
+textarea:focus {
+    border-color: var(--p-brand) !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, .16) !important;
+}
+input::placeholder,
+textarea::placeholder { color: #6b7c96 !important; }
 
-thead tr { background-color: var(--muted) !important; }
+/* ---------- کاشیهای شبکه فروشگاهها ---------- */
+.store-tile {
+    position: relative;
+    border-radius: 12px;
+    border: 1px solid var(--p-line);
+    background: var(--p-surface-2);
+    min-height: 78px;
+    padding: 8px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    overflow: hidden;
+}
+.store-tile::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 2px;
+    background: currentColor;
+    opacity: .85;
+}
+.store-tile:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: currentColor;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, .4);
+    z-index: 2;
+}
+.store-tile.tile-done { color: var(--p-ok); background: linear-gradient(180deg, rgba(16, 185, 129, .18), rgba(15, 23, 42, .8)); border-color: rgba(52, 211, 153, .5); }
+.store-tile.tile-progress { color: var(--p-warn); background: linear-gradient(180deg, rgba(245, 158, 11, .18), rgba(15, 23, 42, .8)); border-color: rgba(251, 191, 36, .5); }
+.store-tile.tile-pending { color: var(--p-bad); background: linear-gradient(180deg, rgba(244, 63, 94, .15), rgba(15, 23, 42, .8)); border-color: rgba(251, 113, 133, .45); }
+.store-tile .tile-code { color: var(--p-ink); font-weight: 800; font-size: 13px; line-height: 1.1; direction: ltr; }
+.store-tile .tile-name { color: var(--p-muted); font-size: 9px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-tile .tile-label { font-size: 9px; font-weight: 800; line-height: 1.2; }
+.store-tile .tile-date { font-size: 8px; color: var(--p-muted); direction: rtl; line-height: 1.2; }
+
+/* ---------- اسکرولبار ---------- */
+* { scrollbar-width: thin; scrollbar-color: #2c3a55 transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #2c3a55; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: #3d4f70; }
+
+/* ---------- واکنشگرا ---------- */
+@media (max-width: 640px) {
+    header { padding: 12px !important; }
+    .store-tile { min-height: 66px; }
+    .store-tile .tile-code { font-size: 11px; }
+    button, .vf-btn { font-size: 11px !important; }
+}
