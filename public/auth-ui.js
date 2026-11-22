@@ -1,28 +1,54 @@
 /**
- * نمایش کاربر واردشده، دکمه خروج و لینکهای بین پنلها با پورتهای قابل تنظیم
- * این فایل روی هر دو سرور (پورتهای پیشفرض 2030/2031) در دسترس است.
+ * نمایش کاربر واردشده، دکمه خروج و لینکهای بین پنلها
+ * صفحه مانیتورینگ برای همه آزاد است؛ پنل مدیریت فقط برای حساب aghanbari.
  */
 (function () {
     var portConfig = null;
+    var isMonitoring = location.pathname.indexOf('monitoring.html') !== -1;
 
     function displayName(user) {
         if (!user) return 'کاربر';
         return user.displayName || user.username || 'کاربر';
     }
 
-    function fillUser(user) {
+    function hideAll(selector) {
+        document.querySelectorAll(selector).forEach(function (el) {
+            el.classList.add('hidden');
+        });
+    }
+
+    function showAll(selector) {
+        document.querySelectorAll(selector).forEach(function (el) {
+            el.classList.remove('hidden');
+        });
+    }
+
+    function fillUser(data) {
+        var user = data.user;
         document.querySelectorAll('[data-user-name]').forEach(function (el) {
             el.textContent = displayName(user);
         });
         document.querySelectorAll('[data-user-mail]').forEach(function (el) {
-            el.textContent = user.mail || '';
+            el.textContent = user && user.mail ? user.mail : '';
         });
-        var auditor = document.getElementById('auditorNameDisplay');
-        if (auditor) auditor.textContent = displayName(user);
-        var auditorMail = document.getElementById('auditorMailDisplay');
-        if (auditorMail) auditorMail.textContent = user.mail || user.username || '';
         var badge = document.getElementById('userBadge');
-        if (badge && user.mail) badge.title = user.mail;
+        if (badge && user && user.mail) badge.title = user.mail;
+
+        showAll('[data-user-only]');
+        hideAll('[data-guest-only]');
+        if (data.isAdmin) showAll('[data-admin-only]');
+        else hideAll('[data-admin-only]');
+    }
+
+    function guestMode() {
+        hideAll('[data-user-only]');
+        hideAll('[data-admin-only]');
+        showAll('[data-guest-only]');
+        // در صفحات محافظتشده سرور خودش ریدایرکت میکند، اینجا فقط fallback است
+        if (!isMonitoring) {
+            var next = encodeURIComponent(location.pathname + location.search);
+            location.replace('/login.html?next=' + next);
+        }
     }
 
     function buildUrl(path, port) {
@@ -42,14 +68,10 @@
     fetch('/api/auth/me', { credentials: 'same-origin' })
         .then(function (r) { return r.json(); })
         .then(function (data) {
-            if (!data.authenticated) {
-                var next = encodeURIComponent(location.pathname + location.search);
-                location.replace('/login.html?next=' + next);
-                return;
-            }
-            fillUser(data.user);
+            if (!data.authenticated) return guestMode();
+            fillUser(data);
         })
-        .catch(function () { /* در صورت خطا، صفحه همانطور که هست باقی میماند */ });
+        .catch(function () { /* وضعیت فعلی باقی میماند */ });
 
     fetch('/api/public-config', { credentials: 'same-origin' })
         .then(function (r) { return r.json(); })
@@ -57,7 +79,7 @@
             portConfig = cfg;
             applyPortLinks();
         })
-        .catch(function () { /* در صورت خطا لینکهای پیشفرض باقی میمانند */ });
+        .catch(function () {});
 
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-logout]');

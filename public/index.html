@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="vibefarsi.css">
     <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="/panel-theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .text-mixed { direction: rtl; unicode-bidi: plaintext; text-align: right; }
@@ -22,7 +23,7 @@
         .app-busy { filter: blur(2px) grayscale(.15); opacity: .55; pointer-events: none; user-select: none; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased w-full">
+<body class="panel-body text-slate-800 min-h-screen flex flex-col justify-between antialiased w-full">
     <div id="loadingOverlay" aria-live="polite">
         <div id="loadingCard">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
@@ -38,22 +39,22 @@
     </div>
     <div id="appShell">
 
-    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/60 shadow-lg py-4 px-6 sticky top-0 z-50 w-full">
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-lg py-4 px-6 sticky top-0 z-50 w-full">
         <div class="w-full flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img src="/logo.webp" alt="هفت" class="h-12 w-auto object-contain">
                 <div>
-                    <h1 class="text-xl font-bold text-white">سامانه انبارگردانی انفورماتیک فروشگاه‌ها</h1>
-                    <p class="text-xs text-slate-400">فروشگاه‌های زنجیره‌ای هفت - واحد پشتیبانی IT</p>
+                    <h1 class="text-xl font-bold text-slate-900">سامانه انبارگردانی انفورماتیک فروشگاه‌ها</h1>
+                    <p class="text-xs text-slate-500">فروشگاه‌های زنجیره‌ای هفت - واحد پشتیبانی IT</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <a href="/monitoring.html" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">📊 مانیتورینگ</a>
-                <a data-admin-link="/" href="#" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🛡️ پنل مدیریت</a>
-                <div id="serverStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300">
+                <a href="/monitoring.html" class="bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs px-4 py-2 rounded-xl transition font-medium">📊 مانیتورینگ</a>
+                <a data-admin-only data-admin-link="/" href="#" class="hidden bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🛡️ پنل مدیریت</a>
+                <div id="serverStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
                     ● متصل به سرور مرکزی
                 </div>
-                <div id="userBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-slate-200" title="">
+                <div id="userBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-700" title="">
                     👤 <span data-user-name>...</span>
                 </div>
                 <button data-logout type="button" class="bg-rose-700 hover:bg-rose-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🚪 خروج</button>
@@ -66,75 +67,71 @@
         <!-- Search Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
             <!-- مرحله ۱ -->
-            <div class="bg-slate-800 border border-orange-700/40 rounded-3xl p-5 shadow-xl">
+            <div class="bg-white border border-orange-700/40 rounded-3xl p-5 shadow-xl">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-sm">۱</span>
                     <div>
-                        <h2 class="text-sm font-bold text-orange-400">کد فروشگاه</h2>
-                        <p class="text-[10px] text-slate-400">کد ۴ رقمی پلنت را وارد کنید</p>
+                        <h2 class="text-sm font-bold text-orange-700">کد فروشگاه</h2>
+                        <p class="text-[10px] text-slate-500">کد ۴ رقمی پلنت را وارد کنید</p>
                     </div>
                 </div>
-                <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
+                <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
             </div>
 
             <!-- مرحله ۲ -->
-            <div class="bg-slate-800 border border-sky-700/40 rounded-3xl p-5 shadow-xl">
+            <div class="bg-white border border-sky-700/40 rounded-3xl p-5 shadow-xl">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">۲</span>
                     <div>
-                        <h2 class="text-sm font-bold text-sky-400">اطلاعات انبارگردان</h2>
-                        <p class="text-[10px] text-slate-400">برای گزارش و ایمیل نهایی استفاده میشود</p>
+                        <h2 class="text-sm font-bold text-sky-700">ایمیل مدیر فروشگاه</h2>
+                        <p class="text-[10px] text-slate-500">گزارش نهایی به این ایمیل ارسال میشود</p>
                     </div>
                 </div>
                 <div class="space-y-2">
-                    <div class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
-                        <span class="text-slate-400">انبارگردان:</span>
-                        <b id="auditorNameDisplay" class="font-bold">...</b>
-                        <div id="auditorMailDisplay" class="text-[10px] text-slate-500" dir="ltr"></div>
-                    </div>
-                    <input type="email" id="managerEmailInput" value="manager@haftstores.ir" placeholder="ایمیل مدیر فروشگاه" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-500">
+                    <input type="email" id="managerEmailInput" value="manager@haftstores.ir" placeholder="ایمیل مدیر فروشگاه" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-sky-500">
+                    <p class="text-[10px] text-slate-500">انبارگردان همان حساب واردشده شماست و نیازی به وارد کردن دستی ندارد.</p>
                 </div>
             </div>
 
             <!-- مرحله ۳ -->
-            <div class="bg-slate-800 border border-emerald-700/40 rounded-3xl p-5 shadow-xl">
+            <div class="bg-white border border-emerald-700/40 rounded-3xl p-5 shadow-xl">
                 <div class="flex items-center gap-3 mb-3">
                     <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">۳</span>
                     <div>
-                        <h2 class="text-sm font-bold text-emerald-400">جستجوی سراسری</h2>
-                        <p class="text-[10px] text-slate-400">جستجوی اموال یا سریال در تمام فروشگاهها</p>
+                        <h2 class="text-sm font-bold text-emerald-700">جستجوی سراسری</h2>
+                        <p class="text-[10px] text-slate-500">جستجوی اموال یا سریال در تمام فروشگاهها</p>
                     </div>
                 </div>
-                <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثال: 217910401171" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-white text-xs font-mono focus:outline-none focus:border-emerald-500">
+                <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثال: 217910401171" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 text-xs font-mono focus:outline-none focus:border-emerald-500">
             </div>
         </div>
 
         <!-- Global Asset Search Results Dropdown / Box -->
-        <div id="globalSearchResultBox" class="hidden w-full mb-8 bg-slate-800 border border-emerald-600/60 rounded-3xl p-5 shadow-2xl">
-            <h3 class="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
+        <div id="globalSearchResultBox" class="hidden w-full mb-8 bg-white border border-emerald-600/60 rounded-3xl p-5 shadow-2xl">
+            <h3 class="text-sm font-bold text-emerald-700 mb-3 flex items-center gap-2">
                 🔍 نتایج جستجوی سراسری تجهیز:
             </h3>
             <div id="globalSearchResultContent" class="space-y-2 text-xs"></div>
         </div>
 
         <!-- Progress & Status Box -->
-        <div id="statusBox" class="hidden w-full mb-8 bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-lg">
+        <div id="statusBox" class="hidden w-full mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-lg">
             <div class="flex justify-between items-center mb-2">
-                <span id="statusMessage" class="text-xs font-medium text-slate-300">در حال جستجوی رکوردها...</span>
-                <span id="statusPercentage" class="text-xs font-bold text-orange-400">0%</span>
+                <span id="statusMessage" class="text-xs font-medium text-slate-700">در حال جستجوی رکوردها...</span>
+                <span id="statusPercentage" class="text-xs font-bold text-orange-700">0%</span>
             </div>
-            <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-700">
+            <div class="w-full bg-white h-2.5 rounded-full overflow-hidden border border-slate-200">
                 <div id="progressBar" class="bg-orange-500 h-full w-0 transition-all duration-150"></div>
             </div>
         </div>
 
         <!-- Lock Status Banner -->
-        <div id="lockBanner" class="hidden bg-amber-950/80 border border-amber-600 text-amber-200 p-4 rounded-2xl mb-6 text-sm flex justify-between items-center">
+        <div id="lockBanner" class="hidden bg-amber-50 border border-amber-600 text-amber-700 p-4 rounded-2xl mb-6 text-sm flex justify-between items-center">
             <div>
                 🔒 <b id="lockBannerTitle">انبارگردانی این فروشگاه انجام شده است.</b>
-                <span id="lockInfo" class="block text-xs text-amber-400 mt-1"></span>
+                <span id="lockInfo" class="block text-xs text-amber-700 mt-1"></span>
             </div>
-            <button onclick="unlockStore()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition shadow">
+            <button onclick="unlockStore()" class="bg-amber-600 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-xl text-xs font-bold transition shadow">
                 🔓 باز کردن قفل و ویرایش مجدد
             </button>
         </div>
@@ -143,43 +140,43 @@
         <div id="resultsContainer" class="hidden space-y-6 w-full">
             
             <!-- Store Title & Counters Card -->
-            <div class="bg-slate-800 border border-slate-700 p-5 rounded-3xl shadow-xl flex flex-wrap justify-between items-center gap-4">
+            <div class="bg-white border border-slate-200 p-5 rounded-3xl shadow-xl flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <span class="text-xs text-orange-400 font-bold block mb-1">نام فروشگاه (مرکز هزینه):</span>
-                    <h2 id="storeTitleName" class="text-2xl font-bold text-white">---</h2>
+                    <span class="text-xs text-orange-700 font-bold block mb-1">نام فروشگاه (مرکز هزینه):</span>
+                    <h2 id="storeTitleName" class="text-2xl font-bold text-slate-900">---</h2>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
-                        <p class="text-[11px] text-slate-400">کل تجهیزات</p>
-                        <p id="totalEquipCount" class="text-lg font-bold text-orange-400 mt-0.5">۰</p>
+                    <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-500">کل تجهیزات</p>
+                        <p id="totalEquipCount" class="text-lg font-bold text-orange-700 mt-0.5">۰</p>
                     </div>
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
-                        <p class="text-[11px] text-slate-400">تایید شده</p>
-                        <p id="countChecked" class="text-lg font-bold text-emerald-400 mt-0.5">۰</p>
+                    <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-500">تایید شده</p>
+                        <p id="countChecked" class="text-lg font-bold text-emerald-700 mt-0.5">۰</p>
                     </div>
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
-                        <p class="text-[11px] text-slate-400">اقلام فاقد</p>
-                        <p id="countMissing" class="text-lg font-bold text-rose-400 mt-0.5">۰</p>
+                    <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-500">اقلام فاقد</p>
+                        <p id="countMissing" class="text-lg font-bold text-rose-700 mt-0.5">۰</p>
                     </div>
-                    <div class="bg-slate-900 border border-slate-700 px-4 py-3 rounded-2xl text-center min-w-[90px]">
-                        <p class="text-[11px] text-slate-400">پیشرفت</p>
-                        <p id="auditProgressCount" class="text-lg font-bold text-sky-400 mt-0.5">۰٪</p>
+                    <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl text-center min-w-[90px]">
+                        <p class="text-[11px] text-slate-500">پیشرفت</p>
+                        <p id="auditProgressCount" class="text-lg font-bold text-sky-700 mt-0.5">۰٪</p>
                     </div>
                 </div>
-                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-700 mt-4">
+                <div class="w-full bg-white h-2 rounded-full overflow-hidden border border-slate-200 mt-4">
                     <div id="auditProgressBar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- Data Table Card -->
-            <div class="bg-slate-800 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden w-full">
-                <div class="p-3 sm:p-4 border-b border-slate-700 flex flex-wrap justify-between items-center gap-3">
+            <div class="bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden w-full">
+                <div class="p-3 sm:p-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-3">
                     <div>
-                        <h3 class="font-semibold text-white text-sm">لیست تجهیزات متریال سری 9000</h3>
-                        <p id="tableInfo" class="text-[10px] text-slate-400 mt-1">نمایش تمام تجهیزات</p>
+                        <h3 class="font-semibold text-slate-900 text-sm">لیست تجهیزات متریال سری 9000</h3>
+                        <p id="tableInfo" class="text-[10px] text-slate-500 mt-1">نمایش تمام تجهیزات</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="saveDraft()" id="draftBtn" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium shadow">
+                        <button onclick="saveDraft()" id="draftBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs px-4 py-2 rounded-xl transition font-medium shadow">
                             💾 ذخیره موقت
                         </button>
                         <button onclick="downloadReport()" id="downloadBtn" class="hidden bg-sky-700 hover:bg-sky-600 text-white text-xs px-4 py-2 rounded-xl transition font-bold shadow">
@@ -191,25 +188,25 @@
                     </div>
                 </div>
                 <!-- نوار فیلتر لیست -->
-                <div class="p-3 border-b border-slate-700 bg-slate-900/40 flex flex-wrap items-center gap-2">
-                    <input type="text" id="tableSearchInput" oninput="renderFilteredTable()" placeholder="جستجو در لیست (اموال، سریال، شرح)..." class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs w-full md:w-64 focus:outline-none focus:border-orange-500">
+                <div class="p-3 border-b border-slate-200 bg-white/70 flex flex-wrap items-center gap-2">
+                    <input type="text" id="tableSearchInput" oninput="renderFilteredTable()" placeholder="جستجو در لیست (اموال، سریال، شرح)..." class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs w-full md:w-64 focus:outline-none focus:border-orange-500">
                     <div class="flex flex-wrap gap-1" id="tableStatusFilters">
                         <button onclick="setAuditFilter('all')" id="af-all" class="af-btn bg-orange-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold">همه</button>
-                        <button onclick="setAuditFilter('unchecked')" id="af-unchecked" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید نشده</button>
-                        <button onclick="setAuditFilter('checked')" id="af-checked" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید شده</button>
-                        <button onclick="setAuditFilter('missing')" id="af-missing" class="af-btn bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold">فاقد</button>
+                        <button onclick="setAuditFilter('unchecked')" id="af-unchecked" class="af-btn bg-slate-100 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید نشده</button>
+                        <button onclick="setAuditFilter('checked')" id="af-checked" class="af-btn bg-slate-100 px-3 py-1.5 rounded-lg text-[11px] font-bold">تایید شده</button>
+                        <button onclick="setAuditFilter('missing')" id="af-missing" class="af-btn bg-slate-100 px-3 py-1.5 rounded-lg text-[11px] font-bold">فاقد</button>
                     </div>
                     <div class="flex gap-1 mr-auto">
-                        <button onclick="checkAllVisible(true)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">✓ تیک همه</button>
-                        <button onclick="checkAllVisible(false)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">✕ پاک کردن</button>
+                        <button onclick="checkAllVisible(true)" class="bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold">✓ تیک همه</button>
+                        <button onclick="checkAllVisible(false)" class="bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold">✕ پاک کردن</button>
                     </div>
                 </div>
                 <div class="overflow-x-auto w-full">
                     <table class="w-full text-right border-collapse">
                         <thead class="sticky top-0 z-10">
-                            <tr id="equipmentTableHeader" class="bg-slate-900 text-slate-400 text-xs border-b border-slate-700"></tr>
+                            <tr id="equipmentTableHeader" class="bg-white text-slate-500 text-xs border-b border-slate-200"></tr>
                         </thead>
-                        <tbody id="equipmentTableBody" class="divide-y divide-slate-700/60 text-sm"></tbody>
+                        <tbody id="equipmentTableBody" class="divide-y divide-slate-200 text-sm"></tbody>
                     </table>
                 </div>
             </div>
@@ -264,19 +261,19 @@
                 const pr = st.progress || st.cache?.progress || st;
                 if (pr && pr.state === 'loading') {
                     showLoading(pr.message, pr.percent, pr.detail);
-                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-amber-950 border border-amber-800 text-amber-300";
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-700";
                     document.getElementById('serverStatusBadge').innerText = `● در حال آماده‌سازی ${pr.percent || 0}%`;
                     return pr;
                 }
                 if (pr && pr.state === 'ready') {
                     if (loadingActive) hideLoading();
-                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300";
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700";
                     document.getElementById('serverStatusBadge').innerText = "● متصل به سرور مرکزی";
                     return pr;
                 }
                 if (pr && pr.state === 'error') {
                     updateLoading(pr.message || 'خطا در آماده‌سازی', pr.percent || 0, pr.detail || '');
-                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-950 border border-rose-800 text-rose-300";
+                    document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
                     document.getElementById('serverStatusBadge').innerText = "✕ خطا در آماده‌سازی داده";
                     return pr;
                 }
@@ -329,7 +326,7 @@
                     handleStoreInput(urlPlant);
                 }
             } catch (err) {
-                document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-950 border border-rose-800 text-rose-300";
+                document.getElementById('serverStatusBadge').className = "text-xs px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
                 document.getElementById('serverStatusBadge').innerText = "✕ خطا در اتصال به سرور";
             }
         };
@@ -373,24 +370,24 @@
             const content = document.getElementById('globalSearchResultContent');
             if (!q || q.length < 4) { box.classList.add('hidden'); content.innerHTML = ''; return; }
             box.classList.remove('hidden');
-            content.innerHTML = `<p class="text-slate-400">در حال جستجو...</p>`;
+            content.innerHTML = `<p class="text-slate-500">در حال جستجو...</p>`;
             try {
                 const pr = await pollCacheProgress();
-                if (!pr || !pr.ready) { content.innerHTML = `<p class="text-amber-300">داده‌ها هنوز در حال آماده‌سازی هستند. بعد از تکمیل بارگذاری دوباره جستجو کنید.</p>`; return; }
+                if (!pr || !pr.ready) { content.innerHTML = `<p class="text-amber-700">داده‌ها هنوز در حال آماده‌سازی هستند. بعد از تکمیل بارگذاری دوباره جستجو کنید.</p>`; return; }
                 const res = await fetch(`/api/equipment/search?q=${encodeURIComponent(q)}`);
                 const result = await res.json();
                 const matches = result.data || [];
-                if (matches.length === 0) { content.innerHTML = `<p class="text-rose-400">هیچ تجهیزی با شماره اموال یا سریال «${query}» یافت نشد.</p>`; return; }
+                if (matches.length === 0) { content.innerHTML = `<p class="text-rose-700">هیچ تجهیزی با شماره اموال یا سریال «${query}» یافت نشد.</p>`; return; }
                 content.innerHTML = matches.slice(0, 30).map(m => `
-                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-xl flex flex-wrap justify-between items-center gap-2">
-                        <div><span class="text-orange-400 font-bold">فروشگاه: ${m.storeName} (کد: ${m.plant})</span><p class="text-white mt-1 text-mixed">${(m.desc||'').replace(/([a-zA-Z0-9_-]+)/g,' $1 ')}</p></div>
+                    <div class="bg-white border border-slate-200 p-3 rounded-xl flex flex-wrap justify-between items-center gap-2">
+                        <div><span class="text-orange-700 font-bold">فروشگاه: ${m.storeName} (کد: ${m.plant})</span><p class="text-slate-900 mt-1 text-mixed">${(m.desc||'').replace(/([a-zA-Z0-9_-]+)/g,' $1 ')}</p></div>
                         <div class="flex items-center gap-3">
-                            <div><span class="text-slate-400 text-[10px] block">اموال:</span><span class="asset-text text-xs">${m.assetNo||'-'}</span></div>
-                            <div><span class="text-slate-400 text-[10px] block">سریال:</span><span class="asset-text text-xs">${m.serial||'-'}</span></div>
+                            <div><span class="text-slate-500 text-[10px] block">اموال:</span><span class="asset-text text-xs">${m.assetNo||'-'}</span></div>
+                            <div><span class="text-slate-500 text-[10px] block">سریال:</span><span class="asset-text text-xs">${m.serial||'-'}</span></div>
                             <button onclick="selectStoreFromSearch('${m.plant}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] px-3 py-1.5 rounded-lg transition font-medium">نمایش فروشگاه ➔</button>
                         </div>
                     </div>`).join('');
-            } catch (e) { content.innerHTML = `<p class="text-rose-400">خطا در جستجو.</p>`; }
+            } catch (e) { content.innerHTML = `<p class="text-rose-700">خطا در جستجو.</p>`; }
         }
 
         function selectStoreFromSearch(plantCode) {
@@ -455,7 +452,7 @@
 
                 if (!filteredItems.length) {
                     statusBox.classList.remove('hidden');
-                    statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${plantCode} یافت نشد!</span>`;
+                    statusMsg.innerHTML = `<span class="text-rose-700 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${plantCode} یافت نشد!</span>`;
                     hideLoading();
                     return;
                 }
@@ -491,7 +488,7 @@
             } catch (e) {
                 console.error(e);
                 hideLoading();
-                statusMsg.innerHTML = `<span class="text-rose-400 font-bold">❌ خطا در بارگذاری اطلاعات: ${e.message || ''}</span>`;
+                statusMsg.innerHTML = `<span class="text-rose-700 font-bold">❌ خطا در بارگذاری اطلاعات: ${e.message || ''}</span>`;
             }
         }
 
@@ -505,7 +502,7 @@
             ['all', 'unchecked', 'checked', 'missing'].forEach(f => {
                 const btn = document.getElementById('af-' + f);
                 if (btn) btn.className = 'af-btn vf-btn vf-btn-sm px-3 py-1.5 rounded-lg text-[11px] font-bold ' +
-                    (f === auditFilter ? 'bg-orange-600 text-white vf-btn-brand' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 vf-btn-ghost');
+                    (f === auditFilter ? 'bg-orange-600 text-white vf-btn-brand' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 vf-btn-ghost');
             });
         }
 

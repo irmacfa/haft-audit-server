@@ -75,7 +75,7 @@
         root.querySelectorAll('[class*="rounded-3xl"]').forEach(c => c.classList.add('ds-card'));
 
         /* سه کارت مرحله در پنل انبارگردان */
-        ['storeCodeInput', 'auditorNameInput', 'globalAssetSearchInput'].forEach(id => {
+        ['storeCodeInput', 'managerEmailInput', 'globalAssetSearchInput'].forEach(id => {
             const input = document.getElementById(id);
             if (input) input.closest('[class*="rounded-3xl"]')?.classList.add('ds-step');
         });

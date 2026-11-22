@@ -201,9 +201,12 @@ function parseCookies(header) {
 }
 
 const ASSET_RE = /\.(css|js|mjs|woff2?|ttf|eot|svg|png|jpe?g|gif|ico|webp|map)$/i;
+const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || 'aghanbari').toLowerCase();
+// مانیتورینگ برای همه آزاد است؛ بقیه مسیرها محافظتشدهاند
 const PUBLIC_PATHS = new Set([
     '/login', '/login.html', '/api/auth/login', '/api/auth/logout', '/api/auth/me',
-    '/api/health', '/api/public-config'
+    '/api/health', '/api/public-config',
+    '/monitoring.html', '/api/monitoring/status', '/api/monitoring/export'
 ]);
 
 function isPublic(pathname) {
@@ -247,6 +250,10 @@ function middleware(req, res, next) {
     }
     const nextUrl = encodeURIComponent(req.originalUrl || pathname);
     return res.redirect(`/login.html?next=${nextUrl}`);
+}
+
+function isAdminUser(session) {
+    return !!session && String(session.u || '').toLowerCase() === ADMIN_USERNAME;
 }
 
 function publicUser(session) {
@@ -317,10 +324,14 @@ function install(app) {
 
     app.get('/api/auth/me', (req, res) => {
         const session = verify(parseCookies(req.headers.cookie)[COOKIE_NAME]);
-        res.json({ authenticated: !!session, user: session ? publicUser(session) : null });
+        res.json({
+            authenticated: !!session,
+            isAdmin: isAdminUser(session),
+            user: session ? publicUser(session) : null
+        });
     });
 
     app.use(middleware);
 }
 
-module.exports = { install, middleware, authenticate, verify, sign, COOKIE_NAME, ALLOWED_GROUP };
+module.exports = { install, middleware, authenticate, verify, sign, COOKIE_NAME, ALLOWED_GROUP, isAdminUser, ADMIN_USERNAME };

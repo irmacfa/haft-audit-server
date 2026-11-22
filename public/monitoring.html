@@ -8,56 +8,58 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="vibefarsi.css">
     <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="/panel-theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .status-card { transition: all 0.3s ease; }
         .status-card:hover { transform: translateY(-5px); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-5">
+<body class="panel-body text-slate-800 min-h-screen p-3 sm:p-5">
 
-    <header class="mb-6 flex flex-col lg:flex-row justify-between items-center bg-slate-800 p-6 rounded-3xl shadow-lg border border-slate-700 gap-4">
+    <header class="mb-6 flex flex-col lg:flex-row justify-between items-center bg-white p-6 rounded-3xl shadow-lg border border-slate-200 gap-4">
         <div class="flex items-center gap-3">
             <img src="/logo.webp" alt="هفت" class="h-10 w-auto object-contain">
-            <h1 class="text-xl font-bold text-white">مانیتورینگ وضعیت انبارگردانی</h1>
+            <h1 class="text-xl font-bold text-slate-900">مانیتورینگ وضعیت انبارگردانی</h1>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <select id="regionFilter" onchange="onMonitorRegionChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500">
+            <select id="regionFilter" onchange="onMonitorRegionChange()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500">
                 <option value="all">همه مناطق</option>
             </select>
-            <input type="text" id="searchInput" oninput="filterStores()" placeholder="جستجوی کد یا نام فروشگاه..." class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 w-full md:w-56 text-xs focus:outline-none focus:border-orange-500">
+            <input type="text" id="searchInput" oninput="filterStores()" placeholder="جستجوی کد یا نام فروشگاه..." class="bg-white border border-slate-200 rounded-xl px-4 py-2 w-full md:w-56 text-xs focus:outline-none focus:border-orange-500">
             <a href="/api/monitoring/export" class="bg-sky-700 hover:bg-sky-600 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap">📥 اکسل کلی</a>
-            <button onclick="loadMonitoring()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
-            <button onclick="window.location.href='/'" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</button>
-            <a data-admin-link="/" href="#" class="bg-indigo-700 hover:bg-indigo-600 px-4 py-2 rounded-xl text-xs font-bold">🛡️ پنل مدیریت</a>
-            <span id="userBadge" class="bg-slate-700 border border-slate-600 px-3 py-2 rounded-xl text-xs font-bold" title="">👤 <span data-user-name>...</span></span>
-            <button data-logout type="button" class="bg-rose-700 hover:bg-rose-600 px-4 py-2 rounded-xl text-xs font-bold">🚪 خروج</button>
+            <button onclick="loadMonitoring()" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
+            <button onclick="window.location.href='/'" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</button>
+            <a data-admin-only data-admin-link="/" href="#" class="hidden bg-indigo-700 hover:bg-indigo-600 px-4 py-2 rounded-xl text-xs font-bold">🛡️ پنل مدیریت</a>
+            <span data-user-only id="userBadge" class="bg-slate-100 border border-slate-300 px-3 py-2 rounded-xl text-xs font-bold" title="">👤 <span data-user-name>...</span></span>
+            <button data-user-only data-logout type="button" class="bg-rose-700 hover:bg-rose-600 px-4 py-2 rounded-xl text-xs font-bold">🚪 خروج</button>
+            <a data-guest-only href="/login.html" class="hidden bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold">🔐 ورود به سامانه</a>
         </div>
     </header>
 
     <!-- شمارنده وضعیتها -->
     <div class="grid grid-cols-3 gap-4 mb-8 w-full">
-        <div class="bg-emerald-900/40 border border-emerald-600 rounded-2xl p-4 text-center">
-            <p class="text-2xl font-bold text-emerald-400" id="countDone">۰</p>
-            <p class="text-xs text-emerald-300 mt-1">تکمیل شده</p>
+        <div class="bg-emerald-50 border border-emerald-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-700" id="countDone">۰</p>
+            <p class="text-xs text-emerald-700 mt-1">تکمیل شده</p>
         </div>
-        <div class="bg-amber-900/40 border border-amber-600 rounded-2xl p-4 text-center">
-            <p class="text-2xl font-bold text-amber-400" id="countProgress">۰</p>
-            <p class="text-xs text-amber-300 mt-1">در حال انجام</p>
+        <div class="bg-amber-50 border border-amber-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-amber-700" id="countProgress">۰</p>
+            <p class="text-xs text-amber-700 mt-1">در حال انجام</p>
         </div>
-        <div class="bg-rose-900/40 border border-rose-600 rounded-2xl p-4 text-center">
-            <p class="text-2xl font-bold text-rose-400" id="countPending">۰</p>
-            <p class="text-xs text-rose-300 mt-1">در انتظار</p>
+        <div class="bg-rose-50 border border-rose-600 rounded-2xl p-4 text-center">
+            <p class="text-2xl font-bold text-rose-700" id="countPending">۰</p>
+            <p class="text-xs text-rose-700 mt-1">در انتظار</p>
         </div>
     </div>
 
     <!-- پیشرفت مناطق -->
-    <div class="w-full mb-8 bg-slate-800 border border-slate-700 rounded-3xl p-5 shadow-xl">
+    <div class="w-full mb-8 bg-white border border-slate-200 rounded-3xl p-5 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
-            <h2 class="text-sm font-bold text-white">📈 پیشرفت انبارگردانی به تفکیک منطقه</h2>
+            <h2 class="text-sm font-bold text-slate-900">📈 پیشرفت انبارگردانی به تفکیک منطقه</h2>
             <div class="flex items-center gap-2">
-                <span id="regionHint" class="text-[10px] text-slate-400">برای فیلتر، روی منطقه کلیک کنید</span>
-                <button onclick="resetMonitorRegion()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold">↺ نمایش همه</button>
+                <span id="regionHint" class="text-[10px] text-slate-500">برای فیلتر، روی منطقه کلیک کنید</span>
+                <button onclick="resetMonitorRegion()" class="bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-[11px] font-bold">↺ نمایش همه</button>
             </div>
         </div>
         <div id="regionProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
@@ -72,7 +74,7 @@
             try {
                 const res = await fetch('/api/monitoring/status');
                 if (res.status === 202) {
-                    document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-16 text-amber-300 bg-slate-800 rounded-2xl border border-slate-700">در حال آماده‌سازی فایل مادر... لطفاً چند ثانیه صبر کنید.</div>`;
+                    document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-16 text-amber-700 bg-white rounded-2xl border border-slate-200">در حال آماده‌سازی فایل مادر... لطفاً چند ثانیه صبر کنید.</div>`;
                     return;
                 }
                 const data = await res.json();
@@ -88,7 +90,7 @@
 
                 filterStores();
             } catch (e) {
-                document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-20 text-rose-400">خطا: ${e.message}</div>`;
+                document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-20 text-rose-700">خطا: ${e.message}</div>`;
             }
         }
 
@@ -125,15 +127,15 @@
                 const active = document.getElementById('regionFilter').value === name;
                 return `
                     <button onclick="toggleMonitorRegion('${name}')"
-                        class="text-right bg-slate-900 border ${active ? 'border-orange-500 ring-2 ring-orange-500/40' : 'border-slate-700 hover:border-orange-500/60'} rounded-2xl p-3 transition-all hover:-translate-y-0.5 cursor-pointer">
+                        class="text-right bg-white border ${active ? 'border-orange-500 ring-2 ring-orange-500/40' : 'border-slate-200 hover:border-orange-500/60'} rounded-2xl p-3 transition-all hover:-translate-y-0.5 cursor-pointer">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold ${active ? 'text-orange-400' : 'text-white'}">${active ? '▶ ' : ''}${name}</span>
-                            <span class="text-xs font-bold ${pct === 100 ? 'text-emerald-400' : 'text-orange-400'}">${pct}٪</span>
+                            <span class="text-xs font-bold ${active ? 'text-orange-700' : 'text-slate-900'}">${active ? '▶ ' : ''}${name}</span>
+                            <span class="text-xs font-bold ${pct === 100 ? 'text-emerald-700' : 'text-orange-700'}">${pct}٪</span>
                         </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                        <div class="w-full bg-white h-2 rounded-full overflow-hidden border border-slate-200">
                             <div class="${barColor} h-full transition-all duration-500" style="width:${pct}%"></div>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-2">${v.done} تکمیل · ${v.progress} در حال اجرا · ${v.total} کل</p>
+                        <p class="text-[10px] text-slate-500 mt-2">${v.done} تکمیل · ${v.progress} در حال اجرا · ${v.total} کل</p>
                     </button>
                 `;
             }).join('');
@@ -171,17 +173,17 @@
                 const isDone = store.isLocked;
                 const isInProgress = !isDone && (store.auditor !== null);
 
-                let bgColor = 'bg-rose-950/20 border-rose-800';
-                let textColor = 'text-rose-400';
+                let bgColor = 'bg-rose-50 border-rose-200';
+                let textColor = 'text-rose-700';
                 let label = 'در انتظار';
 
                 if (isDone) {
                     bgColor = 'bg-emerald-600/20 border-emerald-500';
-                    textColor = 'text-emerald-400';
+                    textColor = 'text-emerald-700';
                     label = 'تکمیل';
                 } else if (isInProgress) {
                     bgColor = 'bg-amber-600/20 border-amber-500';
-                    textColor = 'text-amber-400';
+                    textColor = 'text-amber-700';
                     label = 'در حال انجام';
                 }
 

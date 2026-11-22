@@ -9,6 +9,7 @@ const compression = require('compression');
 require('dotenv').config();
 const core = require('./core');
 const auth = require('./auth');
+const directory = require('./ad-directory');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 2031;
@@ -19,6 +20,24 @@ app.use(express.json({ limit: '50mb' }));
 
 // احراز هویت اکتیو دایرکتوری قبل از تمام مسیرها و فایلهای استاتیک
 auth.install(app);
+
+// تمام تنظیمات و عملیات مدیریتی فقط برای حساب aghanbari
+app.use((req, res, next) => {
+    const p = req.path;
+    const adminOnly = p === '/' || p === '/index.html' || p.startsWith('/api/admin') ||
+        p === '/api/reload' || p.startsWith('/api/cache/');
+    if (!adminOnly) return next();
+    if (auth.isAdminUser(req.user)) return next();
+    if (p.startsWith('/api/')) {
+        return res.status(403).json({ error: 'دسترسی فقط برای حساب مدیر است.', code: 'FORBIDDEN' });
+    }
+    return res.status(403).type('html').send(
+        '<meta charset="utf-8"><div dir="rtl" style="font-family:tahoma;padding:40px">' +
+        'دسترسی به پنل مدیریت فقط برای حساب <b>' + auth.ADMIN_USERNAME + '</b> است.' +
+        '<br><a href="/login.html">بازگشت به صفحه ورود</a></div>'
+    );
+});
+
 app.use(express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
@@ -27,6 +46,7 @@ app.use('/vf-apply.js', express.static(path.join(__dirname, 'public', 'vf-apply.
 app.use('/auth-ui.js', express.static(path.join(__dirname, 'public', 'auth-ui.js')));
 app.use('/logo.webp', express.static(path.join(__dirname, 'public', 'logo.webp')));
 app.use('/design.css', express.static(path.join(__dirname, 'public', 'design.css')));
+app.use('/panel-theme.css', express.static(path.join(__dirname, 'public', 'panel-theme.css')));
 
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
 app.post('/api/reload', (req, res) => {
@@ -98,6 +118,34 @@ app.get('/api/admin/settings', (req, res) => {
         res.json({ settings: core.getEffectiveSettings(), columns: core.getMasterColumns() });
     } catch (e) {
         res.status(500).json({ error: e.message });
+    }
+});
+
+// اعضای گروه ITSUP همراه مناطق لینکشده به آنها (لینکها فقط داخل برنامه ذخیره میشوند)
+app.get('/api/admin/members', async (req, res) => {
+    try {
+        const [members, regions] = await Promise.all([directory.listMembers(), Promise.resolve(core.getEffectiveSettings().regions)]);
+        const saved = directory.getLinks();
+        res.json({
+            group: directory.GROUP,
+            regions: regions.map(r => r.name),
+            members: members.map(m => ({
+                ...m,
+                regions: Array.isArray(saved[m.username.toLowerCase()]) ? saved[m.username.toLowerCase()] : []
+            }))
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/admin/region-links', (req, res) => {
+    try {
+        const { username, region, assigned } = req.body || {};
+        const links = directory.setLink(username, region, assigned !== false);
+        res.json({ success: true, links });
+    } catch (e) {
+        res.status(400).json({ error: e.message, code: e.code });
     }
 });
 
