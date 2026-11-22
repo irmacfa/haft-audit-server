@@ -24,15 +24,15 @@ cls
 echo Checking dependencies...
 call npm install
 echo.
-netstat -ano | findstr "LISTENING" | findstr ":3000 " >nul
-if %errorlevel%==0 (echo User panel already running on port 3000) else (
-  echo Starting USER panel on port 3000...
-  start "User Panel - Port 3000" node server.js
+netstat -ano | findstr "LISTENING" | findstr ":2030 " >nul
+if %errorlevel%==0 (echo User panel already running on port 2030) else (
+  echo Starting USER panel on port 2030...
+  start "User Panel - Port 2030" node server.js
 )
-netstat -ano | findstr "LISTENING" | findstr ":3001 " >nul
-if %errorlevel%==0 (echo Admin panel already running on port 3001) else (
-  echo Starting ADMIN panel on port 3001...
-  start "Admin Panel - Port 3001" node admin-server.js
+netstat -ano | findstr "LISTENING" | findstr ":2031 " >nul
+if %errorlevel%==0 (echo Admin panel already running on port 2031) else (
+  echo Starting ADMIN panel on port 2031...
+  start "Admin Panel - Port 2031" node admin-server.js
 )
 echo.
 echo Wait about 20 seconds for the 21MB master Excel to load into memory.
@@ -51,15 +51,15 @@ goto menu
 :stopservers
 cls
 echo Stopping servers...
-powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 3000,3001 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"
+powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 2030,2031 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"
 echo Servers stopped.
 echo.
 pause
 goto menu
 
 :openpanels
-start http://localhost:3000
-start http://localhost:3001
+start http://%COMPUTERNAME%:2030
+start http://%COMPUTERNAME%:2031
 echo Panels opened in browser.
 echo.
 pause

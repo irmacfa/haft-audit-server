@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سامانه انبارگردانی فروشگاه‌های زنجیره‌ای هفت</title>
+    <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="vibefarsi.css">
     <link rel="stylesheet" href="design.css">
@@ -40,7 +41,7 @@
     <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/60 shadow-lg py-4 px-6 sticky top-0 z-50 w-full">
         <div class="w-full flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-orange-600 text-white font-bold rounded-2xl w-12 h-12 flex items-center justify-center text-2xl shadow-lg shadow-orange-600/30">۷</div>
+                <img src="/logo.webp" alt="هفت" class="h-12 w-auto object-contain">
                 <div>
                     <h1 class="text-xl font-bold text-white">سامانه انبارگردانی انفورماتیک فروشگاه‌ها</h1>
                     <p class="text-xs text-slate-400">فروشگاه‌های زنجیره‌ای هفت - واحد پشتیبانی IT</p>
@@ -48,10 +49,14 @@
             </div>
             <div class="flex items-center gap-4">
                 <a href="/monitoring.html" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">📊 مانیتورینگ</a>
-                <a href="http://localhost:3001/" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🛡️ پنل مدیریت</a>
+                <a data-admin-link="/" href="#" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🛡️ پنل مدیریت</a>
                 <div id="serverStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-800 text-emerald-300">
                     ● متصل به سرور مرکزی
                 </div>
+                <div id="userBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-700 border border-slate-600 text-slate-200" title="">
+                    👤 <span data-user-name>...</span>
+                </div>
+                <button data-logout type="button" class="bg-rose-700 hover:bg-rose-600 text-white text-xs px-4 py-2 rounded-xl transition font-medium">🚪 خروج</button>
             </div>
         </div>
     </header>
@@ -82,7 +87,11 @@
                     </div>
                 </div>
                 <div class="space-y-2">
-                    <input type="text" id="auditorNameInput" value="علی قنبری (پشتیبانی IT)" placeholder="نام انبارگردان" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-500">
+                    <div class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
+                        <span class="text-slate-400">انبارگردان:</span>
+                        <b id="auditorNameDisplay" class="font-bold">...</b>
+                        <div id="auditorMailDisplay" class="text-[10px] text-slate-500" dir="ltr"></div>
+                    </div>
                     <input type="email" id="managerEmailInput" value="manager@haftstores.ir" placeholder="ایمیل مدیر فروشگاه" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-500">
                 </div>
             </div>
@@ -673,7 +682,7 @@
             const res = await fetch('/api/audit/draft', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData, storeName: currentStoreName, auditorName: document.getElementById('auditorNameInput').value.trim() })
+                body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData, storeName: currentStoreName })
             });
             const data = await res.json();
             if (data.success) {
@@ -702,7 +711,6 @@
                         plant: currentPlant,
                         storeName: currentStoreName,
                         auditItems: localAuditData,
-                        auditorName: document.getElementById('auditorNameInput').value.trim() || 'کارشناس IT',
                         managerEmail: document.getElementById('managerEmailInput').value.trim() || 'manager@haftstores.ir'
                     })
                 });
@@ -717,6 +725,7 @@
             }
         }
     </script>
+    <script src="/auth-ui.js"></script>
     <script src="vf-apply.js"></script>
 </body>
 </html>

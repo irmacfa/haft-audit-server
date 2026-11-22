@@ -1,9 +1,10 @@
 // نمایش وضعیت سرورهای سامانه انبارگردانی هفت
 const http = require('http');
+require('dotenv').config();
 
 const services = [
-    { name: 'پنل انبارگردان (کاربر)', port: Number(process.env.PORT || 3000), url: 'http://localhost:' + (process.env.PORT || 3000) },
-    { name: 'پنل مدیریت', port: Number(process.env.ADMIN_PORT || 3001), url: 'http://localhost:' + (process.env.ADMIN_PORT || 3001) }
+    { name: 'پنل انبارگردان (کاربر)', port: Number(process.env.PORT || 2030), url: 'http://localhost:' + (process.env.PORT || 2030) },
+    { name: 'پنل مدیریت', port: Number(process.env.ADMIN_PORT || 2031), url: 'http://localhost:' + (process.env.ADMIN_PORT || 2031) }
 ];
 
 function check(service) {

@@ -5,13 +5,33 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const core = require('./core');
+const auth = require('./auth');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2030;
 
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '50mb' }));
+
+// احراز هویت اکتیو دایرکتوری قبل از تمام مسیرها و فایلهای استاتیک
+auth.install(app);
+
+// اطلاعات انبارگردان از نشست لاگین گرفته میشود، نه از ورودی کلاینت
+function getAuditor(req) {
+    const u = req.user || {};
+    return {
+        name: u.n || u.u || 'کاربر ناشناس',
+        email: u.m || '',
+        username: u.u || ''
+    };
+}
+
+function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[ch]);
+}
 
 // APIهای کش قبل از static تا پاسخ JSON تضمین شود
 app.get('/api/cache/status', (req, res) => {
@@ -40,6 +60,14 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
+
+// تنظیمات عمومی پورتها (برای ساخت لینکهای بین پنلها در شبکه داخلی)
+app.get('/api/public-config', (req, res) => {
+    res.json({
+        userPort: Number(PORT),
+        adminPort: Number(process.env.ADMIN_PORT || 2031)
+    });
 });
 
 // وضعیت سلامت سرور
@@ -197,14 +225,15 @@ app.get('/api/monitoring/export', (req, res) => {
 
 app.post('/api/audit/draft', (req, res) => {
     try {
-        const { plant, auditItems, storeName, auditorName } = req.body;
+        const { plant, auditItems, storeName } = req.body;
+        const auditor = getAuditor(req);
         const db = core.readDb();
         db.audit_records[plant] = auditItems;
         core.writeDb(db);
         const fileName = core.writeReportFile(plant, auditItems);
         core.sendTelegramNotification(
             `💾 <b>ذخیره موقت انبارگردانی</b>\nفروشگاه: ${plant} (${storeName || 'نامشخص'})\n` +
-            `انبارگردان: ${auditorName || db.plant_status[plant]?.auditor || 'کارشناس IT'}\n` +
+            `انبارگردان: ${auditor.name}${auditor.email ? ` (${auditor.email})` : ''}\n` +
             `تجهیزات ثبت شده: ${Object.keys(auditItems).length}`
         );
         res.json({ success: true, downloadLink: `/reports/${fileName}` });
@@ -216,23 +245,25 @@ app.post('/api/audit/draft', (req, res) => {
 
 app.post('/api/audit/finalize', async (req, res) => {
     try {
-        const { plant, storeName, auditItems, auditorName, managerEmail } = req.body;
+        const { plant, storeName, auditItems, managerEmail } = req.body;
+        const auditorInfo = getAuditor(req);
+        const auditor = auditorInfo.name;
         const db = core.readDb();
         const now = new Date();
         const currentDate = now.toLocaleString('fa-IR', {
             year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
         });
         const auditMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        const auditor = auditorName || 'کارشناس IT';
         const history = (db.plant_status[plant] || {}).history || [];
         history.push({
-            date: currentDate, month: auditMonth, auditor,
+            date: currentDate, month: auditMonth, auditor, auditorEmail: auditorInfo.email,
             equipmentCount: Object.keys(auditItems).length,
             missingCount: Object.values(auditItems).filter(i => i.status === 'missing').length
         });
         db.audit_records[plant] = auditItems;
         db.plant_status[plant] = {
-            isLocked: true, auditDate: currentDate, lastMonth: auditMonth, auditor, history
+            isLocked: true, auditDate: currentDate, lastMonth: auditMonth, auditor,
+            auditorEmail: auditorInfo.email, history
         };
         core.writeDb(db);
 
@@ -240,13 +271,15 @@ app.post('/api/audit/finalize', async (req, res) => {
         const mailOptions = {
             from: '"سامانه انبارگردانی هفت" <audit-system@haftstores.ir>',
             to: managerEmail || 'manager@haftstores.ir',
+            replyTo: auditorInfo.email || undefined,
             subject: `گزارش انبارگردانی نهایی - فروشگاه ${plant} (${storeName})`,
             html: `
                 <div dir="rtl" style="font-family: Tahoma, sans-serif; padding: 20px; background-color: #f4f4f4;">
                     <h2 style="color: #d97706;">گزارش انبارگردانی تجهیزات انفورماتیک</h2>
                     <p><b>کد فروشگاه:</b> ${plant}</p><p><b>نام فروشگاه:</b> ${storeName}</p>
                     <p><b>تاریخ ثبت:</b> ${currentDate}</p><p><b>ماه انبارگردانی:</b> ${auditMonth}</p>
-                    <p><b>انبارگردان:</b> ${auditor}</p><hr>
+                    <p><b>انبارگردان:</b> ${escapeHtml(auditor)}</p>
+                    <p><b>ایمیل انبارگردان:</b> ${escapeHtml(auditorInfo.email || '-')}</p><hr>
                     <p>فایل کامل گزارش به این ایمیل پیوست شده است.</p>
                 </div>
             `,
@@ -261,7 +294,7 @@ app.post('/api/audit/finalize', async (req, res) => {
 
         core.sendTelegramNotification(
             `✅ <b>تکمیل انبارگردانی</b>\nفروشگاه: ${plant} (${storeName})\n` +
-            `ماه: ${auditMonth}\nتاریخ: ${currentDate}\nانبارگردان: ${auditor}\n` +
+            `ماه: ${auditMonth}\nتاریخ: ${currentDate}\nانبارگردان: ${auditor}${auditorInfo.email ? ` (${auditorInfo.email})` : ''}\n` +
             `تجهیزات: ${Object.keys(auditItems).length} مورد`
         );
         res.json({
@@ -279,8 +312,8 @@ app.post('/api/audit/finalize', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`[USER PANEL] http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[USER PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
     // پیش‌بارگذاری در پس‌زمینه تا اولین کاربر منتظر نماند
     core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.message));
 });

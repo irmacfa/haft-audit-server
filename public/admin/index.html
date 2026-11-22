@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پنل مدیریت انبارگردانی</title>
+    <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="vibefarsi.css">
     <link rel="stylesheet" href="design.css">
@@ -13,7 +14,10 @@
 
     <header class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-800 p-4 sm:p-6 rounded-3xl shadow-lg border border-slate-700">
         <div>
-            <h1 class="text-2xl font-bold text-white">🛡️ پنل مدیریت کل انبارگردانی</h1>
+            <div class="flex items-center gap-3">
+                <img src="/logo.webp" alt="هفت" class="h-10 w-auto object-contain">
+                <h1 class="text-2xl font-bold text-white">🛡️ پنل مدیریت کل انبارگردانی</h1>
+            </div>
             <p class="text-xs text-slate-400 mt-1">نمای کلی وضعیت تمام فروشگاهها + مدیریت فایل مادر و ستونها</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
@@ -22,7 +26,9 @@
             <button onclick="setView('grid')" id="viewGridBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🏠 نمای خانه ای</button>
             <button onclick="setView('table')" id="viewTableBtn" class="bg-indigo-700 px-4 py-2 rounded-xl text-xs font-bold">📋 جدول تفصیلی</button>
             <button onclick="loadAdmin()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی</button>
-            <a href="http://localhost:3000/" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</a>
+            <a data-user-link="/" href="#" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-xs font-bold">بازگشت به پنل</a>
+            <span id="userBadge" class="bg-slate-700 border border-slate-600 px-3 py-2 rounded-xl text-xs font-bold" title="">👤 <span data-user-name>...</span></span>
+            <button data-logout type="button" class="bg-rose-700 hover:bg-rose-600 px-4 py-2 rounded-xl text-xs font-bold">🚪 خروج</button>
         </div>
     </header>
 
@@ -433,7 +439,7 @@
                 const txt = isDone ? 'text-emerald-300' : isInProgress ? 'text-amber-300' : 'text-rose-300';
                 const label = isDone ? 'تکمیل' : isInProgress ? 'در حال اجرا' : 'در انتظار';
                 grid.innerHTML += `
-                    <a href="http://localhost:3000/?plant=${store.plant}" title="${store.plant} - ${store.storeName} (${label})"
+                    <a data-user-link="/?plant=${store.plant}" href="#" title="${store.plant} - ${store.storeName} (${label})"
                        class="aspect-square min-h-[64px] border ${cls} rounded-xl p-1.5 flex flex-col items-center justify-center gap-0.5 transition-all hover:scale-105 hover:shadow-lg relative overflow-hidden">
                         <span class="absolute top-1 left-1 w-1.5 h-1.5 rounded-full ${dot}"></span>
                         <span class="font-bold text-[13px] text-white leading-none">${store.plant}</span>
@@ -489,7 +495,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-700/40">
                         <td class="p-3 text-center">
-                            <a href="http://localhost:3000/?plant=${store.plant}" class="text-orange-400 font-bold hover:underline" title="باز کردن پنل انبارگردانی">${store.plant}</a>
+                            <a data-user-link="/?plant=${store.plant}" href="#" class="text-orange-400 font-bold hover:underline" title="باز کردن پنل انبارگردانی">${store.plant}</a>
                         </td>
                         <td class="p-3 text-slate-200">${store.storeName}</td>
                         <td class="p-3 text-center text-indigo-300 text-xs font-bold">${store.region || 'سایر'}</td>
@@ -520,6 +526,7 @@
         loadAdmin();
         setInterval(loadAdmin, 15000);
     </script>
+    <script src="/auth-ui.js"></script>
     <script src="vf-apply.js"></script>
 </body>
 </html>

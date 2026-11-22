@@ -8,18 +8,24 @@ const XLSX = require('xlsx');
 const compression = require('compression');
 require('dotenv').config();
 const core = require('./core');
+const auth = require('./auth');
 
 const app = express();
-const PORT = process.env.ADMIN_PORT || 3001;
+const PORT = process.env.ADMIN_PORT || 2031;
 
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '50mb' }));
+
+// احراز هویت اکتیو دایرکتوری قبل از تمام مسیرها و فایلهای استاتیک
+auth.install(app);
 app.use(express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
 app.use('/vibefarsi.css', express.static(path.join(__dirname, 'public', 'vibefarsi.css')));
 app.use('/vf-apply.js', express.static(path.join(__dirname, 'public', 'vf-apply.js')));
+app.use('/auth-ui.js', express.static(path.join(__dirname, 'public', 'auth-ui.js')));
+app.use('/logo.webp', express.static(path.join(__dirname, 'public', 'logo.webp')));
 app.use('/design.css', express.static(path.join(__dirname, 'public', 'design.css')));
 
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
@@ -33,6 +39,14 @@ app.get('/api/cache/status', (req, res) => res.json(core.getCacheStatus()));
 app.post('/api/cache/warmup', (req, res) => {
     core.ensureMasterCache().catch(e => console.error('[Admin warmup]', e.message));
     res.json({ started: true, ...core.getCacheStatus() });
+});
+
+// تنظیمات عمومی پورتها (برای ساخت لینکهای بین پنلها در شبکه داخلی)
+app.get('/api/public-config', (req, res) => {
+    res.json({
+        userPort: Number(process.env.PORT || 2030),
+        adminPort: Number(PORT)
+    });
 });
 
 // وضعیت سلامت سرورمدیریت
@@ -50,7 +64,8 @@ app.get('/api/health', (req, res) => {
 // ارتباط با سرور کاربر برای تازه کردن کش آن بعد از آپلود/تغییر تنظیمات
 function notifyUserServer() {
     const req = http.request({
-        host: 'localhost', port: process.env.PORT || 3000, path: '/api/reload', method: 'POST'
+        host: 'localhost', port: process.env.PORT || 2030, path: '/api/reload', method: 'POST',
+        headers: { 'x-internal-token': process.env.INTERNAL_TOKEN || '' }
     }, res => res.resume());
     req.on('error', e => console.error('[Reload] User server not reachable:', e.message));
     req.end();
@@ -178,7 +193,7 @@ app.get('/api/monitoring/export', (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`[ADMIN PANEL] http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[ADMIN PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
     core.ensureMasterCache().catch(e => console.error('[Admin startup warmup]', e.message));
 });
