@@ -91,36 +91,6 @@
             </div>
         </div>
 
-        <!-- دکمه نمایش شبکه فروشگاههای تحت پوشش کاربر -->
-        <div class="w-full flex justify-center mb-6">
-            <button id="myStoresToggle" type="button" onclick="toggleMyStores()"
-                class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg flex items-center gap-2">
-                🏪 شبکه فروشگاههای من
-                <span id="myStoresCount" class="hidden text-[10px] bg-emerald-600 rounded-full px-2 py-0.5">0</span>
-            </button>
-        </div>
-
-        <!-- شبکه فروشگاههای تحت پوشش کاربر (تنها بعد از زدن دکمه بالا نمایش داده میشود) -->
-        <section id="myStoresPanel" class="hidden w-full mb-8 bg-white border border-slate-700/60 rounded-3xl p-5 shadow-xl">
-            <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                <div>
-                    <h2 class="text-base font-bold text-slate-100">🏪 شبکه فروشگاههای من</h2>
-                    <p id="myStoresHint" class="text-[11px] text-slate-400 mt-1">فروشگاههای مناطق لینکشده به حساب شما</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="hidden sm:inline-flex items-center gap-1 text-[10px] text-slate-400">
-                        <i class="inline-block w-2 h-2 rounded-full bg-emerald-500"></i> تکمیل
-                        <i class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></i> در حال انجام
-                        <i class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></i> در انتظار
-                    </span>
-                    <button type="button" onclick="loadMyStores()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-xl text-xs font-bold">🔄 تازهسازی</button>
-                    <button data-admin-only onclick="location.href='/monitoring.html'" class="hidden bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">📊 مانیتورینگ کل</button>
-                    <button type="button" onclick="toggleMyStores(false)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-2 rounded-xl text-xs font-bold">✕ بستن</button>
-                </div>
-            </div>
-            <div id="myStoresGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-1.5 sm:gap-2"></div>
-        </section>
-
         <!-- Global Asset Search Results Dropdown / Box -->
         <div id="globalSearchResultBox" class="hidden w-full mb-8 bg-white border border-emerald-600/60 rounded-3xl p-5 shadow-2xl">
             <h3 class="text-sm font-bold text-emerald-700 mb-3 flex items-center gap-2">
@@ -224,6 +194,31 @@
                         <tbody id="equipmentTableBody" class="divide-y divide-slate-200 text-sm"></tbody>
                     </table>
                 </div>
+                <!-- افزودن دستی تجهیزی که در فایل مادر نیست -->
+                <div class="p-3 border-t border-slate-200 flex flex-wrap justify-between items-center gap-2 bg-slate-50">
+                    <button id="addItemBtn" type="button" onclick="openAddItemBox()" class="bg-orange-600 hover:bg-orange-500 text-white text-xs px-4 py-2 rounded-xl font-bold shadow">
+                        ➕ افزودن تجهیز به رکورد
+                    </button>
+                    <span class="text-[10px] text-slate-500">برای تجهیزاتی که در فایل مادر وجود ندارند</span>
+                </div>
+                <div id="addItemBox" class="hidden p-4 border-t border-slate-200 bg-white">
+                    <div class="flex flex-wrap items-end gap-3">
+                        <div class="flex-1 min-w-[220px]">
+                            <label for="newItemDesc" class="block text-[11px] text-slate-500 mb-1">شرح تجهیز</label>
+                            <input id="newItemDesc" type="text" placeholder="مثال: لپتاپ Dell Latitude" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500">
+                        </div>
+                        <div>
+                            <label for="newItemAsset" class="block text-[11px] text-slate-500 mb-1">شماره اموال</label>
+                            <input id="newItemAsset" type="text" dir="ltr" placeholder="مثال: 217910401171" class="w-44 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-orange-500">
+                        </div>
+                        <div>
+                            <label for="newItemSerial" class="block text-[11px] text-slate-500 mb-1">شماره سریال</label>
+                            <input id="newItemSerial" type="text" dir="ltr" placeholder="سریال دستگاه" class="w-44 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-orange-500">
+                        </div>
+                        <button type="button" onclick="addManualItem()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl font-bold">✓ اضافه به رکورد</button>
+                        <button type="button" onclick="closeAddItemBox()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-4 py-2 rounded-xl font-bold">انصراف</button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -240,101 +235,12 @@
         let visibleRows = [];
         let loadingTimer = null;
         let loadingActive = false;
-        let myAccess = { authenticated: true, all: false, regions: [] };
         let activityTimer = null;
 
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             })[ch]);
-        }
-
-        async function loadMyAccess(loadStores = false) {
-            try {
-                const res = await fetch('/api/my-access', { credentials: 'same-origin' });
-                myAccess = await res.json();
-            } catch (e) {
-                myAccess = { authenticated: true, all: false, regions: [] };
-            }
-            if (loadStores) await loadMyStores();
-        }
-
-        let myStoresLoaded = false;
-
-        // لیست مانیتورینگ تنها با زدن دکمه نمایش داده میشود و بار اول بهصورت تنبل بارگذاری میشود
-        function toggleMyStores(force) {
-            const panel = document.getElementById('myStoresPanel');
-            const shouldShow = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
-            if (!shouldShow) {
-                panel.classList.add('hidden');
-                return;
-            }
-            panel.classList.remove('hidden');
-            if (myStoresLoaded) {
-                loadMyStores();
-            } else {
-                myStoresLoaded = true;
-                loadMyAccess(true);
-            }
-        }
-
-        async function loadMyStores() {
-            const grid = document.getElementById('myStoresGrid');
-            const hint = document.getElementById('myStoresHint');
-            const badge = document.getElementById('myStoresCount');
-            if (!myAccess.all && (!myAccess.regions || !myAccess.regions.length)) {
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">شما به هیچ منطقهای لینک نشدهاید. لطفاً با ادمین سامانه تماس بگیرید.</div>';
-                hint.textContent = 'دسترسی منطقهای تنظیم نشده است';
-                if (badge) { badge.textContent = '0'; badge.classList.remove('hidden'); }
-                return;
-            }
-            try {
-                const res = await fetch('/api/monitoring/status');
-                if (res.status === 202) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">در حال آمادهسازی فایل مادر...</div>';
-                    if (badge) badge.classList.add('hidden');
-                    return;
-                }
-                const data = await res.json();
-                const stores = (Array.isArray(data) ? data : []).filter(s =>
-                    myAccess.all || myAccess.regions.includes(s.region));
-                hint.textContent = myAccess.all
-                    ? `همه مناطق — ${stores.length} فروشگاه`
-                    : `مناطق: ${myAccess.regions.join(' · ')} — ${stores.length} فروشگاه`;
-                renderMyStores(stores);
-                if (badge) { badge.textContent = String(stores.length); badge.classList.remove('hidden'); }
-            } catch (e) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-rose-500 text-xs">خطا: ${escapeHtml(e.message)}</div>`;
-                if (badge) badge.classList.add('hidden');
-            }
-        }
-
-        function renderMyStores(stores) {
-            const grid = document.getElementById('myStoresGrid');
-            if (!stores.length) {
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">فروشگاهی در مناطق شما یافت نشد.</div>';
-                return;
-            }
-            grid.innerHTML = stores.map(s => {
-                const done = !!s.isLocked;
-                const inProgress = !done && !!s.auditor;
-                const cls = done ? 'tile-done' : inProgress ? 'tile-progress' : 'tile-pending';
-                const label = done ? 'تکمیل' : inProgress ? 'در حال انجام' : 'در انتظار';
-                const date = done && s.auditDate
-                    ? `<span class="tile-date">📅 ${escapeHtml(s.auditDate)}</span>` : '';
-                return `<button type="button" class="store-tile ${cls}" onclick="openStoreFromGrid('${escapeHtml(s.plant)}')"
-                    title="${escapeHtml(s.plant)} - ${escapeHtml(s.storeName || '')} (${label})">
-                    <span class="tile-code">${escapeHtml(s.plant)}</span>
-                    <span class="tile-name">${escapeHtml(s.storeName || '')}</span>
-                    <span class="tile-label">${label}</span>
-                    ${date}
-                </button>`;
-            }).join('');
-        }
-
-        function openStoreFromGrid(plant) {
-            document.getElementById('storeCodeInput').value = plant;
-            handleStoreInput(plant);
         }
 
         function activityPost(path, payload) {
@@ -457,7 +363,6 @@
 
         window.onload = async function() {
             renderDynamicHeader();
-            loadMyAccess();
             window.addEventListener('beforeunload', notifyActivityStop);
             try {
                 fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {});
@@ -595,16 +500,14 @@
                 const auditInfo = await auditRes.json();
                 progBar.style.width = '85%'; percTxt.innerText = '85%';
 
-                if (!filteredItems.length) {
-                    statusBox.classList.remove('hidden');
-                    statusMsg.innerHTML = `<span class="text-rose-700 font-bold">❌ خطا: هیچ تجهیزی برای کد فروشگاه ${plantCode} یافت نشد!</span>`;
-                    hideLoading();
-                    return;
-                }
-
-                currentStoreName = filteredItems[0].storeName || `فروشگاه ${plantCode}`;
+                const noMasterItems = !filteredItems.length;
+                currentStoreName = (filteredItems[0] && filteredItems[0].storeName) || `فروشگاه ${plantCode}`;
                 document.getElementById('storeTitleName').innerText = `${currentStoreName} (کد پلنت: ${plantCode})`;
                 document.getElementById('resultsContainer').classList.remove('hidden');
+                if (noMasterItems) {
+                    statusBox.classList.remove('hidden');
+                    statusMsg.innerHTML = `<span class="text-amber-700 font-bold">⚠ هیچ تجهیزی در فایل مادر برای این فروشگاه یافت نشد؛ میتوانید از دکمه «➕ افزودن تجهیز» در پایین جدول استفاده کنید.</span>`;
+                }
 
                 isCurrentLocked = auditInfo.statusData.isLocked;
                 localAuditData = auditInfo.auditItems || {};
@@ -627,8 +530,17 @@
                 }
 
                 currentItems = filteredItems.map((it, i) => ({ ...it, _rowNo: i + 1 }));
+                // رکوردهای دستی که قبلاً ذخیره شدهاند دوباره به جدول برگردانده میشوند
+                Object.entries(localAuditData).forEach(([uid, saved]) => {
+                    if (uid.startsWith('manual_') && !currentItems.some(it => it._uid === uid)) {
+                        currentItems.push(makeManualItem(uid, saved || {}));
+                    }
+                });
+                currentItems.forEach((it, i) => { it._rowNo = i + 1; });
+                document.getElementById('addItemBtn').classList.toggle('hidden', !!isCurrentLocked);
+                closeAddItemBox();
                 renderFilteredTable();
-                statusMsg.innerText = `✅ ${filteredItems.length} رکورد تجهیز با موفقیت بارگذاری شد.`;
+                if (!noMasterItems) statusMsg.innerText = `✅ ${filteredItems.length} رکورد تجهیز با موفقیت بارگذاری شد.`;
                 hideLoading();
                 if (isCurrentLocked) notifyActivityStop();
                 else notifyActivityStart(currentPlant, currentStoreName);
@@ -637,6 +549,78 @@
                 hideLoading();
                 statusMsg.innerHTML = `<span class="text-rose-700 font-bold">❌ خطا در بارگذاری اطلاعات: ${e.message || ''}</span>`;
             }
+        }
+
+        // ---- افزودن دستی تجهیز به رکورد انبارگردانی ----
+        function manualItemFields(desc, assetNo, serial) {
+            const fields = {};
+            const descCol = currentColumns.find(c => c.includes('شرح')) || currentColumns[0];
+            const assetCol = currentColumns.find(c => c.includes('اموال')) || currentColumns[1];
+            const serialCol = currentColumns.find(c => c.includes('سریال')) || currentColumns[2];
+            if (descCol) fields[descCol] = desc;
+            if (assetCol) fields[assetCol] = assetNo;
+            if (serialCol) fields[serialCol] = serial;
+            return fields;
+        }
+
+        function makeManualItem(uid, data) {
+            const label = data.desc || data.assetNo || data.serial || uid;
+            const assetNo = data.assetNo || '';
+            const serial = data.serial || '';
+            return {
+                _uid: uid, desc: label, assetNo, serial,
+                fields: manualItemFields(label, assetNo, serial),
+                _manual: true
+            };
+        }
+
+        function openAddItemBox() {
+            if (isCurrentLocked) return;
+            document.getElementById('addItemBox').classList.remove('hidden');
+            document.getElementById('newItemDesc').focus();
+        }
+
+        function closeAddItemBox() {
+            document.getElementById('addItemBox').classList.add('hidden');
+            ['newItemDesc', 'newItemAsset', 'newItemSerial'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+        }
+
+        function addManualItem() {
+            if (isCurrentLocked) return;
+            const desc = document.getElementById('newItemDesc').value.trim();
+            const assetNo = document.getElementById('newItemAsset').value.trim();
+            const serial = document.getElementById('newItemSerial').value.trim();
+            if (!desc && !assetNo && !serial) {
+                document.getElementById('newItemDesc').focus();
+                return;
+            }
+            const uid = 'manual_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            currentItems.push(makeManualItem(uid, { desc, assetNo, serial }));
+            localAuditData[uid] = {
+                desc: desc || assetNo || serial,
+                assetNo, serial,
+                checked: true,
+                status: 'present',
+                newAsset: ''
+            };
+            currentItems.forEach((it, i) => { it._rowNo = i + 1; });
+            auditFilter = 'all';
+            updateFilterButtons();
+            document.getElementById('tableSearchInput').value = '';
+            closeAddItemBox();
+            renderFilteredTable();
+            document.getElementById('statusBox').classList.add('hidden');
+        }
+
+        function removeManualItem(uid) {
+            if (isCurrentLocked) return;
+            currentItems = currentItems.filter(it => it._uid !== uid);
+            delete localAuditData[uid];
+            currentItems.forEach((it, i) => { it._rowNo = i + 1; });
+            renderFilteredTable();
         }
 
         function setAuditFilter(filter) {
@@ -696,7 +680,10 @@
 
                 htmlParts.push(`
                     <tr style="background-color:${saved.checked ? 'rgba(6,78,59,0.18)' : 'transparent'};">
-                        <td style="padding:8px;text-align:center;color:#64748b;font-size:12px;border-bottom:1px solid #1e293b;">${item._rowNo || idx + 1}</td>
+                        <td style="padding:8px;text-align:center;color:#64748b;font-size:12px;border-bottom:1px solid #1e293b;">
+                            ${item._rowNo || idx + 1}
+                            ${item._manual && !isCurrentLocked ? `<button type="button" onclick="removeManualItem('${escapeHtml(itemId)}')" title="حذف رکورد اضافهشده" style="margin-right:4px;border:0;background:transparent;color:#e11d48;cursor:pointer;font-size:12px;">🗑</button>` : ''}
+                        </td>
                         <td style="padding:8px;text-align:center;border-bottom:1px solid #1e293b;">
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
