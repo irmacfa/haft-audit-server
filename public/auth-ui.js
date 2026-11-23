@@ -1,10 +1,9 @@
 /**
  * نمایش کاربر واردشده، دکمه خروج و لینکهای بین پنلها
- * صفحه مانیتورینگ برای همه آزاد است؛ پنل مدیریت فقط برای حساب aghanbari.
+ * مانیتورینگ و پنل مدیریت هر دو محافظتشدهاند؛ سهم هر کاربر از API تعیین میشود.
  */
 (function () {
     var portConfig = null;
-    var isMonitoring = location.pathname.indexOf('monitoring.html') !== -1;
 
     function displayName(user) {
         if (!user) return 'کاربر';
@@ -45,10 +44,8 @@
         hideAll('[data-admin-only]');
         showAll('[data-guest-only]');
         // در صفحات محافظتشده سرور خودش ریدایرکت میکند، اینجا فقط fallback است
-        if (!isMonitoring) {
-            var next = encodeURIComponent(location.pathname + location.search);
-            location.replace('/login.html?next=' + next);
-        }
+        var next = encodeURIComponent(location.pathname + location.search);
+        location.replace('/login.html?next=' + next);
     }
 
     function buildUrl(path, port) {

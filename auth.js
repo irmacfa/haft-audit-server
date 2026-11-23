@@ -1,12 +1,31 @@
 /**
- * احراز هویت مبتنی بر اکتیو دایرکتوری (LDAPS) برای پنلهای انبارگردانی
- * تنها کاربرانی که عضو گروه LDAP_ALLOWED_GROUP (پیشفرض Oshanak-ITSUP) هستند
- * میتوانند وارد سامانه شوند. نشست با کوکی امضاشده بین دو سرور (پورتهای پیشفرض 2030/2031) مشترک است.
+ * احراز هویت پنلهای انبارگردانی
+ * حالت پیشفرض hybrid است: حساب مدیر از فایل محلی و سایر کاربران از اکتیو دایرکتوری میآیند.
+ * AUTH_MODE=local یعنی همه کاربران محلی (برای ماشین کاملاً آفلاین) و AUTH_MODE=ldap یعنی همه از دامین.
+ * نشست با کوکی امضاشده بین دو سرور (پورتهای پیشفرض 2030/2031) مشترک است.
  */
 const crypto = require('crypto');
 const path = require('path');
-const { Client } = require('ldapts');
 require('dotenv').config();
+const localUsers = require('./local-users');
+
+// hybrid (پیشفرض): مدیر محلی، کاربران عادی از اکتیو دایرکتوری
+// local: همه محلی | ldap: همه از دامین
+const AUTH_MODE = (process.env.AUTH_MODE || 'hybrid').toLowerCase();
+const IS_LOCAL = AUTH_MODE === 'local';
+const IS_HYBRID = AUTH_MODE === 'hybrid';
+
+let LdapClient = null;
+function getLdapClient() {
+    if (!LdapClient) {
+        try {
+            LdapClient = require('ldapts').Client;
+        } catch (_) {
+            throw Object.assign(new Error('برای حالت ldap باید بسته ldapts نصب باشد.'), { code: 'LDAP_MODULE_MISSING' });
+        }
+    }
+    return LdapClient;
+}
 
 const COOKIE_NAME = process.env.COOKIE_NAME || 'haft_session';
 const SECRET = process.env.SESSION_SECRET || 'change-this-secret-in-env';
@@ -32,6 +51,7 @@ function escapeFilter(value) {
 }
 
 function makeClient() {
+    const Client = getLdapClient();
     return new Client({
         url: LDAP_URL,
         timeout: 10000,
@@ -128,6 +148,17 @@ async function authenticate(username, password) {
         throw Object.assign(new Error('نام کاربری و رمز عبور الزامی است.'), { code: 'MISSING_FIELDS' });
     }
 
+    if (IS_LOCAL || IS_HYBRID) {
+        // در hybrid فقط حساب مدیر محلی از اینجا میآید؛ بقیه اعضا از دامین میآیند.
+        const localUser = IS_LOCAL
+            ? localUsers.authenticate(raw, password)
+            : localUsers.authenticateAdmin(raw, password);
+        if (localUser) {
+            console.log(`[Auth] ورود موفق (محلی): ${localUser.username}`);
+            return localUser;
+        }
+    }
+
     let boundClient = null;
     let bindDn = '';
     for (const candidate of bindCandidates(raw)) {
@@ -201,12 +232,11 @@ function parseCookies(header) {
 }
 
 const ASSET_RE = /\.(css|js|mjs|woff2?|ttf|eot|svg|png|jpe?g|gif|ico|webp|map)$/i;
-const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || 'aghanbari').toLowerCase();
-// مانیتورینگ برای همه آزاد است؛ بقیه مسیرها محافظتشدهاند
+const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || (IS_LOCAL ? 'admin' : 'aghanbari')).toLowerCase();
+// مانیتورینگ هم محافظتشده است تا هر کاربر فقط فروشگاههای خودش را ببیند
 const PUBLIC_PATHS = new Set([
     '/login', '/login.html', '/api/auth/login', '/api/auth/logout', '/api/auth/me',
-    '/api/health', '/api/public-config',
-    '/monitoring.html', '/api/monitoring/status', '/api/monitoring/export'
+    '/api/health', '/api/public-config'
 ]);
 
 function isPublic(pathname) {
@@ -253,7 +283,11 @@ function middleware(req, res, next) {
 }
 
 function isAdminUser(session) {
-    return !!session && String(session.u || '').toLowerCase() === ADMIN_USERNAME;
+    if (!session) return false;
+    // حساب مدیر محلی پرچم admin دارد؛ در حالت local تنها همین پرچم ملاک است.
+    if (session.a === true) return true;
+    if (IS_LOCAL) return false;
+    return String(session.u || '').toLowerCase() === ADMIN_USERNAME;
 }
 
 function publicUser(session) {
@@ -294,7 +328,8 @@ function install(app) {
                 u: user.username,
                 n: user.displayName,
                 m: user.mail,
-                g: ALLOWED_GROUP,
+                g: user.dn === 'LOCAL' ? 'LOCAL' : ALLOWED_GROUP,
+                a: user.admin === true,
                 iat: now,
                 exp: now + ttl
             };
@@ -310,7 +345,7 @@ function install(app) {
         } catch (err) {
             const status = err.code === 'INVALID_CREDENTIALS' ? 401
                 : err.code === 'NOT_IN_GROUP' ? 403
-                    : err.code === 'LDAP_UNAVAILABLE' || err.code === 'GROUP_NOT_FOUND' ? 503
+                    : err.code === 'LDAP_UNAVAILABLE' || err.code === 'GROUP_NOT_FOUND' || err.code === 'LDAP_MODULE_MISSING' ? 503
                         : 400;
             console.warn(`[Auth] ورود ناموفق: ${username} -> ${err.code || err.message}`);
             res.status(status).json({ error: err.message, code: err.code || 'LOGIN_FAILED' });
@@ -334,4 +369,4 @@ function install(app) {
     app.use(middleware);
 }
 
-module.exports = { install, middleware, authenticate, verify, sign, COOKIE_NAME, ALLOWED_GROUP, isAdminUser, ADMIN_USERNAME };
+module.exports = { install, middleware, authenticate, verify, sign, COOKIE_NAME, ALLOWED_GROUP, isAdminUser, ADMIN_USERNAME, AUTH_MODE, IS_LOCAL, IS_HYBRID };

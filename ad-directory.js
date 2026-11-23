@@ -6,7 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
+const localUsers = require('./local-users');
 
+const IS_LOCAL = (process.env.AUTH_MODE || 'hybrid').toLowerCase() === 'local';
 const GROUP = process.env.LDAP_ALLOWED_GROUP || 'Oshanak-ITSUP';
 const LINKS_PATH = path.join(__dirname, 'db', 'region_members.json');
 const CACHE_MS = 5 * 60 * 1000;
@@ -21,6 +23,10 @@ function normalizeList(value) {
 }
 
 function listMembers() {
+    // فقط در حالت local فهرست کاربران از فایل local_users.json میآید.
+    // در حالت پیشفرض hybrid لیست اعضا باید از اکتیو دایرکتوری خوانده شود.
+    if (IS_LOCAL) return Promise.resolve(localUsers.listUsers());
+
     if (Date.now() - membersCache.at < CACHE_MS && membersCache.data.length) {
         return Promise.resolve(membersCache.data);
     }
@@ -102,4 +108,4 @@ function invalidate() {
     membersCache = { at: 0, data: [] };
 }
 
-module.exports = { GROUP, ALL_REGIONS, listMembers, getLinks, getRegionsForUser, setLink, invalidate };
+module.exports = { GROUP, ALL_REGIONS, IS_LOCAL, listMembers, getLinks, getRegionsForUser, setLink, invalidate };

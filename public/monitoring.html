@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="vibefarsi.css">
     <link rel="stylesheet" href="design.css">
     <link rel="stylesheet" href="/panel-theme.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/tailwind-cdn.js"></script>
     <style>
         .status-card { transition: all 0.3s ease; }
         .status-card:hover { transform: translateY(-5px); }
@@ -20,7 +20,10 @@
     <header class="mb-6 flex flex-col lg:flex-row justify-between items-center bg-white p-6 rounded-3xl shadow-lg border border-slate-200 gap-4">
         <div class="flex items-center gap-3">
             <img src="/logo.webp" alt="هفت" class="h-10 w-auto object-contain">
-            <h1 class="text-xl font-bold text-slate-900">مانیتورینگ وضعیت انبارگردانی</h1>
+            <div>
+                <h1 class="text-xl font-bold text-slate-900">مانیتورینگ وضعیت انبارگردانی</h1>
+                <p id="accessScope" class="text-[10px] text-slate-500 mt-1">در حال بررسی سطح دسترسی...</p>
+            </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <select id="regionFilter" onchange="onMonitorRegionChange()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500">
@@ -78,6 +81,19 @@
 
     <script>
         let allStores = [];
+
+        async function loadAccessScope() {
+            try {
+                const res = await fetch('/api/my-access', { credentials: 'same-origin' });
+                if (!res.ok) return;
+                const access = await res.json();
+                const el = document.getElementById('accessScope');
+                if (!el) return;
+                if (access.admin) el.textContent = 'دسترسی: همه فروشگاهها (مدیر)';
+                else if (access.all) el.textContent = 'دسترسی: همه مناطق';
+                else el.textContent = 'دسترسی: ' + ((access.regions && access.regions.length) ? access.regions.join('، ') : 'هیچ منطقهای');
+            } catch (e) { /* پیام پیشفرض باقی میماند */ }
+        }
 
         async function loadMonitoring() {
             try {
@@ -236,6 +252,7 @@
             }
         }
 
+        loadAccessScope();
         loadMonitoring();
         setInterval(loadMonitoring, 15000);
     </script>

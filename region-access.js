@@ -1,6 +1,6 @@
 /**
  * تعیین محدوده دسترسی کاربر به مناطق/فروشگاهها.
- * - حساب مدیر (aghanbari) همه مناطق را میبیند.
+ * - حساب مدیر (admin در حالت محلی، ADMIN_USERNAME در حالت ldap) همه مناطق را میبیند.
  * - لینک «دسترسی کل منطقه» (علامت *) به معنای دیدن تمام مناطق است.
  * - سایر کاربران فقط مناطقی را میبینند که در پنل مدیریت به آنها لینک شدهاند.
  */
@@ -38,4 +38,11 @@ function filterStores(session, stores) {
     return stores.filter(s => access.regions.includes(s.region));
 }
 
-module.exports = { ALL, getAccess, isPlantAllowed, filterStores };
+function isRegionAllowed(session, region) {
+    const access = getAccess(session);
+    if (!access.authenticated) return false;
+    if (access.all) return true;
+    return access.regions.includes(String(region || ''));
+}
+
+module.exports = { ALL, getAccess, isPlantAllowed, isRegionAllowed, filterStores };

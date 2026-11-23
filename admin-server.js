@@ -11,6 +11,7 @@ const core = require('./core');
 const auth = require('./auth');
 const directory = require('./ad-directory');
 const activity = require('./live-activity');
+const regionAccess = require('./region-access');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 2031;
@@ -19,31 +20,40 @@ app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 
-// احراز هویت اکتیو دایرکتوری قبل از تمام مسیرها و فایلهای استاتیک
+// احراز هویت (محلی یا اکتیو دایرکتوری) قبل از تمام مسیرها و فایلهای استاتیک
 auth.install(app);
 
-// تمام تنظیمات و عملیات مدیریتی فقط برای حساب aghanbari
+// تمام تنظیمات و عملیات مدیریتی فقط برای حساب مدیر (در حالت محلی: پرچم admin)
 app.use((req, res, next) => {
     const p = req.path;
     const adminOnly = p === '/' || p === '/index.html' || p.startsWith('/api/admin') ||
-        p === '/api/reload' || p.startsWith('/api/cache/');
+        p === '/api/reload' || p.startsWith('/api/cache/') ||
+        p === '/monitoring.html' || p.startsWith('/api/monitoring/');
     if (!adminOnly) return next();
     if (auth.isAdminUser(req.user)) return next();
     if (p.startsWith('/api/')) {
         return res.status(403).json({ error: 'دسترسی فقط برای حساب مدیر است.', code: 'FORBIDDEN' });
     }
+    const adminLabel = auth.IS_LOCAL ? 'حساب مدیر محلی (ساختهشده با --admin)' : auth.ADMIN_USERNAME;
     return res.status(403).type('html').send(
         '<meta charset="utf-8"><div dir="rtl" style="font-family:tahoma;padding:40px">' +
-        'دسترسی به پنل مدیریت فقط برای حساب <b>' + auth.ADMIN_USERNAME + '</b> است.' +
+        'دسترسی به پنل مدیریت فقط برای <b>' + adminLabel + '</b> است.' +
         '<br><a href="/login.html">بازگشت به صفحه ورود</a></div>'
     );
 });
 
 app.use(express.static(path.join(__dirname, 'public', 'admin')));
+
+// مانیتورینگ کامل همه فروشگاهها فقط روی پنل مدیریت در دسترس است
+app.get('/monitoring.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'monitoring.html'));
+});
+
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts')));
 app.use('/style.css', express.static(path.join(__dirname, 'public', 'style.css')));
 app.use('/vibefarsi.css', express.static(path.join(__dirname, 'public', 'vibefarsi.css')));
 app.use('/vf-apply.js', express.static(path.join(__dirname, 'public', 'vf-apply.js')));
+app.use('/tailwind-cdn.js', express.static(path.join(__dirname, 'public', 'tailwind-cdn.js')));
 app.use('/auth-ui.js', express.static(path.join(__dirname, 'public', 'auth-ui.js')));
 app.use('/logo.webp', express.static(path.join(__dirname, 'public', 'logo.webp')));
 app.use('/design.css', express.static(path.join(__dirname, 'public', 'design.css')));
@@ -80,6 +90,11 @@ app.get('/api/health', (req, res) => {
         regions: core.getEffectiveSettings().regions.map(r => r.name),
         cache: core.getCacheStatus()
     });
+});
+
+// سطح دسترسی کاربر فعلی (برای نمایش محدوده مانیتورینگ)
+app.get('/api/my-access', (req, res) => {
+    res.json(regionAccess.getAccess(req.user));
 });
 
 // ارتباط با سرور کاربر برای تازه کردن کش آن بعد از آپلود/تغییر تنظیمات
@@ -181,6 +196,7 @@ app.post('/api/admin/settings', (req, res) => {
     }
 });
 
+// این مسیرها پشت middleware مخصوص مدیریت هستند، بنابراین عمداً بدون فیلتر، همه فروشگاهها را برمیگردانند.
 app.get('/api/monitoring/status', async (req, res) => {
     try {
         const progress = core.getCacheProgress();

@@ -16,7 +16,7 @@ app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '50mb' }));
 
-// احراز هویت اکتیو دایرکتوری قبل از تمام مسیرها و فایلهای استاتیک
+// احراز هویت (محلی یا اکتیو دایرکتوری) قبل از تمام مسیرها و فایلهای استاتیک
 auth.install(app);
 
 // اطلاعات انبارگردان از نشست لاگین گرفته میشود، نه از ورودی کلاینت
@@ -170,7 +170,8 @@ app.get('/api/monitoring/status', async (req, res) => {
                 missingCount: items.filter(i => i.status === 'missing').length
             };
         });
-        res.json(result);
+        // هر کاربر فقط فروشگاههای مناطق لینکشدهاش را میبیند؛ حساب مدیر و «دسترسی کل» همه را میبینند.
+        res.json(regionAccess.filterStores(req.user, result));
     } catch (e) {
         if (e.code === 'CACHE_LOADING') return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
         res.status(500).json({ error: e.message });
@@ -218,20 +219,22 @@ app.get('/api/monitoring/export', (req, res) => {
         const XLSX = require('xlsx');
         const db = core.readDb();
         const stores = core.getStores();
-        const rows = Object.keys(stores).map(plant => {
-            const status = db.plant_status[plant];
-            const items = Object.values(db.audit_records[plant] || {});
-            return {
-                'کد فروشگاه': plant, 'منطقه': core.getRegion(plant), 'نام فروشگاه': stores[plant],
-                'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال اجرا' : 'در انتظار'),
-                'آخرین تاریخ انبارگردانی': status?.auditDate || '-',
-                'تعداد دفعات انبارگردانی': (status?.history || []).length,
-                'انبارگردان': status?.auditor || '-',
-                'تعداد تجهیزات': items.length,
-                'تعداد تایید شده': items.filter(i => i.checked).length,
-                'تعداد فاقد': items.filter(i => i.status === 'missing').length
-            };
-        }).sort((a, b) => a['کد فروشگاه'].localeCompare(b['کد فروشگاه']));
+        const rows = Object.keys(stores)
+            .filter(plant => regionAccess.isRegionAllowed(req.user, core.getRegion(plant)))
+            .map(plant => {
+                const status = db.plant_status[plant];
+                const items = Object.values(db.audit_records[plant] || {});
+                return {
+                    'کد فروشگاه': plant, 'منطقه': core.getRegion(plant), 'نام فروشگاه': stores[plant],
+                    'وضعیت': status?.isLocked ? 'تکمیل شده' : (status?.auditor ? 'در حال اجرا' : 'در انتظار'),
+                    'آخرین تاریخ انبارگردانی': status?.auditDate || '-',
+                    'تعداد دفعات انبارگردانی': (status?.history || []).length,
+                    'انبارگردان': status?.auditor || '-',
+                    'تعداد تجهیزات': items.length,
+                    'تعداد تایید شده': items.filter(i => i.checked).length,
+                    'تعداد فاقد': items.filter(i => i.status === 'missing').length
+                };
+            }).sort((a, b) => a['کد فروشگاه'].localeCompare(b['کد فروشگاه']));
         const ws = XLSX.utils.json_to_sheet(rows);
         ws['!dir'] = 'rtl';
         const wb = XLSX.utils.book_new();
