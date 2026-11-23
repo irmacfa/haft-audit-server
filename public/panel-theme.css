@@ -286,7 +286,7 @@ textarea:focus {
 input::placeholder,
 textarea::placeholder { color: #6b7c96 !important; }
 
-/* ---------- کاشیهای شبکه فروشگاهها ---------- */
+/* ---------- کاشیهای شبکه فروشگاه ها ---------- */
 .store-tile {
     position: relative;
     border-radius: 12px;

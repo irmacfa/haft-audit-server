@@ -26,6 +26,17 @@
         }
         .mon-panel h2 { letter-spacing: .01em; }
         .mon-sub { font-size: 10px; color: var(--p-muted); margin-top: 2px; }
+        .mon-store-title {
+            font-size: 1.05rem !important;
+            font-weight: 800 !important;
+            line-height: 1.35 !important;
+            letter-spacing: .005em !important;
+        }
+        .mon-store-sub { font-size: 11px !important; color: #fbbf24 !important; opacity: .9; margin-top: 4px !important; }
+        @media (min-width: 640px) {
+            .mon-store-title { font-size: 1.4rem !important; }
+            .mon-store-sub { font-size: 12px !important; }
+        }
         #accessScope {
             display: inline-block;
             padding: 3px 10px;
@@ -281,12 +292,12 @@
         <div id="expertProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </div>
 
-    <!-- شبکه فروشگاهها -->
+    <!-- شبکه فروشگاه ها -->
     <section class="mon-panel w-full mb-8 p-5">
         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
             <div>
-                <h2 class="text-sm font-bold text-slate-900">🏪 شبکه فروشگاهها</h2>
-                <p class="mon-sub">برای باز کردن پنل انبارگردانی، روی فروشگاه موردنظر کلیک کنید</p>
+                <h2 class="mon-store-title text-slate-900">🏪 شبکه فروشگاه ها</h2>
+                <p class="mon-sub mon-store-sub">برای باز کردن پنل انبارگردانی، روی فروشگاه موردنظر کلیک کنید</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="mon-tabs">

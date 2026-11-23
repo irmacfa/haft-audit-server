@@ -118,8 +118,16 @@ app.get('/api/equipment', async (req, res) => {
         }
 
         const equipment = core.getEquipmentData();
+        const stores = core.getStores();
         const data = equipment.data.filter(i => i.plant === plant);
-        res.json({ total: data.length, columns: equipment.columns, data, cache: core.getCacheProgress() });
+        res.json({
+            total: data.length,
+            columns: equipment.columns,
+            data,
+            storeExists: Object.prototype.hasOwnProperty.call(stores, plant),
+            storeName: stores[plant] || '',
+            cache: core.getCacheProgress()
+        });
     } catch (e) {
         if (e.code === 'CACHE_LOADING') {
             core.ensureMasterCache().catch(() => {});
