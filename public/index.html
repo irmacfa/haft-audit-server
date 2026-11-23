@@ -91,8 +91,17 @@
             </div>
         </div>
 
-        <!-- شبکه فروشگاههای تحت پوشش کاربر -->
-        <section id="myStoresPanel" class="w-full mb-8 bg-white border border-slate-700/60 rounded-3xl p-5 shadow-xl">
+        <!-- دکمه نمایش شبکه فروشگاههای تحت پوشش کاربر -->
+        <div class="w-full flex justify-center mb-6">
+            <button id="myStoresToggle" type="button" onclick="toggleMyStores()"
+                class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg flex items-center gap-2">
+                🏪 شبکه فروشگاههای من
+                <span id="myStoresCount" class="hidden text-[10px] bg-emerald-600 rounded-full px-2 py-0.5">0</span>
+            </button>
+        </div>
+
+        <!-- شبکه فروشگاههای تحت پوشش کاربر (تنها بعد از زدن دکمه بالا نمایش داده میشود) -->
+        <section id="myStoresPanel" class="hidden w-full mb-8 bg-white border border-slate-700/60 rounded-3xl p-5 shadow-xl">
             <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                 <div>
                     <h2 class="text-base font-bold text-slate-100">🏪 شبکه فروشگاههای من</h2>
@@ -104,7 +113,9 @@
                         <i class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-2"></i> در حال انجام
                         <i class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-2"></i> در انتظار
                     </span>
+                    <button type="button" onclick="loadMyStores()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-xl text-xs font-bold">🔄 تازهسازی</button>
                     <button data-admin-only onclick="location.href='/monitoring.html'" class="hidden bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">📊 مانیتورینگ کل</button>
+                    <button type="button" onclick="toggleMyStores(false)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-2 rounded-xl text-xs font-bold">✕ بستن</button>
                 </div>
             </div>
             <div id="myStoresGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-1.5 sm:gap-2"></div>
@@ -238,28 +249,50 @@
             })[ch]);
         }
 
-        async function loadMyAccess() {
+        async function loadMyAccess(loadStores = false) {
             try {
                 const res = await fetch('/api/my-access', { credentials: 'same-origin' });
                 myAccess = await res.json();
             } catch (e) {
                 myAccess = { authenticated: true, all: false, regions: [] };
             }
-            loadMyStores();
+            if (loadStores) await loadMyStores();
+        }
+
+        let myStoresLoaded = false;
+
+        // لیست مانیتورینگ تنها با زدن دکمه نمایش داده میشود و بار اول بهصورت تنبل بارگذاری میشود
+        function toggleMyStores(force) {
+            const panel = document.getElementById('myStoresPanel');
+            const shouldShow = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
+            if (!shouldShow) {
+                panel.classList.add('hidden');
+                return;
+            }
+            panel.classList.remove('hidden');
+            if (myStoresLoaded) {
+                loadMyStores();
+            } else {
+                myStoresLoaded = true;
+                loadMyAccess(true);
+            }
         }
 
         async function loadMyStores() {
             const grid = document.getElementById('myStoresGrid');
             const hint = document.getElementById('myStoresHint');
+            const badge = document.getElementById('myStoresCount');
             if (!myAccess.all && (!myAccess.regions || !myAccess.regions.length)) {
                 grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">شما به هیچ منطقهای لینک نشدهاید. لطفاً با ادمین سامانه تماس بگیرید.</div>';
                 hint.textContent = 'دسترسی منطقهای تنظیم نشده است';
+                if (badge) { badge.textContent = '0'; badge.classList.remove('hidden'); }
                 return;
             }
             try {
                 const res = await fetch('/api/monitoring/status');
                 if (res.status === 202) {
                     grid.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 text-xs">در حال آمادهسازی فایل مادر...</div>';
+                    if (badge) badge.classList.add('hidden');
                     return;
                 }
                 const data = await res.json();
@@ -269,8 +302,10 @@
                     ? `همه مناطق — ${stores.length} فروشگاه`
                     : `مناطق: ${myAccess.regions.join(' · ')} — ${stores.length} فروشگاه`;
                 renderMyStores(stores);
+                if (badge) { badge.textContent = String(stores.length); badge.classList.remove('hidden'); }
             } catch (e) {
                 grid.innerHTML = `<div class="col-span-full text-center py-10 text-rose-500 text-xs">خطا: ${escapeHtml(e.message)}</div>`;
+                if (badge) badge.classList.add('hidden');
             }
         }
 
