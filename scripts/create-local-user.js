@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * ساخت، ویرایش یا فهرست کردن کاربران محلی
- * در حالت پیشفرض hybrid فقط حسابهای --admin محلی پذیرفته میشوند؛ بقیه از دامین میآیند.
- * در حالت AUTH_MODE=local میشود کاربر عادی هم ساخت.
+ * Create, update, or list local users.
+ * In the default hybrid mode only --admin accounts are accepted locally; other users come from the domain.
+ * With AUTH_MODE=local, regular local users can also be created.
  *
- * نمونهها:
- *   npm run create-user -- admin R4ndomPass "مدیر سامانه" --admin
+ * Examples:
+ *   npm run create-user -- admin R4ndomPass "System Administrator" --admin
  *   npm run create-user -- --list
  */
 const users = require('../local-users');
@@ -16,7 +16,7 @@ const admin = args.includes('--admin');
 const positional = args.filter(a => a !== '--admin' && a !== '--list');
 
 if (list) {
-    console.log('کاربران محلی:');
+    console.log('Local users:');
     console.table(users.listUsers());
     process.exit(0);
 }
@@ -24,16 +24,16 @@ if (list) {
 const [username, password, displayName, mail] = positional;
 
 if (!username || !password) {
-    console.error('استفاده: npm run create-user -- <username> <password> [displayName] [mail] [--admin]');
-    console.error('مثال:   npm run create-user -- admin MySecret123 "مدیر سامانه" --admin');
+    console.error('Usage: npm run create-user -- <username> <password> [displayName] [mail] [--admin]');
+    console.error('Example: npm run create-user -- admin MySecret123 "System Administrator" --admin');
     process.exit(1);
 }
 
 try {
     const user = users.upsertUser({ username, password, displayName, mail, admin });
-    console.log('کاربر ذخیره شد:', user);
-    console.log('برای اعمال لینک مناطق، وارد پنل مدیریت شوید: اعضا و مناطق');
+    console.log('User saved:', user);
+    console.log('To link regions, open the admin panel: Members and Regions');
 } catch (e) {
-    console.error('خطا:', e.message);
+    console.error('Error:', e.message);
     process.exit(1);
 }

@@ -50,7 +50,7 @@ app.get('/api/cache/status', (req, res) => {
 
 app.post('/api/cache/warmup', async (req, res) => {
     try {
-        core.ensureMasterCache().catch(e => console.error('[Warmup]', e.message));
+        core.ensureMasterCache().catch(e => console.error('[Warmup]', e.consoleMessage || e.message));
         res.json({ started: true, ...core.getCacheStatus() });
     } catch (e) {
         res.status(500).json({ started: false, error: e.message, ...core.getCacheStatus() });
@@ -59,7 +59,7 @@ app.post('/api/cache/warmup', async (req, res) => {
 
 app.post('/api/reload', (req, res) => {
     core.invalidateCache();
-    core.ensureMasterCache().catch(e => console.error('[Reload warmup]', e.message));
+    core.ensureMasterCache().catch(e => console.error('[Reload warmup]', e.consoleMessage || e.message));
     res.json({ success: true, ...core.getCacheStatus() });
 });
 
@@ -113,7 +113,7 @@ app.get('/api/equipment', async (req, res) => {
 
         const progress = core.getCacheProgress();
         if (!progress.ready) {
-            core.ensureMasterCache().catch(e => console.error('[Equipment warmup]', e.message));
+            core.ensureMasterCache().catch(e => console.error('[Equipment warmup]', e.consoleMessage || e.message));
             return res.status(202).json({ loading: true, message: 'فایل مادر در حال پردازش است...', progress: core.getCacheProgress() });
         }
 
@@ -125,7 +125,7 @@ app.get('/api/equipment', async (req, res) => {
             core.ensureMasterCache().catch(() => {});
             return res.status(202).json({ loading: true, message: 'فایل مادر در حال پردازش است...', progress: core.getCacheProgress() });
         }
-        console.error(e);
+        console.error(e.consoleMessage || e.message || e);
         res.status(500).json({ error: 'خطا: ' + e.message });
     }
 });
@@ -158,7 +158,7 @@ app.get('/api/monitoring/status', async (req, res) => {
     try {
         const progress = core.getCacheProgress();
         if (!progress.ready) {
-            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.message));
+            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.consoleMessage || e.message));
             return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
         }
         const db = core.readDb();
@@ -272,7 +272,7 @@ app.post('/api/audit/draft', (req, res) => {
         );
         res.json({ success: true, downloadLink: `/reports/${fileName}` });
     } catch (e) {
-        console.error(e);
+        console.error(e.consoleMessage || e.message || e);
         res.status(500).json({ success: false });
     }
 });
@@ -342,7 +342,7 @@ app.post('/api/audit/finalize', async (req, res) => {
             downloadLink: `/reports/${fileName}`
         });
     } catch (e) {
-        console.error(e);
+        console.error(e.consoleMessage || e.message || e);
         res.status(500).json({ error: 'خطا در ثبت نهایی.' });
     }
 });
@@ -369,5 +369,5 @@ app.post('/api/activity/stop', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`[USER PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
     // پیش‌بارگذاری در پس‌زمینه تا اولین کاربر منتظر نماند
-    core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.message));
+    core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.consoleMessage || e.message));
 });

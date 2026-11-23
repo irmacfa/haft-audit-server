@@ -126,6 +126,7 @@ function ensureMasterCache(force = false) {
     const excelPath = getExcelPath();
     if (!fs.existsSync(excelPath)) {
         const err = new Error('فایل مادر یافت نشد.');
+        err.consoleMessage = 'Master file not found.';
         setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
         return Promise.reject(err);
     }
@@ -168,6 +169,7 @@ function ensureMasterCache(force = false) {
             }
             if (msg.type === 'error') {
                 const err = new Error(msg.error || 'خطا در پردازش فایل مادر');
+                err.consoleMessage = 'Master file processing failed.';
                 setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
                 reject(err);
             }
@@ -181,6 +183,7 @@ function ensureMasterCache(force = false) {
         worker.on('exit', (code) => {
             if (code !== 0 && !_equipment) {
                 const err = new Error(`پردازش فایل مادر با کد ${code} متوقف شد`);
+                err.consoleMessage = `Master file processing exited with code ${code}.`;
                 setCacheProgress({ state: 'error', percent: 0, message: err.message, detail: '', ready: false, error: err.message });
                 reject(err);
             }

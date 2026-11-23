@@ -43,7 +43,7 @@ const REJECT_UNAUTHORIZED = process.env.LDAP_TLS_REJECT_UNAUTHORIZED === 'true';
 const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true';
 
 if (!process.env.SESSION_SECRET) {
-    console.warn('[Auth] هشدار: SESSION_SECRET تنظیم نشده است. مقدار پیشفرض ناامن استفاده میشود.');
+    console.warn('[Auth] Warning: SESSION_SECRET is not set. An insecure default value is being used.');
 }
 
 function escapeFilter(value) {
@@ -154,7 +154,7 @@ async function authenticate(username, password) {
             ? localUsers.authenticate(raw, password)
             : localUsers.authenticateAdmin(raw, password);
         if (localUser) {
-            console.log(`[Auth] ورود موفق (محلی): ${localUser.username}`);
+            console.log(`[Auth] Local login successful: ${localUser.username}`);
             return localUser;
         }
     }
@@ -340,14 +340,14 @@ function install(app) {
                 path: '/',
                 maxAge: ttl
             });
-            console.log(`[Auth] ورود موفق: ${user.username} (${user.dn})`);
+            console.log(`[Auth] Login successful: ${user.username} (${user.dn})`);
             res.json({ ok: true, user: publicUser(session) });
         } catch (err) {
             const status = err.code === 'INVALID_CREDENTIALS' ? 401
                 : err.code === 'NOT_IN_GROUP' ? 403
                     : err.code === 'LDAP_UNAVAILABLE' || err.code === 'GROUP_NOT_FOUND' || err.code === 'LDAP_MODULE_MISSING' ? 503
                         : 400;
-            console.warn(`[Auth] ورود ناموفق: ${username} -> ${err.code || err.message}`);
+            console.warn(`[Auth] Login failed: ${username} -> ${err.code || err.message}`);
             res.status(status).json({ error: err.message, code: err.code || 'LOGIN_FAILED' });
         }
     });

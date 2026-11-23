@@ -1,10 +1,10 @@
-// نمایش وضعیت سرورهای سامانه انبارگردانی هفت
+// Show the status of both Haft Audit services.
 const http = require('http');
 require('dotenv').config();
 
 const services = [
-    { name: 'پنل انبارگردان (کاربر)', port: Number(process.env.PORT || 2030), url: 'http://localhost:' + (process.env.PORT || 2030) },
-    { name: 'پنل مدیریت', port: Number(process.env.ADMIN_PORT || 2031), url: 'http://localhost:' + (process.env.ADMIN_PORT || 2031) }
+    { name: 'User panel (audit)', port: Number(process.env.PORT || 2030), url: 'http://localhost:' + (process.env.PORT || 2030) },
+    { name: 'Admin panel', port: Number(process.env.ADMIN_PORT || 2031), url: 'http://localhost:' + (process.env.ADMIN_PORT || 2031) }
 ];
 
 function check(service) {
@@ -16,7 +16,7 @@ function check(service) {
                 try {
                     resolve({ service, ok: res.statusCode === 200, info: JSON.parse(data) });
                 } catch (e) {
-                    resolve({ service, ok: false, error: 'پاسخ نامعتبر' });
+                    resolve({ service, ok: false, error: 'Invalid response' });
                 }
             });
         });
@@ -27,26 +27,26 @@ function check(service) {
 
 (async () => {
     console.log('==================================================');
-    console.log('  وضعیت سرورهای سامانه انبارگردانی هفت');
+    console.log('  HAFT AUDIT SERVER STATUS');
     console.log('==================================================\n');
 
     const results = await Promise.all(services.map(check));
     results.forEach(r => {
         console.log(`${r.ok ? '[RUNNING]' : '[STOPPED]'} ${r.service.name}`);
-        console.log(`          آدرس: ${r.service.url}`);
+        console.log(`          URL: ${r.service.url}`);
         if (r.ok) {
             const i = r.info;
-            console.log(`          زمان اجرا: ${i.uptimeSeconds} ثانیه`);
-            console.log(`          فایل مادر: ${i.cache.masterFileReady ? 'آماده' : 'یافت نشد'}`);
-            console.log(`          کش اکسل: ${i.cache.workbookCached ? 'فعال' : 'غیرفعال'}`);
-            console.log(`          کش فروشگاهها: ${i.cache.storeCount !== null ? i.cache.storeCount + ' فروشگاه' : 'غیرفعال'}`);
-            console.log(`          مناطق: ${(i.regions || []).join('، ')}`);
+            console.log(`          Uptime: ${i.uptimeSeconds} seconds`);
+            console.log(`          Master file: ${i.cache.masterFileReady ? 'Ready' : 'Not found'}`);
+            console.log(`          Excel cache: ${i.cache.workbookCached ? 'Active' : 'Inactive'}`);
+            console.log(`          Store cache: ${i.cache.storeCount !== null ? i.cache.storeCount + ' stores' : 'Inactive'}`);
+            console.log(`          Regions: ${(i.regions || []).join(', ')}`);
         } else {
-            console.log(`          خطا: ${r.error}`);
+            console.log(`          Error: ${r.error}`);
         }
         console.log('');
     });
 
     const allUp = results.every(r => r.ok);
-    console.log(allUp ? '✅ هر دو سرور در حال اجرا هستند.' : '⚠️ برخی سرورها در حال اجرا نیستند. فایل start.bat را اجرا کنید.');
+    console.log(allUp ? '✅ Both servers are running.' : '⚠️ Some servers are not running. Run start.bat to start them.');
 })();

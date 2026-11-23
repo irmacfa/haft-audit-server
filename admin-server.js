@@ -70,13 +70,13 @@ app.use('/panel-theme.css', express.static(path.join(__dirname, 'public', 'panel
 // تازه کردن کش (پس از آپلود فایل مادر یا تغییر تنظیمات)
 app.post('/api/reload', (req, res) => {
     core.invalidateCache();
-    core.ensureMasterCache().catch(e => console.error('[Admin reload warmup]', e.message));
+    core.ensureMasterCache().catch(e => console.error('[Admin reload warmup]', e.consoleMessage || e.message));
     res.json({ success: true, ...core.getCacheStatus() });
 });
 
 app.get('/api/cache/status', (req, res) => res.json(core.getCacheStatus()));
 app.post('/api/cache/warmup', (req, res) => {
-    core.ensureMasterCache().catch(e => console.error('[Admin warmup]', e.message));
+    core.ensureMasterCache().catch(e => console.error('[Admin warmup]', e.consoleMessage || e.message));
     res.json({ started: true, ...core.getCacheStatus() });
 });
 
@@ -138,7 +138,7 @@ app.post('/api/admin/upload-master', upload.single('file'), async (req, res) => 
             sizeBytes: req.file.size
         });
         notifyUserServer();
-        core.ensureMasterCache().catch(e => console.error('[Upload warmup]', e.message));
+        core.ensureMasterCache().catch(e => console.error('[Upload warmup]', e.consoleMessage || e.message));
         res.json({
             success: true,
             fileName: originalName,
@@ -233,7 +233,7 @@ app.get('/api/monitoring/status', async (req, res) => {
     try {
         const progress = core.getCacheProgress();
         if (!progress.ready) {
-            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.message));
+            core.ensureMasterCache().catch(e => console.error('[Monitoring warmup]', e.consoleMessage || e.message));
             return res.status(202).json({ loading: true, progress: core.getCacheProgress() });
         }
         const db = core.readDb();
@@ -302,5 +302,5 @@ app.get('/api/monitoring/export', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`[ADMIN PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
-    core.ensureMasterCache().catch(e => console.error('[Admin startup warmup]', e.message));
+    core.ensureMasterCache().catch(e => console.error('[Admin startup warmup]', e.consoleMessage || e.message));
 });

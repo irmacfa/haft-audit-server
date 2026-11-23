@@ -58,7 +58,7 @@ function listMembers() {
                     membersCache = { at: Date.now(), data };
                     resolve(data);
                 } catch (e) {
-                    console.error('[AD Members] پاسخ نامعتبر', e.message);
+                    console.error('[AD Members] Invalid response', e.message);
                     resolve(membersCache.data);
                 }
             });

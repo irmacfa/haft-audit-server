@@ -53,8 +53,8 @@ function seedStore() {
     };
     writeStore(store);
     if (!process.env.LOCAL_ADMIN_PASSWORD) {
-        console.warn(`[LocalUsers] حساب مدیر پیشفرض ساخته شد: ${DEFAULT_ADMIN_USER} / ${DEFAULT_ADMIN_PASSWORD}`);
-        console.warn('[LocalUsers] حتماً رمز آن را با دستور npm run create-user -- <username> <password> تغییر دهید.');
+        console.warn(`[LocalUsers] Default admin account created: ${DEFAULT_ADMIN_USER} / ${DEFAULT_ADMIN_PASSWORD}`);
+        console.warn('[LocalUsers] Change the password with: npm run create-user -- <username> <password>');
     }
     return store;
 }
@@ -64,7 +64,7 @@ function readStore() {
         const parsed = JSON.parse(fs.readFileSync(USERS_PATH, 'utf8'));
         if (parsed && Array.isArray(parsed.users)) return parsed;
     } catch (e) {
-        if (e.code !== 'ENOENT') console.error('[LocalUsers] فایل کاربران خوانده نشد:', e.message);
+        if (e.code !== 'ENOENT') console.error('[LocalUsers] Could not read the users file:', e.message);
     }
     return null;
 }
