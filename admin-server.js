@@ -128,12 +128,36 @@ app.post('/api/admin/upload-master', upload.single('file'), async (req, res) => 
     try {
         if (!req.file) return res.status(400).json({ error: 'فایلی آپلود نشد.' });
         core.invalidateCache();
+        const originalName = req.file.originalname;
+        const extension = (path.extname(originalName).toLowerCase().replace('.', '') || 'نامشخص').toUpperCase();
+        core.saveMasterFileMeta({
+            originalName,
+            storedName: req.file.filename,
+            extension,
+            mimeType: req.file.mimetype || '',
+            sizeBytes: req.file.size
+        });
         notifyUserServer();
         core.ensureMasterCache().catch(e => console.error('[Upload warmup]', e.message));
-        res.json({ success: true, fileName: req.file.originalname, processing: true, progress: core.getCacheProgress() });
+        res.json({
+            success: true,
+            fileName: originalName,
+            processing: true,
+            masterFile: core.getMasterFileMeta(),
+            progress: core.getCacheProgress()
+        });
     } catch (e) {
         console.error('Upload Error:', e);
         res.status(500).json({ error: 'خطا در پردازش فایل: ' + e.message });
+    }
+});
+
+// اطلاعات فایل مادر آپلودشده (نام، نوع، حجم، زمان و لیست ستونها)
+app.get('/api/admin/master-file', (req, res) => {
+    try {
+        res.json(core.getMasterFileMeta());
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 });
 

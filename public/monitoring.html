@@ -11,8 +11,212 @@
     <link rel="stylesheet" href="/panel-theme.css">
     <script src="/tailwind-cdn.js"></script>
     <style>
-        .status-card { transition: all 0.3s ease; }
-        .status-card:hover { transform: translateY(-5px); }
+        /* ==================nice monitoring theme================= */
+        .status-card { transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+
+        .mon-panel {
+            position: relative;
+            border-radius: 22px !important;
+            border: 1px solid var(--p-line) !important;
+            background:
+                radial-gradient(620px 190px at 92% -35%, rgba(245, 158, 11, .10), transparent 70%),
+                linear-gradient(165deg, rgba(19, 30, 48, .97), rgba(10, 17, 32, .95)) !important;
+            box-shadow: 0 16px 44px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+            backdrop-filter: blur(14px);
+        }
+        .mon-panel h2 { letter-spacing: .01em; }
+        .mon-sub { font-size: 10px; color: var(--p-muted); margin-top: 2px; }
+        #accessScope {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(245, 158, 11, .10);
+            border: 1px solid rgba(245, 158, 11, .28);
+        }
+
+        /* سه کارت شمارنده */
+        #statusStrip > div {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px !important;
+            padding: 16px 10px !important;
+            border: 1px solid var(--p-line) !important;
+            background: linear-gradient(160deg, rgba(19, 30, 48, .96), rgba(10, 17, 32, .94)) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .05) !important;
+        }
+        #statusStrip > div::after {
+            content: '';
+            position: absolute;
+            inset-inline-start: -45%;
+            inset-block-start: -120%;
+            width: 55%;
+            height: 260%;
+            transform: rotate(25deg);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .07), transparent);
+            pointer-events: none;
+        }
+        #statusStrip > div p:first-child { font-size: 30px !important; line-height: 1.1; }
+        #statusStrip > div p:last-child { font-size: 11px !important; margin-top: 4px !important; }
+        #statusStrip .mon-done { border-color: rgba(52, 211, 153, .45) !important; }
+        #statusStrip .mon-progress { border-color: rgba(251, 191, 36, .45) !important; }
+        #statusStrip .mon-pending { border-color: rgba(251, 113, 133, .45) !important; }
+
+        /* کارتهای مناطق و کارشناسان */
+        #regionProgress > button,
+        #expertProgress > div {
+            border-radius: 14px !important;
+            padding: 12px !important;
+            background: linear-gradient(160deg, rgba(26, 37, 57, .92), rgba(15, 23, 42, .92)) !important;
+            border: 1px solid var(--p-line) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .22) !important;
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+        }
+        #regionProgress > button:hover {
+            transform: translateY(-3px);
+            border-color: var(--p-brand) !important;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, .34) !important;
+        }
+        #regionProgress .w-full.h-2,
+        #expertProgress .w-full.h-2 { background: rgba(7, 11, 20, .85) !important; }
+
+        /* تبهای فیلتر وضعیت */
+        .mon-tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px; background: rgba(7, 11, 20, .55); border: 1px solid var(--p-line); }
+        .mon-tab {
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: var(--p-muted) !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            padding: 6px 11px !important;
+            border-radius: 9px !important;
+        }
+        .mon-tab:hover { background: rgba(255, 255, 255, .05) !important; color: var(--p-ink) !important; transform: none !important; }
+        .mon-tab.active {
+            background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+            color: #1a1206 !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, .28) !important;
+        }
+        .mon-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 10px; color: var(--p-muted); }
+        .mon-legend span { display: inline-flex; align-items: center; gap: 5px; }
+        .mon-legend i { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+
+        /* کاشیهای فروشگاهها */
+        #statsGrid .store-tile {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            min-height: 126px;
+            padding: 12px !important;
+            border-radius: 16px !important;
+            border: 1px solid var(--p-line) !important;
+            background: linear-gradient(160deg, rgba(24, 36, 57, .96), rgba(11, 18, 33, .96)) !important;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+            text-decoration: none !important;
+            animation: monTileIn .36s ease both;
+            width: 100%;
+        }
+        @keyframes monTileIn {
+            from { opacity: 0; transform: translateY(10px) scale(.98); }
+            to { opacity: 1; transform: none; }
+        }
+        #statsGrid .store-tile::before {
+            content: '';
+            position: absolute;
+            inset-block-start: 0;
+            inset-inline: 0;
+            height: 3px;
+            background: currentColor;
+            opacity: .9;
+        }
+        #statsGrid .store-tile::after {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            inset-inline-end: -38px;
+            inset-block-start: -42px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .07;
+            pointer-events: none;
+        }
+        #statsGrid .store-tile:hover {
+            transform: translateY(-5px) scale(1.015) !important;
+            border-color: currentColor !important;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, .42), 0 0 0 1px currentColor !important;
+            z-index: 2;
+        }
+        #statsGrid .tile-top { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        #statsGrid .tile-code {
+            color: var(--p-ink);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            direction: ltr;
+        }
+        #statsGrid .tile-dot {
+            width: 9px;
+            height: 9px;
+            flex: 0 0 9px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 12px currentColor;
+        }
+        #statsGrid .tile-name {
+            color: var(--p-ink);
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.45;
+            text-align: right;
+            min-height: 31px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        #statsGrid .tile-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            font-size: 9px;
+            color: var(--p-muted);
+        }
+        #statsGrid .tile-region,
+        #statsGrid .tile-auditor {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #statsGrid .tile-region {
+            background: rgba(148, 163, 184, .12);
+            border-radius: 6px;
+            padding: 1px 6px;
+            color: var(--p-ink);
+        }
+        #statsGrid .tile-bar {
+            display: block;
+            width: 100%;
+            height: 5px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: rgba(7, 11, 20, .9);
+            border: 1px solid rgba(255, 255, 255, .05);
+        }
+        #statsGrid .tile-bar i { display: block; height: 100%; border-radius: 999px; background: currentColor; }
+        #statsGrid .tile-label { font-size: 10px; font-weight: 800; line-height: 1.2; }
+        #statsGrid .tile-date { font-size: 9px; color: var(--p-muted); direction: rtl; }
+
+        @media (max-width: 640px) {
+            #statusStrip > div p:first-child { font-size: 24px !important; }
+            #statsGrid .store-tile { min-height: 112px; padding: 10px !important; }
+            #statsGrid .tile-code { font-size: 13px; }
+        }
     </style>
 </head>
 <body class="panel-body text-slate-800 min-h-screen p-3 sm:p-5">
@@ -41,23 +245,23 @@
     </header>
 
     <!-- شمارنده وضعیتها -->
-    <div class="grid grid-cols-3 gap-4 mb-8 w-full">
-        <div class="bg-emerald-50 border border-emerald-600 rounded-2xl p-4 text-center">
+    <div id="statusStrip" class="grid grid-cols-3 gap-3 sm:gap-4 mb-8 w-full">
+        <div class="mon-done p-4 text-center">
             <p class="text-2xl font-bold text-emerald-700" id="countDone">۰</p>
-            <p class="text-xs text-emerald-700 mt-1">تکمیل شده</p>
+            <p class="text-xs text-emerald-700 mt-1">✅ تکمیل شده</p>
         </div>
-        <div class="bg-amber-50 border border-amber-600 rounded-2xl p-4 text-center">
+        <div class="mon-progress p-4 text-center">
             <p class="text-2xl font-bold text-amber-700" id="countProgress">۰</p>
-            <p class="text-xs text-amber-700 mt-1">در حال انجام</p>
+            <p class="text-xs text-amber-700 mt-1">🟡 در حال انجام</p>
         </div>
-        <div class="bg-rose-50 border border-rose-600 rounded-2xl p-4 text-center">
+        <div class="mon-pending p-4 text-center">
             <p class="text-2xl font-bold text-rose-700" id="countPending">۰</p>
-            <p class="text-xs text-rose-700 mt-1">در انتظار</p>
+            <p class="text-xs text-rose-700 mt-1">🔴 در انتظار</p>
         </div>
     </div>
 
     <!-- پیشرفت مناطق -->
-    <div class="w-full mb-8 bg-white border border-slate-200 rounded-3xl p-5 shadow-xl">
+    <div class="mon-panel w-full mb-8 p-5">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
             <h2 class="text-sm font-bold text-slate-900">📈 پیشرفت انبارگردانی به تفکیک منطقه</h2>
             <div class="flex items-center gap-2">
@@ -69,7 +273,7 @@
     </div>
 
     <!-- پیشرفت به تفکیک کارشناس -->
-    <div class="w-full mb-8 bg-white border border-slate-200 rounded-3xl p-5 shadow-xl">
+    <div class="mon-panel w-full mb-8 p-5">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
             <h2 class="text-sm font-bold text-slate-900">👷 پیشرفت انبارگردانی به تفکیک کارشناس</h2>
             <span class="text-[10px] text-slate-500">بر اساس آخرین انبارگردان ثبتشده هر فروشگاه</span>
@@ -77,10 +281,43 @@
         <div id="expertProgress" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </div>
 
-    <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
+    <!-- شبکه فروشگاهها -->
+    <section class="mon-panel w-full mb-8 p-5">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900">🏪 شبکه فروشگاهها</h2>
+                <p class="mon-sub">برای باز کردن پنل انبارگردانی، روی فروشگاه موردنظر کلیک کنید</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="mon-tabs">
+                    <button type="button" onclick="setMonitorStatus('all')" id="msAll" class="mon-tab active">همه</button>
+                    <button type="button" onclick="setMonitorStatus('done')" id="msDone" class="mon-tab">✅ تکمیل</button>
+                    <button type="button" onclick="setMonitorStatus('progress')" id="msProgress" class="mon-tab">🟡 در حال انجام</button>
+                    <button type="button" onclick="setMonitorStatus('pending')" id="msPending" class="mon-tab">🔴 در انتظار</button>
+                </div>
+                <span id="gridCountInfo" class="text-[10px] text-slate-400"></span>
+            </div>
+        </div>
+        <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"></div>
+        <div class="mon-legend mt-4 pt-3 border-t border-slate-700/60">
+            <span><i class="bg-emerald-400"></i> تکمیل</span>
+            <span><i class="bg-amber-400"></i> در حال انجام</span>
+            <span><i class="bg-rose-400"></i> در انتظار</span>
+        </div>
+    </section>
 
     <script>
         let allStores = [];
+        let statusFilter = 'all';
+
+        function setMonitorStatus(value) {
+            statusFilter = value;
+            ['all', 'done', 'progress', 'pending'].forEach(k => {
+                const el = document.getElementById('ms' + k.charAt(0).toUpperCase() + k.slice(1));
+                if (el) el.classList.toggle('active', k === value);
+            });
+            filterStores();
+        }
 
         async function loadAccessScope() {
             try {
@@ -131,9 +368,18 @@
             document.getElementById('countProgress').innerText = filtered.filter(s => !s.isLocked && s.auditor).length;
             document.getElementById('countPending').innerText = filtered.filter(s => !s.isLocked && !s.auditor).length;
 
+            const shown = filtered.filter(s =>
+                statusFilter === 'all' ||
+                (statusFilter === 'done' ? s.isLocked
+                    : statusFilter === 'progress' ? (!s.isLocked && s.auditor)
+                    : (!s.isLocked && !s.auditor))
+            );
+            const info = document.getElementById('gridCountInfo');
+            if (info) info.innerText = `نمایش ${shown.length} از ${filtered.length} فروشگاه`;
+
             renderRegionProgress();
             renderExpertProgress(filtered);
-            renderGrid(filtered);
+            renderGrid(shown);
         }
 
         function renderRegionProgress() {
@@ -232,24 +478,40 @@
 
         function renderGrid(stores) {
             const grid = document.getElementById('statsGrid');
-            grid.innerHTML = stores.map(store => {
+            if (!stores.length) {
+                grid.innerHTML = '<div class="col-span-full text-center py-14 text-slate-400 text-xs">فروشگاهی با این فیلتر یافت نشد.</div>';
+                return;
+            }
+            grid.innerHTML = stores.map((store, i) => {
                 const isDone = !!store.isLocked;
                 const isInProgress = !isDone && !!store.auditor;
                 const cls = isDone ? 'tile-done' : isInProgress ? 'tile-progress' : 'tile-pending';
                 const label = isDone ? 'تکمیل' : isInProgress ? 'در حال انجام' : 'در انتظار';
+                const pct = isDone ? 100 : (store.equipmentCount ? Math.round(store.checkedCount / store.equipmentCount * 100) : 0);
+                const plantUrl = '/?plant=' + encodeURIComponent(store.plant);
                 const date = isDone && store.auditDate
                     ? `<span class="tile-date">📅 ${escapeHtml(store.auditDate)}</span>` : '';
+                const auditor = store.auditor
+                    ? `<span class="tile-auditor" title="${escapeHtml(store.auditor)}">👤 ${escapeHtml(store.auditor)}</span>`
+                    : '<span class="tile-auditor">—</span>';
                 return `
-                    <div class="store-tile status-card ${cls}" title="${escapeHtml(store.plant)} - ${escapeHtml(store.storeName || '')} (${label})">
-                        <span class="tile-code">${escapeHtml(store.plant)}</span>
-                        <span class="tile-name">${escapeHtml(store.storeName || '')}</span>
-                        <span class="tile-label">${label}</span>
+                    <a data-user-link="${plantUrl}" href="${plantUrl}"
+                       class="store-tile status-card ${cls}" style="animation-delay:${Math.min(i * 18, 320)}ms"
+                       title="${escapeHtml(store.plant)} - ${escapeHtml(store.storeName || '')} (${label})">
+                        <span class="tile-top">
+                            <span class="tile-code">${escapeHtml(store.plant)}</span>
+                            <span class="tile-dot"></span>
+                        </span>
+                        <span class="tile-name">${escapeHtml(store.storeName || 'فروشگاه')}</span>
+                        <span class="tile-meta">
+                            <span class="tile-region">${escapeHtml(store.region || 'سایر')}</span>
+                            ${auditor}
+                        </span>
+                        <span class="tile-bar" title="${pct}٪ تایید"><i style="width:${pct}%"></i></span>
+                        <span class="tile-label">${label} · ${pct}٪</span>
                         ${date}
-                    </div>`;
+                    </a>`;
             }).join('');
-            if (!stores.length) {
-                grid.innerHTML = '<div class="col-span-full text-center py-16 text-slate-400">فروشگاهی یافت نشد.</div>';
-            }
         }
 
         loadAccessScope();

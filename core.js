@@ -154,6 +154,13 @@ function ensureMasterCache(force = false) {
                 _stores = msg.stores;
                 _masterColumns = msg.columns;
                 _equipment = msg.equipment;
+                updateMasterFileMeta({
+                    columns: _masterColumns,
+                    columnCount: _masterColumns.length,
+                    storeCount: Object.keys(_stores).length,
+                    equipmentCount: _equipment.total,
+                    processing: false
+                });
                 setCacheProgress({ state: 'ready', percent: 100, message: 'کش آماده است', detail: `${_equipment.total} تجهیز در ${Object.keys(_stores).length} فروشگاه`, ready: true, error: null });
                 console.log('[Cache] Ready:', _equipment.total, 'rows');
                 resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
@@ -275,10 +282,59 @@ function getCacheStatus() {
     };
 }
 
+// ===================== متادیتای فایل مادر آپلودشده =====================
+// این اطلاعات در db/audit_db.json ذخیره میشوند تا بعد از استارت مجدد سرور هم نمایش داده شوند.
+function updateMasterFileMeta(patch) {
+    try {
+        const db = readDb();
+        db.masterFile = { ...(db.masterFile || {}), ...(patch || {}), updatedAt: new Date().toISOString() };
+        writeDb(db);
+    } catch (e) {
+        console.error('[Master meta]', e.message);
+    }
+}
+
+function getMasterFileMeta() {
+    const saved = readDb().masterFile || {};
+    const columns = (_masterColumns && _masterColumns.length)
+        ? _masterColumns
+        : (Array.isArray(saved.columns) ? saved.columns : []);
+    const masterPath = getExcelPath();
+    const masterExists = fs.existsSync(masterPath);
+    let fileSize = null;
+    let fileModifiedAt = null;
+    try {
+        const stat = fs.statSync(masterPath);
+        fileSize = stat.size;
+        fileModifiedAt = stat.mtime.toISOString();
+    } catch (e) { /* فایل مادر هنوز آپلود نشده است */ }
+    return {
+        originalName: masterExists ? path.basename(masterPath) : '',
+        extension: masterExists ? path.extname(masterPath).slice(1).toUpperCase() : '',
+        mimeType: '',
+        sizeBytes: null,
+        ...saved,
+        columns,
+        columnCount: columns.length,
+        fileSize,
+        fileModifiedAt,
+        masterReady: masterExists,
+        cached: !!_equipment,
+        storeCount: _stores ? Object.keys(_stores).length : null,
+        equipmentCount: _equipment ? _equipment.total : null
+    };
+}
+
+function saveMasterFileMeta(meta) {
+    updateMasterFileMeta({ ...(meta || {}), processing: true, columns: [], columnCount: 0, uploadedAt: new Date().toISOString() });
+    return getMasterFileMeta();
+}
+
 module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR, DEFAULT_SETTINGS,
     invalidateCache, ensureMasterCache, getExcelPath, readDb, writeDb,
     getSettings, getEffectiveSettings, saveSettings, getRegion,
     getMasterColumns, getStores, getEquipmentData,
-    writeReportFile, sendTelegramNotification, getCacheStatus, getCacheProgress
+    writeReportFile, sendTelegramNotification, getCacheStatus, getCacheProgress,
+    getMasterFileMeta, saveMasterFileMeta
 };
