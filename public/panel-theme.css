@@ -188,30 +188,62 @@ table.vf-table thead th {
     color: var(--p-muted) !important;
 }
 
-/* ---------- دکمهها: یکدست، برجستهتر، واکنشگرا ---------- */
-button,
+/* ---------- دکمهها: بزرگتر، برجستهتر، واکنشگرا ---------- */
+button[class],
 a.vf-btn,
 .filter-btn,
 .af-btn {
-    border-radius: 11px !important;
+    min-height: 42px !important;
+    padding: .65rem 1.15rem !important;
+    font-size: .8125rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2;
+    border-radius: 13px !important;
     letter-spacing: .01em;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 6px 16px rgba(0, 0, 0, .26);
-    transition: transform .16s ease, filter .16s ease, border-color .16s ease,
-                box-shadow .16s ease, background-color .16s ease !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 8px 20px rgba(0, 0, 0, .30) !important;
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1), filter .18s ease, border-color .18s ease,
+                box-shadow .18s ease, background-color .18s ease !important;
+}
+
+/* دکمههای کوچک هم کمی جاگیرتر شدند، بدون اینکه چیدمان بشکند */
+button.vf-btn-sm,
+a.vf-btn-sm,
+.filter-btn.vf-btn-sm {
+    min-height: 36px !important;
+    padding: .45rem .9rem !important;
+    font-size: .75rem !important;
+    border-radius: 11px !important;
+}
+
+button.vf-btn-lg,
+a.vf-btn-lg {
+    min-height: 50px !important;
+    padding: .8rem 1.6rem !important;
+    font-size: .9375rem !important;
+    border-radius: 15px !important;
+}
+
+/* لینکهای هدر هم اندازه دکمههای واقعی دیده شوند */
+header a.vf-btn {
+    min-height: 42px !important;
+    padding: .65rem 1.15rem !important;
+    font-size: .8125rem !important;
+    border-radius: 13px !important;
 }
 
 button:hover:not(:disabled),
 a.vf-btn:hover,
 .filter-btn:hover,
 .af-btn:hover {
-    filter: brightness(1.14) !important;
+    filter: brightness(1.16) saturate(1.08) !important;
     border-color: var(--p-brand) !important;
-    transform: translateY(-1px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 10px 24px rgba(0, 0, 0, .38);
+    transform: translateY(-2px) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 14px 30px rgba(0, 0, 0, .42),
+                0 0 0 3px rgba(245, 158, 11, .12) !important;
 }
 
 button:active:not(:disabled),
-a.vf-btn:active { transform: translateY(0) scale(.975) !important; }
+a.vf-btn:active { transform: translateY(0) scale(.96) !important; }
 
 button:focus-visible,
 a:focus-visible,
@@ -225,47 +257,112 @@ textarea:focus-visible {
 button:disabled { opacity: .5; cursor: not-allowed; filter: grayscale(.35); }
 
 /* دکمههای اصلی گرادینت دار */
-.vf-btn-brand,
-.vf-primary,
-[id="finalizeBtn"] {
-    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+button.vf-btn-brand,
+a.vf-btn-brand,
+button.vf-primary,
+a.vf-primary,
+button[id="finalizeBtn"] {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 48%, #ea580c 100%) !important;
     color: #1a1206 !important;
-    border-color: #f59e0b !important;
+    border-color: #fcd34d !important;
     font-weight: 800 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 10px 24px rgba(245, 158, 11, .28) !important;
 }
 .vf-btn-brand:hover,
-.vf-primary:hover { color: #1a1206 !important; }
+.vf-primary:hover {
+    color: #1a1206 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32), 0 16px 34px rgba(245, 158, 11, .36),
+                0 0 0 4px rgba(245, 158, 11, .18) !important;
+}
 
-.vf-btn-success,
-.bg-emerald-600,
-.bg-emerald-700 {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+button.vf-btn-success,
+a.vf-btn-success,
+button.bg-emerald-600,
+button.bg-emerald-700,
+a.bg-emerald-600,
+a.bg-emerald-700 {
+    background: linear-gradient(135deg, #10b981 0%, #059669 52%, #047857 100%) !important;
     color: #ecfdf5 !important;
-    border-color: #10b981 !important;
+    border-color: #34d399 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 10px 24px rgba(5, 150, 105, .28) !important;
+}
+.vf-btn-success:hover,
+.bg-emerald-700:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 16px 34px rgba(5, 150, 105, .36),
+                0 0 0 4px rgba(16, 185, 129, .18) !important;
 }
 
-.vf-btn-danger,
-.bg-rose-600,
-.bg-rose-700 {
-    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+button.vf-btn-danger,
+a.vf-btn-danger,
+button.bg-rose-600,
+button.bg-rose-700,
+a.bg-rose-600,
+a.bg-rose-700 {
+    background: linear-gradient(135deg, #fb7185 0%, #e11d48 52%, #be123c 100%) !important;
     color: #fff !important;
-    border-color: #fb7185 !important;
+    border-color: #fda4af !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .20), 0 10px 24px rgba(225, 29, 72, .28) !important;
+}
+.vf-btn-danger:hover,
+.bg-rose-700:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .24), 0 16px 34px rgba(225, 29, 72, .36),
+                0 0 0 4px rgba(244, 63, 94, .18) !important;
 }
 
-.bg-indigo-600,
-.bg-indigo-700,
-.bg-blue-600,
-.bg-blue-700 {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+button.bg-indigo-600,
+button.bg-indigo-700,
+button.bg-blue-600,
+button.bg-blue-700,
+a.bg-indigo-600,
+a.bg-indigo-700,
+a.bg-blue-600,
+a.bg-blue-700 {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 52%, #1e40af 100%) !important;
     color: #eff6ff !important;
-    border-color: #60a5fa !important;
+    border-color: #93c5fd !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .20), 0 10px 24px rgba(29, 78, 216, .28) !important;
+}
+.bg-indigo-700:hover,
+.bg-blue-700:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .24), 0 16px 34px rgba(29, 78, 216, .36),
+                0 0 0 4px rgba(96, 165, 250, .18) !important;
 }
 
-.bg-sky-600,
-.bg-sky-700 {
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+button.bg-sky-600,
+button.bg-sky-700,
+a.bg-sky-600,
+a.bg-sky-700 {
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 52%, #0369a1 100%) !important;
     color: #f0f9ff !important;
-    border-color: #7dd3fc !important;
+    border-color: #bae6fd !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 10px 24px rgba(2, 132, 199, .28) !important;
+}
+.bg-sky-700:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 16px 34px rgba(2, 132, 199, .36),
+                0 0 0 4px rgba(125, 211, 252, .18) !important;
+}
+
+button.bg-orange-600,
+button.bg-orange-700,
+button.bg-amber-600,
+a.bg-orange-600,
+a.bg-orange-700,
+a.bg-amber-600 {
+    background: linear-gradient(135deg, #fdba74 0%, #f97316 52%, #ea580c 100%) !important;
+    color: #fff7ed !important;
+    border-color: #fb923c !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .24), 0 10px 24px rgba(234, 88, 12, .28) !important;
+}
+.bg-orange-700:hover,
+.bg-orange-600:hover,
+.bg-amber-600:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 16px 34px rgba(234, 88, 12, .36),
+                0 0 0 4px rgba(251, 146, 60, .18) !important;
+}
+
+button[class*="bg-slate-100"],
+a.vf-btn[class*="bg-slate-100"] {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0)) !important;
 }
 
 /* فیلدها */
@@ -336,5 +433,6 @@ textarea::placeholder { color: #6b7c96 !important; }
     header { padding: 12px !important; }
     .store-tile { min-height: 66px; }
     .store-tile .tile-code { font-size: 11px; }
-    button, .vf-btn { font-size: 11px !important; }
+    button, .vf-btn { font-size: 12px !important; }
+    button.vf-btn-sm, a.vf-btn-sm { min-height: 34px !important; }
 }
