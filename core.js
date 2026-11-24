@@ -61,6 +61,8 @@ const DEFAULT_SETTINGS = {
     materialColumn: 'شماره متریال تجهیز',
     materialPrefix: '9000',
     columns: ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'],
+    emailNotifyEnabled: true,
+    emailNotifyTo: '',
     regions: [
         { name: 'تهران', ranges: [[1000, 1499], [7000, 7099]] },
         { name: 'گیلان', ranges: [[2000, 2200], [5500, 5599]] },
@@ -109,6 +111,8 @@ function getEffectiveSettings() {
         materialColumn: s.materialColumn || DEFAULT_SETTINGS.materialColumn,
         materialPrefix: s.materialPrefix || DEFAULT_SETTINGS.materialPrefix,
         columns: normalizeColumns(s.columns, DEFAULT_SETTINGS.columns),
+        emailNotifyEnabled: s.emailNotifyEnabled !== undefined ? !!s.emailNotifyEnabled : DEFAULT_SETTINGS.emailNotifyEnabled,
+        emailNotifyTo: String(s.emailNotifyTo || DEFAULT_SETTINGS.emailNotifyTo || '').trim(),
         regions: Array.isArray(s.regions) && s.regions.length ? s.regions : DEFAULT_SETTINGS.regions
     };
 }
@@ -264,9 +268,15 @@ function buildReportRows(auditItems) {
 function writeReportFile(plant, auditItems) {
     const rows = buildReportRows(auditItems);
     const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{ 'پیام': 'هنوز تجهیزی ثبت نشده است.' }]);
-    ws['!dir'] = 'rtl';
+    // راست به چپ برای اکسل فارسی
+    if (!ws['!views']) ws['!views'] = [{}];
+    ws['!views'][0].rightToLeft = true;
     ws['!cols'] = [{ wch: 45 }, { wch: 22 }, { wch: 22 }, { wch: 20 }, { wch: 16 }, { wch: 16 }];
     const wb = XLSX.utils.book_new();
+    if (!wb.Workbook) wb.Workbook = {};
+    if (!wb.Workbook.Views) wb.Workbook.Views = [];
+    if (!wb.Workbook.Views[0]) wb.Workbook.Views[0] = {};
+    wb.Workbook.Views[0].RTL = true;
     XLSX.utils.book_append_sheet(wb, ws, 'گزارش انبارگردانی');
     const fileName = `Audit_Report_Store_${plant}.xlsx`;
     XLSX.writeFile(wb, path.join(REPORTS_DIR, fileName));

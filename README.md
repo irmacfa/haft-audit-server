@@ -164,6 +164,7 @@ npm run create-user -- --list
 |---|---|
 | `EMAIL_USER` | نام کاربری ایمیل سامانه |
 | `EMAIL_PASS` | رمز عبور / App Password ایمیل |
+| `AUDIT_NOTIFY_TO` | گیرنده/گیرندگان گزارش نهایی (با کاما). خالی = ابتدا ایمیل گروه AD (`LDAP_ALLOWED_GROUP`)، سپس ایمیل اعضای گروه AD، در نهایت `manager@haftstores.ir` |
 | `PORT` | پورت سرور (پیشفرض 2030) |
 | `ADMIN_PORT` | پورت پنل مدیریت (پیشفرض 2031) |
 | `AUTH_MODE` | `hybrid` (پیشفرض: مدیر محلی + کاربران دامین)، `local` یا `ldap` |

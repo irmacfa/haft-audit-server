@@ -16,6 +16,46 @@ const CACHE_MS = 5 * 60 * 1000;
 const ALL_REGIONS = '*';
 
 let membersCache = { at: 0, data: [] };
+let groupMailCache = { at: 0, value: '' };
+
+function getGroupMail() {
+    const envTo = String(process.env.AUDIT_NOTIFY_TO || '').trim();
+    if (envTo) return Promise.resolve(envTo);
+
+    if (IS_LOCAL) return Promise.resolve('');
+
+    if (Date.now() - groupMailCache.at < CACHE_MS && groupMailCache.value) {
+        return Promise.resolve(groupMailCache.value);
+    }
+
+    const safeGroup = GROUP.replace(/'/g, "''");
+    const ps = [
+        'Import-Module ActiveDirectory; [Console]::OutputEncoding=[Text.Encoding]::UTF8; ' +
+        `Get-ADGroup -Identity '${safeGroup}' -Properties mail,displayName | ` +
+        'Select-Object mail,displayName | ConvertTo-Json -Compress -Depth 2'
+    ];
+
+    return new Promise((resolve) => {
+        execFile('powershell', ['-NoProfile', '-NonInteractive', '-Command', ps[0]],
+            { timeout: 15000, windowsHide: true, maxBuffer: 2 * 1024 * 1024 },
+            (err, stdout, stderr) => {
+                if (err) {
+                    console.warn('[AD Group Mail]', err.message || err);
+                    return resolve(groupMailCache.value || '');
+                }
+                try {
+                    const raw = JSON.parse((stdout || '').toString().trim() || 'null');
+                    const obj = Array.isArray(raw) ? raw[0] : raw;
+                    const mail = String((obj && obj.mail) || '').trim();
+                    groupMailCache = { at: Date.now(), value: mail };
+                    resolve(mail);
+                } catch (e) {
+                    console.warn('[AD Group Mail] parse:', e.message);
+                    resolve(groupMailCache.value || '');
+                }
+            });
+    });
+}
 
 function normalizeList(value) {
     if (!value) return [];
@@ -106,6 +146,7 @@ function setLink(username, region, assigned) {
 
 function invalidate() {
     membersCache = { at: 0, data: [] };
+    groupMailCache = { at: 0, value: '' };
 }
 
-module.exports = { GROUP, ALL_REGIONS, IS_LOCAL, listMembers, getLinks, getRegionsForUser, setLink, invalidate };
+module.exports = { GROUP, ALL_REGIONS, IS_LOCAL, listMembers, getGroupMail, getLinks, getRegionsForUser, setLink, invalidate };

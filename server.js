@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const core = require('./core');
 const auth = require('./auth');
+const directory = require('./ad-directory');
 const regionAccess = require('./region-access');
 const activity = require('./live-activity');
 
@@ -71,6 +72,44 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
+
+function parseEmails(value) {
+    return [...new Set(String(value || '')
+        .split(/[;,]+/)
+        .map(s => s.trim())
+        .filter(Boolean))];
+}
+
+async function resolveAuditRecipients(fallbackManagerEmail) {
+    const envTo = parseEmails(process.env.AUDIT_NOTIFY_TO);
+    if (envTo.length) return { to: envTo, source: 'env' };
+
+    const settings = core.getEffectiveSettings();
+    if (settings.emailNotifyEnabled === false) return { to: [], source: 'disabled' };
+
+    const settingsTo = parseEmails(settings.emailNotifyTo);
+    if (settingsTo.length) return { to: settingsTo, source: 'settings' };
+
+    const requestTo = parseEmails(fallbackManagerEmail);
+    if (requestTo.length) return { to: requestTo, source: 'request' };
+
+    try {
+        const groupMail = String(await directory.getGroupMail() || '').trim();
+        if (groupMail) return { to: parseEmails(groupMail), source: 'ad-group' };
+    } catch (e) {
+        console.warn('[Audit Mail] group mail lookup failed:', e.message || e);
+    }
+
+    try {
+        const members = await directory.listMembers();
+        const memberMails = parseEmails(members.map(m => m && m.mail).filter(Boolean).join(','));
+        if (memberMails.length) return { to: memberMails, source: 'ad-members' };
+    } catch (e) {
+        console.warn('[Audit Mail] member mail lookup failed:', e.message || e);
+    }
+
+    return { to: ['manager@haftstores.ir'], source: 'fallback' };
+}
 
 // تنظیمات عمومی پورتها (برای ساخت لینکهای بین پنلها در شبکه داخلی)
 app.get('/api/public-config', (req, res) => {
@@ -311,12 +350,19 @@ app.post('/api/audit/finalize', async (req, res) => {
         core.writeDb(db);
 
         const fileName = core.writeReportFile(plant, auditItems);
-        const mailOptions = {
-            from: '"سامانه انبارگردانی هفت" <audit-system@haftstores.ir>',
-            to: managerEmail || 'manager@haftstores.ir',
-            replyTo: auditorInfo.email || undefined,
-            subject: `گزارش انبارگردانی نهایی - فروشگاه ${plant} (${storeName})`,
-            html: `
+        const recipients = await resolveAuditRecipients(managerEmail);
+        let mailSent = true;
+        let mailError = '';
+        if (!recipients.to.length) {
+            mailSent = false;
+            mailError = recipients.source === 'disabled' ? 'ارسال ایمیل در تنظیمات غیرفعال است.' : 'گیرنده ایمیل یافت نشد.';
+        } else {
+            const mailOptions = {
+                from: '"سامانه انبارگردانی هفت" <audit-system@haftstores.ir>',
+                to: recipients.to.join(', '),
+                replyTo: auditorInfo.email || undefined,
+                subject: `گزارش انبارگردانی نهایی - فروشگاه ${plant} (${storeName})`,
+                html: `
                 <div dir="rtl" style="font-family: Tahoma, sans-serif; padding: 20px; background-color: #f4f4f4;">
                     <h2 style="color: #d97706;">گزارش انبارگردانی تجهیزات انفورماتیک</h2>
                     <p><b>کد فروشگاه:</b> ${plant}</p><p><b>نام فروشگاه:</b> ${storeName}</p>
@@ -324,15 +370,17 @@ app.post('/api/audit/finalize', async (req, res) => {
                     <p><b>انبارگردان:</b> ${escapeHtml(auditor)}</p>
                     <p><b>ایمیل انبارگردان:</b> ${escapeHtml(auditorInfo.email || '-')}</p><hr>
                     <p>فایل کامل گزارش به این ایمیل پیوست شده است.</p>
+                    <p style="color:#666;font-size:12px;">گیرنده‌ها (${escapeHtml(recipients.source)}): ${escapeHtml(recipients.to.join(', '))}</p>
                 </div>
-            `,
-            attachments: [{ filename: fileName, path: path.join(core.REPORTS_DIR, fileName) }]
-        };
-        let mailSent = true;
-        try { await transporter.sendMail(mailOptions); }
-        catch (mailErr) {
-            mailSent = false;
-            console.error('Mail Error:', mailErr.message);
+                `,
+                attachments: [{ filename: fileName, path: path.join(core.REPORTS_DIR, fileName) }]
+            };
+            try { await transporter.sendMail(mailOptions); }
+            catch (mailErr) {
+                mailSent = false;
+                mailError = mailErr.message || String(mailErr);
+                console.error('Mail Error:', mailError);
+            }
         }
 
         core.sendTelegramNotification(
@@ -346,6 +394,9 @@ app.post('/api/audit/finalize', async (req, res) => {
                 ? `انبارگردانی فروشگاه ${plant} (${storeName}) قفل و گزارش ایمیل شد.`
                 : `انبارگردانی فروشگاه ${plant} (${storeName}) قفل و فایل گزارش ذخیره شد، اما ارسال ایمیل ناموفق بود.`,
             mailSent,
+            mailError: mailSent ? undefined : mailError,
+            mailRecipients: recipients.to,
+            mailRecipientSource: recipients.source,
             auditDate: currentDate,
             downloadLink: `/reports/${fileName}`
         });
