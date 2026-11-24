@@ -69,7 +69,10 @@ try {
                 if (h) allValues[h] = row[idx] === undefined || row[idx] === null ? '' : String(row[idx]);
             });
             const fields = {};
-            settings.columns.forEach(c => { fields[c] = allValues[c] !== undefined ? allValues[c] : ''; });
+            const columnDefs = (Array.isArray(settings.columns) ? settings.columns : [])
+                .map(c => (c && typeof c === 'object') ? String(c.key || '').trim() : String(c || '').trim())
+                .filter(Boolean);
+            columnDefs.forEach(c => { fields[c] = allValues[c] !== undefined ? allValues[c] : ''; });
 
             const uniqueKey = `${plant}_${allValues['شماره اموال تجهیز'] || ''}_${allValues['شماره سریال کارت دارایی'] || ''}_${allValues['شماره تجهیز'] || ''}`;
             if (seen.has(uniqueKey)) continue;
@@ -95,7 +98,7 @@ try {
         type: 'result',
         stores,
         columns,
-        equipment: { total: dataRows.length, columns: settings.columns, data: dataRows }
+        equipment: { total: dataRows.length, data: dataRows }
     });
 } catch (err) {
     parentPort.postMessage({ type: 'error', error: err.message || String(err) });

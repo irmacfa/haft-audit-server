@@ -78,6 +78,29 @@ function getSettings() {
     return _settings;
 }
 
+function normalizeColumn(c) {
+    if (c && typeof c === 'object' && !Array.isArray(c)) {
+        const key = String(c.key || c.name || c.column || '').trim();
+        const label = String(c.label || c.title || key).trim();
+        return key ? { key, label: label || key } : null;
+    }
+    const key = String(c || '').trim();
+    return key ? { key, label: key } : null;
+}
+
+function normalizeColumns(cols, fallback = []) {
+    const src = Array.isArray(cols) && cols.length ? cols : fallback;
+    const out = [];
+    const seen = new Set();
+    for (const c of src) {
+        const n = normalizeColumn(c);
+        if (!n || seen.has(n.key)) continue;
+        seen.add(n.key);
+        out.push(n);
+    }
+    return out;
+}
+
 function getEffectiveSettings() {
     const s = getSettings();
     return {
@@ -85,7 +108,7 @@ function getEffectiveSettings() {
         nameColumn: s.nameColumn || DEFAULT_SETTINGS.nameColumn,
         materialColumn: s.materialColumn || DEFAULT_SETTINGS.materialColumn,
         materialPrefix: s.materialPrefix || DEFAULT_SETTINGS.materialPrefix,
-        columns: Array.isArray(s.columns) && s.columns.length ? s.columns : DEFAULT_SETTINGS.columns,
+        columns: normalizeColumns(s.columns, DEFAULT_SETTINGS.columns),
         regions: Array.isArray(s.regions) && s.regions.length ? s.regions : DEFAULT_SETTINGS.regions
     };
 }
@@ -105,8 +128,10 @@ function getRegion(plant) {
 
 function saveSettings(settings) {
     const db = readDb();
+    const incoming = { ...(settings || {}) };
+    if (incoming.columns !== undefined) incoming.columns = normalizeColumns(incoming.columns, DEFAULT_SETTINGS.columns);
     // حفظ مناطق در صورتی که تنظیمات ستونها به تنهایی ذخیره شود
-    db.settings = { ...(db.settings || {}), ...settings };
+    db.settings = { ...(db.settings || {}), ...incoming };
     if (!Array.isArray(db.settings.regions) || !db.settings.regions.length) {
         db.settings.regions = DEFAULT_SETTINGS.regions;
     }
@@ -119,7 +144,7 @@ function saveSettings(settings) {
 function ensureMasterCache(force = false) {
     if (_equipment && !force) {
         setCacheProgress({ state: 'ready', percent: 100, message: 'کش آماده است', detail: `${_equipment.total} تجهیز`, ready: true, error: null });
-        return Promise.resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+        return Promise.resolve({ stores: _stores, columns: getDisplayColumns(), equipment: _equipment });
     }
     if (_cachePromise && !force) return _cachePromise;
 
@@ -164,7 +189,7 @@ function ensureMasterCache(force = false) {
                 });
                 setCacheProgress({ state: 'ready', percent: 100, message: 'کش آماده است', detail: `${_equipment.total} تجهیز در ${Object.keys(_stores).length} فروشگاه`, ready: true, error: null });
                 console.log('[Cache] Ready:', _equipment.total, 'rows');
-                resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+                resolve({ stores: _stores, columns: getDisplayColumns(), equipment: _equipment });
                 return;
             }
             if (msg.type === 'error') {
@@ -189,11 +214,15 @@ function ensureMasterCache(force = false) {
             }
         });
     }).finally(() => {
-        if (_equipment) _cachePromise = Promise.resolve({ stores: _stores, columns: _masterColumns, equipment: _equipment });
+        if (_equipment) _cachePromise = Promise.resolve({ stores: _stores, columns: getDisplayColumns(), equipment: _equipment });
         else _cachePromise = null;
     });
 
     return _cachePromise;
+}
+
+function getDisplayColumns() {
+    return getEffectiveSettings().columns;
 }
 
 function getMasterColumns() {
@@ -337,7 +366,7 @@ module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR, DEFAULT_SETTINGS,
     invalidateCache, ensureMasterCache, getExcelPath, readDb, writeDb,
     getSettings, getEffectiveSettings, saveSettings, getRegion,
-    getMasterColumns, getStores, getEquipmentData,
+    getMasterColumns, getDisplayColumns, getStores, getEquipmentData,
     writeReportFile, sendTelegramNotification, getCacheStatus, getCacheProgress,
     getMasterFileMeta, saveMasterFileMeta
 };

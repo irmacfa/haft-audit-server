@@ -78,7 +78,8 @@
                     <button onclick="selectAllColumns(false)" class="text-[11px] bg-slate-100 px-3 py-1 rounded-lg">پاک کردن</button>
                 </div>
             </div>
-            <div id="columnsList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-80 overflow-y-auto p-1"></div>
+            <p class="text-[11px] text-slate-500 mb-3">برای تغییر نام نمایشی ستون، روی آیکون ✏️ کنار نام بزنید. نام اصلی فایل مادر تغییر نمیکند.</p>
+            <div id="columnsList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 max-h-96 overflow-y-auto p-1"></div>
             <button onclick="saveSettings()" class="mt-5 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold">💾 ذخیره تنظیمات ستونها</button>
             <p id="settingsStatus" class="text-xs mt-3 text-slate-500"></p>
         </div>
@@ -247,6 +248,7 @@
         let currentRegionName = 'all';
         let visibleCount = 50;
         let masterColumns = [];
+        let columnLabelMap = {};
         let allMembers = [];
         let memberRegions = [];
         let visibleMembers = [];
@@ -497,6 +499,12 @@
                 const data = await res.json();
                 masterColumns = data.columns || [];
                 const s = data.settings || {};
+                const nextMap = { ...columnLabelMap };
+                (s.columns || []).forEach(c => {
+                    if (c && typeof c === 'object') nextMap[c.key] = c.label || c.key;
+                    else if (typeof c === 'string' && !nextMap[c]) nextMap[c] = c;
+                });
+                columnLabelMap = nextMap;
 
                 fillSelect('plantColumn', s.plantColumn);
                 fillSelect('nameColumn', s.nameColumn);
@@ -512,12 +520,20 @@
                 const list = document.getElementById('columnsList');
                 list.innerHTML = '';
                 masterColumns.forEach(col => {
-                    const checked = (s.columns || []).includes(col);
+                    const checked = (s.columns || []).some(c => (c && typeof c === 'object' ? c.key : c) === col);
+                    const displayName = columnLabelMap[col] || col;
+                    const keyAttr = esc(col).replace(/'/g, '&#39;');
                     list.innerHTML += `
-                        <label class="flex items-center gap-2 bg-white border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-orange-500">
-                            <input type="checkbox" value="${col}" ${checked ? 'checked' : ''} class="col-check accent-orange-600 w-4 h-4">
-                            <span class="text-[11px] text-slate-700 truncate" title="${col}">${col}</span>
-                        </label>
+                        <div class="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2 hover:border-orange-500">
+                            <input type="checkbox" value="${col}" ${checked ? 'checked' : ''} class="col-check accent-orange-600 w-4 h-4 shrink-0">
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[11px] text-slate-700 truncate" title="${esc(displayName)}">
+                                    <span class="col-label-text" data-key="${keyAttr}">${esc(displayName)}</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 truncate" title="${esc(col)}">اصلی: ${esc(col)}</div>
+                            </div>
+                            <button type="button" onclick="renameColumn('${keyAttr}')" class="shrink-0 w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-100 text-slate-600 hover:text-orange-700" title="ویرایش نام نمایشی">✏️</button>
+                        </div>
                     `;
                 });
                 document.getElementById('uploadStatus').innerText = `✅ فایل مادر: ${masterColumns.length} ستون شناسایی شد.`;
@@ -536,6 +552,17 @@
 
         function selectAllColumns(val) {
             document.querySelectorAll('.col-check').forEach(cb => cb.checked = val);
+        }
+
+        function renameColumn(key) {
+            const span = document.querySelector(`.col-label-text[data-key="${CSS.escape(key)}"]`);
+            const current = (span?.textContent || columnLabelMap[key] || key).trim();
+            const next = prompt(`نام نمایشی برای ستون:\n${key}`, current);
+            if (next === null) return;
+            const value = next.trim();
+            if (!value) { alert('نام نمایشی نمی‌تواند خالی باشد.'); return; }
+            columnLabelMap[key] = value;
+            if (span) { span.textContent = value; span.title = value; }
         }
 
         async function uploadMaster() {
@@ -567,7 +594,10 @@
                 nameColumn: document.getElementById('nameColumn').value,
                 materialColumn: document.getElementById('materialColumn').value,
                 materialPrefix: document.getElementById('materialPrefix').value.trim() || '9000',
-                columns: Array.from(document.querySelectorAll('.col-check:checked')).map(cb => cb.value)
+                columns: Array.from(document.querySelectorAll('.col-check:checked')).map(cb => {
+                    const key = cb.value;
+                    return { key, label: (columnLabelMap[key] || key).trim() || key };
+                })
             };
             try {
                 const res = await fetch('/api/admin/settings', {

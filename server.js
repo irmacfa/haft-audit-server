@@ -122,7 +122,7 @@ app.get('/api/equipment', async (req, res) => {
         const data = equipment.data.filter(i => i.plant === plant);
         res.json({
             total: data.length,
-            columns: equipment.columns,
+            columns: core.getDisplayColumns(),
             data,
             storeExists: Object.prototype.hasOwnProperty.call(stores, plant),
             storeName: stores[plant] || '',

@@ -299,7 +299,11 @@
         let currentStoreName = '';
         let isCurrentLocked = false;
         let localAuditData = {};
-        let currentColumns = ['شرح کارت دارایی', 'شماره اموال تجهیز', 'شماره سریال کارت دارایی'];
+        let currentColumns = [
+            { key: 'شرح کارت دارایی', label: 'شرح کارت دارایی' },
+            { key: 'شماره اموال تجهیز', label: 'شماره اموال تجهیز' },
+            { key: 'شماره سریال کارت دارایی', label: 'شماره سریال کارت دارایی' }
+        ];
         let auditFilter = 'all';
         let currentItems = [];
         let visibleRows = [];
@@ -426,7 +430,7 @@
             }
             const result = await res.json();
             if (!res.ok) throw new Error(result.error || 'خطا در دریافت تجهیزات');
-            currentColumns = result.columns || currentColumns;
+            currentColumns = normalizeColumns(result.columns || currentColumns);
             renderDynamicHeader();
             return {
                 data: (result.data || []).map((item, i) => ({ ...item, _uid: item.eqId || ('row_' + i) })),
@@ -454,28 +458,44 @@
             }
         };
 
+        function normalizeColumns(cols) {
+            const src = Array.isArray(cols) ? cols : [];
+            const out = [];
+            for (const c of src) {
+                if (c && typeof c === 'object') {
+                    const key = String(c.key || '').trim();
+                    if (!key) continue;
+                    out.push({ key, label: String(c.label || key).trim() || key });
+                } else {
+                    const key = String(c || '').trim();
+                    if (key) out.push({ key, label: key });
+                }
+            }
+            return out.length ? out : currentColumns;
+        }
+
         function renderDynamicHeader() {
             const thStyle = 'padding:10px 12px;border-bottom:1px solid #334155;white-space:nowrap;font-size:12px;font-weight:600;text-align:right;';
             const tr = document.getElementById('equipmentTableHeader');
             tr.innerHTML =
                 `<th style="${thStyle}text-align:center;">#</th>` +
                 `<th style="${thStyle}text-align:center;">تایید</th>` +
-                currentColumns.map(c => `<th style="${thStyle}">${c}</th>`).join('') +
+                currentColumns.map(c => `<th style="${thStyle}" title="${c.key !== c.label ? c.key : ''}">${c.label}</th>`).join('') +
                 `<th style="${thStyle}">کد اموال جدید</th>` +
                 `<th style="${thStyle}text-align:center;">وضعیت موجودی</th>`;
         }
 
         function renderDynamicCells(item) {
             const fields = item.fields || {};
-            const assetKey = currentColumns.find(c => c.includes('اموال') && c.includes('تجهیز'));
-            const serialKey = currentColumns.find(c => c.includes('سریال'));
+            const assetKey = currentColumns.find(c => c.key.includes('اموال') && c.key.includes('تجهیز'))?.key;
+            const serialKey = currentColumns.find(c => c.key.includes('سریال'))?.key;
             return currentColumns.map(c => {
-                let val = fields[c] || '';
+                let val = fields[c.key] || '';
                 if (val === 'undefined' || val === 'NaN') val = '';
-                if (c === assetKey && val) val = cleanCode(val);
-                if (c === serialKey && val) val = cleanCode(val);
+                if (c.key === assetKey && val) val = cleanCode(val);
+                if (c.key === serialKey && val) val = cleanCode(val);
                 // شماره اموال و سریال به صورت مونواسپیس نمایش داده شوند
-                const isCode = c.includes('اموال') || c.includes('سریال');
+                const isCode = c.key.includes('اموال') || c.key.includes('سریال');
                 const style = `padding:8px 12px;border-bottom:1px solid #1e293b;white-space:nowrap;font-size:12px;` +
                     (isCode ? `font-family:monospace;color:#cbd5e1;` : `color:#e2e8f0;`);
                 return `<td style="${style}" title="${val}">${val || '-'}</td>`;
@@ -645,9 +665,9 @@
         // ---- افزودن دستی تجهیز به رکورد انبارگردانی ----
         function manualItemFields(desc, assetNo, serial) {
             const fields = {};
-            const descCol = currentColumns.find(c => c.includes('شرح')) || currentColumns[0];
-            const assetCol = currentColumns.find(c => c.includes('اموال')) || currentColumns[1];
-            const serialCol = currentColumns.find(c => c.includes('سریال')) || currentColumns[2];
+            const descCol = currentColumns.find(c => c.key.includes('شرح'))?.key || currentColumns[0]?.key;
+            const assetCol = currentColumns.find(c => c.key.includes('اموال'))?.key || currentColumns[1]?.key;
+            const serialCol = currentColumns.find(c => c.key.includes('سریال'))?.key || currentColumns[2]?.key;
             if (descCol) fields[descCol] = desc;
             if (assetCol) fields[assetCol] = assetNo;
             if (serialCol) fields[serialCol] = serial;
@@ -732,7 +752,7 @@
             const q = document.getElementById('tableSearchInput').value.toLowerCase().trim();
             const filtered = currentItems.filter(item => {
                 const saved = localAuditData[item._uid] || {};
-                const matchQ = !q || currentColumns.some(c => String(item.fields?.[c] || '').toLowerCase().includes(q))
+                const matchQ = !q || currentColumns.some(c => String(item.fields?.[c.key] || '').toLowerCase().includes(q))
                     || String(item.assetNo).toLowerCase().includes(q) || String(item.serial).toLowerCase().includes(q);
                 const matchStatus =
                     auditFilter === 'all' ? true :
