@@ -169,12 +169,12 @@
             </div>
         </div>
 
-        <!-- خطای زیبا: کد فروشگاه در فایل مادر وجود ندارد -->
+        <!-- پیام خطای دسترسی/یافت نشدن فروشگاه -->
         <div id="storeNotFound" class="hidden w-full mb-6 rounded-2xl border border-rose-500 p-4 shadow-lg" role="alert">
             <div class="flex items-center gap-3">
                 <span class="not-found-icon">⛔</span>
                 <div>
-                    <p class="not-found-title">فروشگاهی با این کد یافت نشد</p>
+                    <p id="storeNotFoundTitle" class="not-found-title">فروشگاهی با این کد یافت نشد</p>
                     <p id="storeNotFoundDetail" class="not-found-detail"></p>
                 </div>
             </div>
@@ -328,9 +328,26 @@
             } catch (_) { /* نادیده گرفته میشود */ }
         }
 
-        function notifyActivityStart(plant, storeName) {
-            activityPost('/api/activity/start', { plant, storeName });
-            if (activityTimer) clearInterval(activityTimer);
+        async function notifyActivityStart(plant, storeName) {
+            if (activityTimer) { clearInterval(activityTimer); activityTimer = null; }
+            try {
+                const res = await fetch('/api/activity/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plant, storeName })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.status === 409) {
+                    const who = data.conflict?.displayName || data.conflict?.username || 'کاربر دیگر';
+                    return { ok: false, conflict: data.conflict, error: data.error || `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.` };
+                }
+                if (!res.ok || data.ok === false) {
+                    return { ok: false, error: data.error || 'ثبت فعالیت ناموفق بود.' };
+                }
+            } catch (_) {
+                // در صورت خطای شبکه، ثبت زنده ممکن است انجام نشود؛ اما کاربر نباید بی‌دلیل قفل شود.
+            }
+
             activityTimer = setInterval(() => {
                 const bar = document.getElementById('auditProgressBar');
                 const pct = bar ? (parseInt(bar.style.width, 10) || 0) : 0;
@@ -341,6 +358,7 @@
                     total
                 });
             }, 15000);
+            return { ok: true };
         }
 
         function notifyActivityStop() {
@@ -599,6 +617,7 @@
                     progBar.style.width = '100%'; percTxt.innerText = '100%';
                     statusBox.classList.add('hidden');
                     document.getElementById('resultsContainer').classList.add('hidden');
+                    document.getElementById('storeNotFoundTitle').innerText = 'فروشگاهی با این کد یافت نشد';
                     document.getElementById('storeNotFoundDetail').innerText =
                         `کد واردشده «${plantCode}» در فایل مادر وجود ندارد. لطفاً کد فروشگاه دیگری را وارد کنید.`;
                     document.getElementById('storeNotFound').classList.remove('hidden');
@@ -653,8 +672,24 @@
                 renderFilteredTable();
                 if (!noMasterItems) statusMsg.innerText = `✅ ${filteredItems.length} رکورد تجهیز با موفقیت بارگذاری شد.`;
                 hideLoading();
-                if (isCurrentLocked) notifyActivityStop();
-                else notifyActivityStart(currentPlant, currentStoreName);
+                if (isCurrentLocked) {
+                    notifyActivityStop();
+                } else {
+                    const activity = await notifyActivityStart(currentPlant, currentStoreName);
+                    if (!activity.ok) {
+                        document.getElementById('resultsContainer').classList.add('hidden');
+                        const who = activity.conflict?.displayName || activity.conflict?.username || 'کاربر دیگر';
+                        document.getElementById('storeNotFoundTitle').innerText = 'دسترسی موقتاً ممکن نیست';
+                        document.getElementById('storeNotFoundDetail').innerText = activity.error || `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`;
+                        document.getElementById('storeNotFound').classList.remove('hidden');
+                        statusBox.classList.remove('hidden');
+                        statusMsg.innerHTML = `<span class="text-rose-700 font-bold">⛔ ${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.</span>`;
+                        currentItems = [];
+                        currentStoreName = '';
+                        notifyActivityStop();
+                        return;
+                    }
+                }
             } catch (e) {
                 console.error(e);
                 hideLoading();
@@ -926,10 +961,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plant: currentPlant, auditItems: localAuditData, storeName: currentStoreName })
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
             if (data.success) {
                 document.getElementById('downloadBtn').classList.remove('hidden');
                 alert('💾 ذخیره موقت اطلاعات با موفقیت انجام شد.\nفایل اکسل گزارش کنار دکمه ذخیره قرار گرفت.');
+            } else {
+                alert(data.error || 'خطا در ذخیره موقت.');
             }
         }
 
@@ -955,13 +992,13 @@
                         auditItems: localAuditData
                     })
                 });
-                const resData = await res.json();
+                const resData = await res.json().catch(() => ({}));
                 if (resData.success) {
                     alert(resData.message + '\n\n📥 فایل گزارش تولید شد. در حال دانلود...');
                     window.location.href = resData.downloadLink; // شروع دانلود خودکار
                     handleStoreInput(currentPlant);
                 } else {
-                    alert('خطا در ثبت نهایی!');
+                    alert(resData.error || 'خطا در ثبت نهایی!');
                 }
             }
         }

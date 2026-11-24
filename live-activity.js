@@ -27,24 +27,48 @@ function keyOf(session) {
     return String((session && session.u) || '').trim().toLowerCase();
 }
 
+function getActiveByPlant(plant, excludeUsername) {
+    const p = String(plant || '').trim();
+    const ex = String(excludeUsername || '').trim().toLowerCase();
+    if (!p) return null;
+    const active = list();
+    return active.find(rec => String(rec.plant || '').trim() === p && String(rec.username || '').toLowerCase() !== ex) || null;
+}
+
 function start(session, plant, storeName) {
     const key = keyOf(session);
-    if (!key) return null;
+    if (!key) return { ok: false, error: 'نشست نامعتبر است.' };
+    const p = String(plant || '').trim();
+    const conflict = getActiveByPlant(p, key);
+    if (conflict) {
+        return {
+            ok: false,
+            conflict: true,
+            active: {
+                username: conflict.username,
+                displayName: conflict.displayName || conflict.username,
+                plant: conflict.plant,
+                storeName: conflict.storeName,
+                startedAt: conflict.startedAt,
+                lastSeen: conflict.lastSeen
+            }
+        };
+    }
     const all = readAll();
     const now = Date.now();
     const previous = all[key];
     all[key] = {
         username: key,
         displayName: (session && session.n) || key,
-        plant: String(plant || ''),
+        plant: p,
         storeName: String(storeName || ''),
-        startedAt: (previous && previous.plant === String(plant || '')) ? previous.startedAt : now,
+        startedAt: (previous && previous.plant === p) ? previous.startedAt : now,
         lastSeen: now,
         checked: 0,
         total: 0
     };
     writeAll(all);
-    return all[key];
+    return { ok: true, activity: all[key] };
 }
 
 function heartbeat(session, plant, checked, total) {
@@ -92,4 +116,4 @@ function list() {
     return active.sort((a, b) => a.startedAt - b.startedAt);
 }
 
-module.exports = { start, heartbeat, stop, list };
+module.exports = { start, heartbeat, stop, list, getActiveByPlant };
