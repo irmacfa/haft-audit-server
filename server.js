@@ -67,11 +67,22 @@ app.post('/api/reload', (req, res) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 const transporter = nodemailer.createTransport({
-    host: 'mail.haftstores.ir',
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST || 'mail.haftstores.ir',
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === 'true',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
+
+// گروه ایمیل همیشه باید گزارش نهایی را دریافت کند؛ آدرس آن قابل تنظیم از env است.
+const AUDIT_GROUP_MAIL = String(process.env.AUDIT_GROUP_MAIL || 'Oshanak-ITSUP@gbgnetwork.net').trim();
+const AUDIT_GROUP_LABEL = String(process.env.AUDIT_GROUP_LABEL || 'Oshanak-ITSUP').trim();
+
+function auditGroupRecipient() {
+    const mail = AUDIT_GROUP_MAIL.replace(/[<>"\r\n]/g, '');
+    if (!mail) return '';
+    const label = AUDIT_GROUP_LABEL.replace(/[<>"\r\n]/g, '');
+    return label ? `"${label}" <${mail}>` : mail;
+}
 
 function parseEmails(value) {
     return [...new Set(String(value || '')
@@ -80,12 +91,13 @@ function parseEmails(value) {
         .filter(Boolean))];
 }
 
-async function resolveAuditRecipients(fallbackManagerEmail) {
+async function resolveBaseRecipients(fallbackManagerEmail) {
+    const settings = core.getEffectiveSettings();
+    // خاموش کردن اعلان ایمیل در پنل ادمین یک کلید قطع کامل است (حتی روی env هم اولویت دارد).
+    if (settings.emailNotifyEnabled === false) return { to: [], source: 'disabled' };
+
     const envTo = parseEmails(process.env.AUDIT_NOTIFY_TO);
     if (envTo.length) return { to: envTo, source: 'env' };
-
-    const settings = core.getEffectiveSettings();
-    if (settings.emailNotifyEnabled === false) return { to: [], source: 'disabled' };
 
     const settingsTo = parseEmails(settings.emailNotifyTo);
     if (settingsTo.length) return { to: settingsTo, source: 'settings' };
@@ -109,6 +121,20 @@ async function resolveAuditRecipients(fallbackManagerEmail) {
     }
 
     return { to: ['manager@haftstores.ir'], source: 'fallback' };
+}
+
+// علاوه بر گیرندگان تنظیمشده، گروه ایمیل همیشه گزارش نهایی را هم میگیرد
+// (مگر اینکه ارسال ایمیل در تنظیمات ادمین خاموش باشد).
+async function resolveAuditRecipients(fallbackManagerEmail) {
+    const resolved = await resolveBaseRecipients(fallbackManagerEmail);
+    if (resolved.source === 'disabled') return resolved;
+    const groupRecipient = auditGroupRecipient();
+    if (!groupRecipient) return resolved;
+    const to = [...resolved.to];
+    const existing = to.findIndex(addr => String(addr).toLowerCase().includes(AUDIT_GROUP_MAIL.toLowerCase()));
+    if (existing >= 0) to[existing] = groupRecipient;
+    else to.push(groupRecipient);
+    return { ...resolved, to };
 }
 
 // تنظیمات عمومی پورتها (برای ساخت لینکهای بین پنلها در شبکه داخلی)
@@ -482,8 +508,13 @@ app.post('/api/activity/stop', (req, res) => {
     res.json({ ok: true });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[USER PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
-    // پیش‌بارگذاری در پس‌زمینه تا اولین کاربر منتظر نماند
-    core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.consoleMessage || e.message));
-});
+// HAFT_SKIP_LISTEN=1 lets tests load the module without opening the port.
+if (process.env.HAFT_SKIP_LISTEN !== '1') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`[USER PANEL] http://localhost:${PORT}  |  http://${require('os').hostname()}:${PORT}`);
+        // پیش‌بارگذاری در پس‌زمینه تا اولین کاربر منتظر نماند
+        core.ensureMasterCache().catch(e => console.error('[Startup warmup]', e.consoleMessage || e.message));
+    });
+}
+
+module.exports = { app, resolveAuditRecipients, parseEmails, auditGroupRecipient };

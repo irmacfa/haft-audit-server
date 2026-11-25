@@ -164,7 +164,11 @@ npm run create-user -- --list
 |---|---|
 | `EMAIL_USER` | نام کاربری ایمیل سامانه |
 | `EMAIL_PASS` | رمز عبور / App Password ایمیل |
-| `AUDIT_NOTIFY_TO` | گیرنده/گیرندگان گزارش نهایی (با کاما). خالی = ابتدا ایمیل گروه AD (`LDAP_ALLOWED_GROUP`)، سپس ایمیل اعضای گروه AD، در نهایت `manager@haftstores.ir` |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | تنظیمات SMTP (پیشفرض `mail.haftstores.ir:587` و `false`) |
+| `SMTP_TEST_TO` | گیرنده پیشفرض ایمیل آزمایشی (اختیاری) |
+| `AUDIT_NOTIFY_TO` | گیرنده/گیرندگان اضافی گزارش نهایی (با کاما). خالی = ابتدا ایمیل گروه AD (`LDAP_ALLOWED_GROUP`)، سپس ایمیل اعضای گروه AD، در نهایت `manager@haftstores.ir`. خاموش کردن اعلان ایمیل در پنل ادمین جلوی تمام ارسالها را میگیرد |
+| `AUDIT_GROUP_MAIL` | آدرس گروهی که همیشه گزارش نهایی را میگیرد (پیشفرض `Oshanak-ITSUP@gbgnetwork.net`) |
+| `AUDIT_GROUP_LABEL` | نام نمایشی گروه در هدر ایمیل (پیشفرض `Oshanak-ITSUP`) |
 | `PORT` | پورت سرور (پیشفرض 2030) |
 | `ADMIN_PORT` | پورت پنل مدیریت (پیشفرض 2031) |
 | `AUTH_MODE` | `hybrid` (پیشفرض: مدیر محلی + کاربران دامین)، `local` یا `ldap` |
@@ -173,6 +177,17 @@ npm run create-user -- --list
 | `LOCAL_USERS_PATH` | مسیر فایل کاربران محلی (پیشفرض `db/local_users.json`) |
 | `SESSION_SECRET` | کلید امضای کوکی نشست (حتماً تغییر دهید) |
 | `INTERNAL_TOKEN` | توکن ارتباط داخلی دو سرور (حتماً تغییر دهید) |
+
+### تست SMTP
+برای بررسی احراز هویت SMTP بدون ارسال ایمیل:
+```powershell
+npm run test:smtp
+```
+برای ارسال ایمیل آزمایشی به گروه یا یک آدرس دلخواه:
+```powershell
+node qa/smtp-check.js --send
+node qa/smtp-check.js --send --to user@example.com
+```
 
 ## مناطق فروشگاهها
 

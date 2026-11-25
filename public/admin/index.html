@@ -87,14 +87,14 @@
         <!-- نوتیفیکیشن ایمیل -->
         <div class="bg-white border border-slate-200 rounded-2xl p-5 mt-6">
             <h3 class="text-sm font-bold text-slate-900 mb-2">۴. اعلان ایمیل پس از انبارگردانی</h3>
-            <p class="text-[11px] text-slate-500 mb-3">پس از «تایید نهایی»، گزارش اکسل برای گیرندگان ایمیل می‌شود. اگر گیرنده را خالی بگذارید: اول ایمیل گروه AD، سپس ایمیل اعضای گروه AD، و در نهایت آدرس پیش‌فرض استفاده می‌شود.</p>
+            <p class="text-[11px] text-slate-500 mb-3">پس از «تایید نهایی»، گزارش اکسل برای گیرندگان ایمیل می‌شود. گروه <b dir="ltr" class="font-mono text-blue-700">Oshanak-ITSUP &lt;Oshanak-ITSUP@gbgnetwork.net&gt;</b> همیشه گیرنده است (مگر اینکه ارسال ایمیل خاموش باشد). اگر گیرندگان خالی بمانند: اول ایمیل گروه AD، سپس ایمیل اعضای گروه AD، و در نهایت آدرس پیشفرض استفاده میشود.</p>
             <label class="flex items-center gap-2 text-xs text-slate-700 mb-3 cursor-pointer">
                 <input id="emailNotifyEnabled" type="checkbox" class="accent-emerald-600 w-4 h-4">
                 <span>ارسال ایمیل گزارش نهایی فعال باشد</span>
             </label>
             <label class="block text-[11px] text-slate-500 mb-1">گیرندگان (اختیاری، با کاما یا ; جدا کنید)</label>
             <input id="emailNotifyTo" type="text" dir="ltr" placeholder="group@haftstores.ir, manager@haftstores.ir" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 text-xs font-mono focus:outline-none focus:border-orange-500">
-            <p class="text-[10px] text-slate-400 mt-2">اولویت: <code>AUDIT_NOTIFY_TO</code> در env &gt; این فیلد &gt; ایمیل گروه AD &gt; ایمیل اعضای AD.</p>
+            <p class="text-[10px] text-slate-400 mt-2">اولویت: خاموش کردن چکباکس بالا &gt; <code>AUDIT_NOTIFY_TO</code> در env &gt; این فیلد &gt; ایمیل گروه AD &gt; ایمیل اعضای AD. گروه ایمیل بالا به همه موارد اضافه میشود.</p>
         </div>
 
         <!-- مناطق -->

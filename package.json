@@ -7,6 +7,8 @@
     "start": "node start.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:concurrency": "node qa/concurrency-check.js",
+    "test:mail": "node qa/mail-recipients-check.js",
+    "test:smtp": "node qa/smtp-check.js",
     "create-user": "node scripts/create-local-user.js"
   },
   "keywords": [],
