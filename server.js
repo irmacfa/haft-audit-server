@@ -72,7 +72,8 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-// فرستنده پیشفرض گروه OshanakSUP است؛ حساب SMTP (EMAIL_USER) باید Send As روی آن داشته باشد.
+// فرستنده پیشفرض صندوق OshanakSUP است؛ معمولاً همان EMAIL_USER است (صندوق اشتراکی).
+// اگر SMTP با حساب دیگری احراز شود، آن حساب باید Send As روی OshanakSUP داشته باشد.
 function auditMailFrom() {
     const address = String(process.env.AUDIT_MAIL_FROM || 'OshanakSUP@oshanak.com')
         .replace(/[<>"\r\n]/g, '').trim();

@@ -154,9 +154,9 @@ aghanbari / <رمز دامین>
 
 | متغیر | توضیح |
 |---|---|
-| `EMAIL_USER` | حساب SMTP (میتواند UPN دامین مانند `aghanbari@gbgnetwork.net` باشد) |
+| `EMAIL_USER` | حساب SMTP Auth؛ پیشفرض صندوق اشتراکی `OshanakSUP@oshanak.com` (در صورت ناموفق بودن، حساب دامین با Send As هم قابل استفاده است) |
 | `EMAIL_PASS` | رمز عبور / App Password همان حساب (در `.env`، gitignored) |
-| `AUDIT_MAIL_FROM` | آدرس فرستنده گزارش نهایی (پیشفرض `OshanakSUP@oshanak.com`)؛ حساب SMTP باید Send As روی آن داشته باشد |
+| `AUDIT_MAIL_FROM` | آدرس فرستنده گزارش نهایی (پیشفرض `OshanakSUP@oshanak.com`) |
 | `AUDIT_MAIL_FROM_LABEL` | نام نمایشی فرستنده (پیشفرض `OshanakSUP`) |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | تنظیمات SMTP (پیشفرض `mail.haftstores.ir:587` و `false`) |
 | `SMTP_TEST_TO` | گیرنده پیشفرض ایمیل آزمایشی (اختیاری) |
@@ -172,9 +172,15 @@ aghanbari / <رمز دامین>
 | `SESSION_SECRET` | کلید امضای کوکی نشست (حتماً تغییر دهید) |
 | `INTERNAL_TOKEN` | توکن ارتباط داخلی دو سرور (حتماً تغییر دهید) |
 
-گزارش نهایی با هدر `From: OshanakSUP <OshanakSUP@oshanak.com>` و `To: Oshanak-ITSUP <Oshanak-ITSUP@gbgnetwork.net>` ارسال میشود. حساب SMTP (`EMAIL_USER`) باید مجوز **Send As** روی گروه OshanakSUP داشته باشد؛ عضویت در گروه بهتنهایی کافی نیست.
+گزارش نهایی با هدر `From: OshanakSUP <OshanakSUP@oshanak.com>` و `To: Oshanak-ITSUP <Oshanak-ITSUP@gbgnetwork.net>` ارسال میشود. پیشفرض آن است که SMTP با همان صندوق OshanakSUP احراز شود؛ در این حالت Send As جداگانه لازم نیست. اگر از حساب دامین دیگری استفاده شود، آن حساب باید مجوز **Send As** روی OshanakSUP داشته باشد.
 
 ### تست SMTP
+برای پیدا کردن هاست معتبر از لیست `email.gbgnetwork.net`، `mail.gbgnetwork.net`، `email.oshanak.com` و `mail.oshanak.com` (فقط احراز هویت، بدون ارسال ایمیل):
+```powershell
+npm run test:smtp-hosts
+```
+سپس `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` را در `.env` مطابق نتیجه تنظیم و سرویس را restart کنید.
+
 برای بررسی احراز هویت SMTP بدون ارسال ایمیل:
 ```powershell
 npm run test:smtp
