@@ -366,6 +366,23 @@
             activityPost('/api/activity/stop', {});
         }
 
+        // نمایش پیام یکسان وقتی کاربر دیگری انبارگردانی فروشگاه را در دست دارد.
+        function showAccessConflict(info) {
+            const statusBox = document.getElementById('statusBox');
+            const statusMsg = document.getElementById('statusMessage');
+            const who = info?.conflict?.displayName || info?.conflict?.username || 'کاربر دیگر';
+            const message = info?.error || `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`;
+            document.getElementById('resultsContainer').classList.add('hidden');
+            document.getElementById('storeNotFoundTitle').innerText = 'دسترسی موقتاً ممکن نیست';
+            document.getElementById('storeNotFoundDetail').innerText = message;
+            document.getElementById('storeNotFound').classList.remove('hidden');
+            statusBox.classList.remove('hidden');
+            statusMsg.innerHTML = `<span class="text-rose-700 font-bold">⛔ ${escapeHtml(message)}</span>`;
+            currentItems = [];
+            currentStoreName = '';
+            localAuditData = {};
+        }
+
         function setAppBusy(busy) {
             document.getElementById('appShell').classList.toggle('app-busy', !!busy);
         }
@@ -611,6 +628,12 @@
                     fetchEquipmentForPlant(plantCode)
                 ]);
                 const auditInfo = await auditRes.json();
+                if (auditRes.status === 409) {
+                    progBar.style.width = '100%'; percTxt.innerText = '100%';
+                    hideLoading();
+                    showAccessConflict(auditInfo);
+                    return;
+                }
                 progBar.style.width = '85%'; percTxt.innerText = '85%';
 
                 if (!equipmentResult.storeExists) {
@@ -677,16 +700,7 @@
                 } else {
                     const activity = await notifyActivityStart(currentPlant, currentStoreName);
                     if (!activity.ok) {
-                        document.getElementById('resultsContainer').classList.add('hidden');
-                        const who = activity.conflict?.displayName || activity.conflict?.username || 'کاربر دیگر';
-                        document.getElementById('storeNotFoundTitle').innerText = 'دسترسی موقتاً ممکن نیست';
-                        document.getElementById('storeNotFoundDetail').innerText = activity.error || `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`;
-                        document.getElementById('storeNotFound').classList.remove('hidden');
-                        statusBox.classList.remove('hidden');
-                        statusMsg.innerHTML = `<span class="text-rose-700 font-bold">⛔ ${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.</span>`;
-                        currentItems = [];
-                        currentStoreName = '';
-                        notifyActivityStop();
+                        showAccessConflict(activity);
                         return;
                     }
                 }

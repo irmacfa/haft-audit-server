@@ -241,8 +241,55 @@ function requirePlantAccess(req, res, plant) {
     return true;
 }
 
+function currentUsername(req) {
+    return String((req.user && req.user.u) || '').trim().toLowerCase();
+}
+
+function activityConflictError(conflict) {
+    const who = (conflict && (conflict.displayName || conflict.username)) || 'کاربر دیگر';
+    return `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`;
+}
+
+function sendActivityConflict(res, conflict) {
+    return res.status(409).json({
+        ok: false,
+        success: false,
+        code: 'AUDIT_IN_PROGRESS',
+        error: activityConflictError(conflict),
+        conflict
+    });
+}
+
+// خواندن/شروع فعالیت: کاربران دیگر نباید وارد انبارگردانی جاری یک فروشگاه شوند.
+function checkPlantNotBusy(req, res, plant) {
+    if (!requirePlantAccess(req, res, plant)) return false;
+    const conflict = activity.getActiveByPlant(plant, currentUsername(req));
+    if (conflict) {
+        sendActivityConflict(res, conflict);
+        return false;
+    }
+    return true;
+}
+
+// نوشتن نتیجه: علاوه بر فوق، کاربر نباید همزمان روی فروشگاه دیگری فعال باشد.
+function checkWriteAuditAccess(req, res, plant) {
+    if (!checkPlantNotBusy(req, res, plant)) return false;
+    const ownElsewhere = activity.getActiveFor(req.user);
+    if (ownElsewhere && String(ownElsewhere.plant || '').trim() !== String(plant || '').trim()) {
+        res.status(409).json({
+            ok: false,
+            success: false,
+            code: 'AUDIT_SESSION_ELSEWHERE',
+            error: `شما در حال انبارگردانی فروشگاه ${ownElsewhere.plant} هستید؛ ابتدا آن فروشگاه را تمام کنید.`,
+            conflict: ownElsewhere
+        });
+        return false;
+    }
+    return true;
+}
+
 app.get('/api/audit/:plant', (req, res) => {
-    if (!requirePlantAccess(req, res, req.params.plant)) return;
+    if (!checkPlantNotBusy(req, res, req.params.plant)) return;
     const db = core.readDb();
     res.json({
         statusData: db.plant_status[req.params.plant] || { isLocked: false, auditDate: null, auditor: null },
@@ -306,12 +353,7 @@ app.get('/api/monitoring/export', (req, res) => {
 app.post('/api/audit/draft', (req, res) => {
     try {
         const { plant, auditItems, storeName } = req.body;
-        if (!requirePlantAccess(req, res, plant)) return;
-        const conflict = activity.getActiveByPlant(plant, String((req.user && req.user.u) || '').toLowerCase());
-        if (conflict) {
-            const who = conflict.displayName || conflict.username || 'کاربر دیگر';
-            return res.status(409).json({ success: false, error: `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`, conflict });
-        }
+        if (!checkWriteAuditAccess(req, res, plant)) return;
         const auditor = getAuditor(req);
         const db = core.readDb();
         db.audit_records[plant] = auditItems;
@@ -332,12 +374,7 @@ app.post('/api/audit/draft', (req, res) => {
 app.post('/api/audit/finalize', async (req, res) => {
     try {
         const { plant, storeName, auditItems, managerEmail } = req.body;
-        if (!requirePlantAccess(req, res, plant)) return;
-        const conflict = activity.getActiveByPlant(plant, String((req.user && req.user.u) || '').toLowerCase());
-        if (conflict) {
-            const who = conflict.displayName || conflict.username || 'کاربر دیگر';
-            return res.status(409).json({ error: `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`, conflict });
-        }
+        if (!checkWriteAuditAccess(req, res, plant)) return;
         const auditorInfo = getAuditor(req);
         const auditor = auditorInfo.name;
         const db = core.readDb();
@@ -358,6 +395,8 @@ app.post('/api/audit/finalize', async (req, res) => {
             auditorEmail: auditorInfo.email, history
         };
         core.writeDb(db);
+        // انبارگردانی تمام شد؛ قفل زنده فروشگاه باید فوراً آزاد شود تا کاربر بعدی منتظر نماند.
+        activity.stop(req.user);
 
         const fileName = core.writeReportFile(plant, auditItems);
         const recipients = await resolveAuditRecipients(managerEmail);
@@ -420,37 +459,20 @@ app.post('/api/audit/finalize', async (req, res) => {
 app.post('/api/activity/start', (req, res) => {
     const { plant, storeName } = req.body || {};
     if (!plant) return res.status(400).json({ error: 'کد فروشگاه الزامی است.' });
-    if (!requirePlantAccess(req, res, plant)) return;
+    if (!checkPlantNotBusy(req, res, plant)) return;
     const result = activity.start(req.user, plant, storeName);
-    if (result && result.conflict) {
-        const who = result.active?.displayName || result.active?.username || 'کاربر دیگر';
-        return res.status(409).json({
-            ok: false,
-            error: `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`,
-            conflict: result.active
-        });
-    }
+    if (result && result.conflict) return sendActivityConflict(res, result.active);
     if (!result || !result.ok) return res.status(400).json({ ok: false, error: (result && result.error) || 'خطا در ثبت فعالیت.' });
     res.json({ ok: true, activity: result.activity });
 });
 
 app.post('/api/activity/heartbeat', (req, res) => {
     const { plant, checked, total } = req.body || {};
-    if (plant && !requirePlantAccess(req, res, plant)) return;
-    if (plant) {
-        const conflict = activity.getActiveByPlant(plant, String((req.user && req.user.u) || '').toLowerCase());
-        if (conflict) {
-            const who = conflict.displayName || conflict.username || 'کاربر دیگر';
-            return res.status(409).json({ ok: false, error: `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`, conflict });
-        }
-    }
+    if (plant && !checkPlantNotBusy(req, res, plant)) return;
     const ok = activity.heartbeat(req.user, plant, checked, total);
     if (!ok && plant) {
         const started = activity.start(req.user, plant, '');
-        if (started && started.conflict) {
-            const who = started.active?.displayName || started.active?.username || 'کاربر دیگر';
-            return res.status(409).json({ ok: false, error: `${who} در حال انبارگردانی این فروشگاه است؛ شما اجازه دسترسی ندارید.`, conflict: started.active });
-        }
+        if (started && started.conflict) return sendActivityConflict(res, started.active);
     }
     res.json({ ok: true });
 });

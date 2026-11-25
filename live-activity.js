@@ -6,7 +6,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const FILE_PATH = path.join(__dirname, 'db', 'live_activity.json');
+// ACTIVITY_FILE به تستها اجازه میدهد از فایل موقتی استفاده کنند و داده زنده سرور دست نخورده بماند.
+const FILE_PATH = process.env.ACTIVITY_FILE
+    ? path.resolve(process.env.ACTIVITY_FILE)
+    : path.join(__dirname, 'db', 'live_activity.json');
 const STALE_MS = 2 * 60 * 1000;
 
 function readAll() {
@@ -33,6 +36,17 @@ function getActiveByPlant(plant, excludeUsername) {
     if (!p) return null;
     const active = list();
     return active.find(rec => String(rec.plant || '').trim() === p && String(rec.username || '').toLowerCase() !== ex) || null;
+}
+
+/** رکورد فعال خود کاربر (اختیاری محدود به یک فروشگاه)؛ رکوردهای منقضی قبل از جستجو پاک میشوند. */
+function getActiveFor(session, plant) {
+    const key = keyOf(session);
+    if (!key) return null;
+    const p = plant == null ? null : String(plant).trim();
+    return list().find(rec =>
+        String(rec.username || '').toLowerCase() === key &&
+        (!p || String(rec.plant || '').trim() === p)
+    ) || null;
 }
 
 function start(session, plant, storeName) {
@@ -116,4 +130,4 @@ function list() {
     return active.sort((a, b) => a.startedAt - b.startedAt);
 }
 
-module.exports = { start, heartbeat, stop, list, getActiveByPlant };
+module.exports = { start, heartbeat, stop, list, getActiveByPlant, getActiveFor };
