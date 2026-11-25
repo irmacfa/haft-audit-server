@@ -174,9 +174,21 @@ app.get('/api/admin/members', async (req, res) => {
     try {
         const [members, regions] = await Promise.all([directory.listMembers(), Promise.resolve(core.getEffectiveSettings().regions)]);
         const saved = directory.getLinks();
+        // کدهای انبار هم قابل لینک کردناند تا هر انبار فقط به صاحبش دسترسی داشته باشد.
+        let warehouses = [];
+        try {
+            const stores = core.getStores();
+            warehouses = Object.keys(stores)
+                .filter(plant => core.isWarehousePlant(plant))
+                .sort()
+                .map(code => ({ code, name: stores[code] }));
+        } catch (e) {
+            // کش هنوز بارگذاری نشده است؛ لیست انبارها در بارگذاری بعدی کامل میشود.
+        }
         res.json({
             group: directory.GROUP,
             regions: regions.map(r => r.name),
+            warehouses,
             members: members.map(m => ({
                 ...m,
                 regions: Array.isArray(saved[m.username.toLowerCase()]) ? saved[m.username.toLowerCase()] : []

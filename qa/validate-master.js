@@ -66,7 +66,8 @@ wb.SheetNames.forEach((name, idx) => {
             { name: 'همدان', ranges: [[3000, 3200]] },
             { name: 'کرمانشاه', ranges: [[3500, 3600], [8500, 8599]] },
             { name: 'مشهد', ranges: [[4000, 4099]] },
-            { name: 'کرمان', ranges: [[5000, 5099], [8000, 8099]] }
+            { name: 'کرمان', ranges: [[5000, 5099], [8000, 8099]] },
+            { name: 'انبارها', ranges: [[9101, 9109]] }
         ];
         const other = [...plants].filter(p => {
             const code = Number(String(p).replace(/\D/g, ''));

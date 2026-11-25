@@ -187,10 +187,9 @@ app.get('/api/equipment/search', (req, res) => {
         const progress = core.getCacheProgress();
         if (!progress.ready) return res.status(202).json({ loading: true, progress });
         const access = regionAccess.getAccess(req.user);
-        const allowedRegions = access.all ? null : new Set(access.regions);
         const equipment = core.getEquipmentData();
         const data = equipment.data.filter(item => {
-            if (allowedRegions && !allowedRegions.has(core.getRegion(item.plant))) return false;
+            if (!regionAccess.isPlantAllowedForAccess(access, item.plant)) return false;
             const a = String(item.assetNo || '').replace(/[-–\s]/g, '');
             const s = String(item.serial || '').replace(/[-–\s]/g, '');
             return a === q || s === q || a.includes(q) || s.includes(q);
@@ -324,7 +323,7 @@ app.get('/api/monitoring/export', (req, res) => {
         const db = core.readDb();
         const stores = core.getStores();
         const rows = Object.keys(stores)
-            .filter(plant => regionAccess.isRegionAllowed(req.user, core.getRegion(plant)))
+            .filter(plant => regionAccess.isPlantAllowed(req.user, plant))
             .map(plant => {
                 const status = db.plant_status[plant];
                 const items = Object.values(db.audit_records[plant] || {});

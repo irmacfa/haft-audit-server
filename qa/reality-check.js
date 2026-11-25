@@ -45,7 +45,7 @@ function check(name, pass, evidence) {
     check('equipment: deduplicated', eq.status === 200 && dup === 0,
         { status: eq.status, ms: eq.ms, total: eqData.total, duplicates: dup });
 
-    // ۳) مانیتورینگ: ۷۱۴ فروشگاه، ۸ گروه منطقه (شامل سایر)
+    // ۳) مانیتورینگ: ۷۱۴ فروشگاه، ۸ گروه منطقه (شامل انبارها)
     const mon = await get('http://localhost:3001/api/monitoring/status');
     let stores = [];
     try { stores = JSON.parse(mon.body); } catch (e) { }

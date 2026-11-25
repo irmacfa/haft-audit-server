@@ -70,7 +70,8 @@ const DEFAULT_SETTINGS = {
         { name: 'همدان', ranges: [[3000, 3200]] },
         { name: 'کرمانشاه', ranges: [[3500, 3600], [8500, 8599]] },
         { name: 'مشهد', ranges: [[4000, 4099]] },
-        { name: 'کرمان', ranges: [[5000, 5099], [8000, 8099]] }
+        { name: 'کرمان', ranges: [[5000, 5099], [8000, 8099]] },
+        { name: 'انبارها', ranges: [[9101, 9109]] }
     ]
 };
 
@@ -128,6 +129,18 @@ function getRegion(plant) {
         return code >= r.from && code <= r.to;
     });
     return region ? region.name : 'سایر';
+}
+
+// کدهای پلنت انبار (مثلاً 9104) بر اساس منطقهای که نامش شامل «انبار» است تشخیص داده میشوند.
+// اگر منطقه انبارها در تنظیمات تغییر نام یا بازهاش عوض شود، این تابع همان تنظیمات را دنبال میکند.
+function isWarehousePlant(plant) {
+    const code = Number(String(plant).replace(/\D/g, ''));
+    if (!Number.isFinite(code)) return false;
+    return getEffectiveSettings().regions.some(r => {
+        if (!/انبار/.test(String(r.name || ''))) return false;
+        if (Array.isArray(r.ranges)) return r.ranges.some(([from, to]) => code >= from && code <= to);
+        return code >= r.from && code <= r.to;
+    });
 }
 
 function saveSettings(settings) {
@@ -375,7 +388,7 @@ function saveMasterFileMeta(meta) {
 module.exports = {
     DATA_DIR, MASTER_PATH, LEGACY_EXCEL_PATH, DB_PATH, REPORTS_DIR, DEFAULT_SETTINGS,
     invalidateCache, ensureMasterCache, getExcelPath, readDb, writeDb,
-    getSettings, getEffectiveSettings, saveSettings, getRegion,
+    getSettings, getEffectiveSettings, saveSettings, getRegion, isWarehousePlant,
     getMasterColumns, getDisplayColumns, getStores, getEquipmentData,
     writeReportFile, sendTelegramNotification, getCacheStatus, getCacheProgress,
     getMasterFileMeta, saveMasterFileMeta

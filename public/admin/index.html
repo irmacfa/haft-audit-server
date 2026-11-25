@@ -100,7 +100,7 @@
         <!-- مناطق -->
         <div class="bg-white border border-slate-200 rounded-2xl p-5 mt-6">
             <h3 class="text-sm font-bold text-slate-900 mb-2">۵. مناطق فروشگاهها</h3>
-            <p class="text-[11px] text-slate-500 mb-3">هر خط: <code class="text-orange-700">نام منطقه:بازه,بازه</code> — مثلاً <code>تهران:1000-1499,7000-7099</code>. فقط فروشگاههای موجود در فایل مادر نمایش داده میشوند.</p>
+            <p class="text-[11px] text-slate-500 mb-3">هر خط: <code class="text-orange-700">نام منطقه:بازه,بازه</code> — مثلاً <code>تهران:1000-1499,7000-7099</code> یا <code>انبارها:9101-9109</code>. کدهای انبار (۹۱۰۱–۹۱۰۹) در منطقه جداگانه «انبارها»اند و در مانیتورینگ فیلتر مخصوص خود را دارند. فقط فروشگاههای موجود در فایل مادر نمایش داده میشوند.</p>
             <textarea id="regionsInput" rows="7" dir="ltr" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 text-xs font-mono focus:outline-none focus:border-orange-500"></textarea>
             <button onclick="saveRegions()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold">💾 ذخیره مناطق</button>
             <p id="regionsStatus" class="text-xs mt-3 text-slate-500"></p>
@@ -111,7 +111,7 @@
             <div class="flex flex-wrap justify-between items-center gap-3 mb-3">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900 mb-1">۶. اعضا و مناطق</h3>
-                    <p class="text-[11px] text-slate-500">لینک اعضای گروه <b id="memberGroupName" dir="ltr" class="font-mono text-blue-700">Oshanak-ITSUP</b> به مناطق برنامه. این لینکها فقط داخل سامانه ذخیره میشوند و گروه اکتیو دایرکتوری تغییری نمیکند.</p>
+                    <p class="text-[11px] text-slate-500">لینک اعضای گروه <b id="memberGroupName" dir="ltr" class="font-mono text-blue-700">Oshanak-ITSUP</b> به مناطق و انبارها. برای انبارها یا «تمام انبارها» را بدهید یا فقط همان کد انبار (مثل 9104)؛ حساب مدیر و لینک «دسترسی کل» به همه انبارها دسترسی دارند. این لینکها فقط داخل سامانه ذخیره میشوند و گروه اکتیو دایرکتوری تغییری نمیکند.</p>
                 </div>
                 <button onclick="loadMembers()" class="bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">🔄 بروزرسانی لیست</button>
             </div>
@@ -264,6 +264,7 @@
         let columnLabelMap = {};
         let allMembers = [];
         let memberRegions = [];
+        let warehouseList = [];
         let visibleMembers = [];
 
         function esc(value) {
@@ -354,6 +355,7 @@
                 if (!res.ok) throw new Error(data.error || 'خطا در دریافت لیست');
                 allMembers = data.members || [];
                 memberRegions = data.regions || [];
+                warehouseList = data.warehouses || [];
                 document.getElementById('memberGroupName').textContent = data.group || '';
                 renderMembers();
                 status.textContent = `${allMembers.length} عضو یافت شد.`;
@@ -368,13 +370,27 @@
                 !q || [m.displayName, m.username, m.mail].join(' ').toLowerCase().includes(q));
             const tbody = document.getElementById('membersTableBody');
             tbody.innerHTML = visibleMembers.map((m, i) => {
+                const warehouseNames = Object.fromEntries(warehouseList.map(w => [w.code, w.name]));
+                const linkLabel = r => {
+                    if (r === '*') return '🌐 دسترسی کل مناطق و انبارها';
+                    if (warehouseNames[r]) return `🏭 ${r} — ${warehouseNames[r]}`;
+                    if (/انبار/.test(String(r))) return `🏭 ${r} (تمام انبارها)`;
+                    return r;
+                };
                 const chips = (m.regions || []).map(r =>
-                    `<button data-member-unlink="${i}" data-region="${esc(r)}" title="حذف لینک" class="inline-flex items-center gap-1 bg-slate-700 text-sky-300 border border-slate-600 px-2 py-1 rounded-lg text-[11px] ml-1">${r === '*' ? '🌐 دسترسی کل مناطق' : esc(r)} ✕</button>`
+                    `<button data-member-unlink="${i}" data-region="${esc(r)}" title="حذف لینک" class="inline-flex items-center gap-1 bg-slate-700 text-sky-300 border border-slate-600 px-2 py-1 rounded-lg text-[11px] ml-1">${esc(linkLabel(r))} ✕</button>`
                 ).join('');
-                const allRegionsLinked = (m.regions || []).includes('*');
-                const options = `<option value="*" ${allRegionsLinked ? 'disabled' : ''}>🌐 دسترسی کل مناطق</option>` +
-                    memberRegions.map(r =>
-                        `<option value="${esc(r)}" ${allRegionsLinked || (m.regions || []).includes(r) ? 'disabled' : ''}>${esc(r)}</option>`).join('');
+                const allLinked = (m.regions || []).includes('*');
+                const allWarehouseRegion = memberRegions.find(r => /انبار/.test(String(r))) || 'انبارها';
+                const allWarehousesLinked = allLinked || (m.regions || []).some(r => /انبار/.test(String(r)));
+                const options = `<option value="*" ${allLinked ? 'disabled' : ''}>🌐 دسترسی کل مناطق و انبارها</option>` +
+                    memberRegions.filter(r => !/انبار/.test(String(r))).map(r =>
+                        `<option value="${esc(r)}" ${allLinked || (m.regions || []).includes(r) ? 'disabled' : ''}>${esc(r)}</option>`).join('') +
+                    `<optgroup label="🏭 انبارها">` +
+                        `<option value="${esc(allWarehouseRegion)}" ${allWarehousesLinked ? 'disabled' : ''}>تمام انبارها</option>` +
+                        warehouseList.map(w =>
+                            `<option value="${esc(w.code)}" ${allWarehousesLinked || (m.regions || []).includes(w.code) ? 'disabled' : ''}>${esc(w.code)} — ${esc(w.name)}</option>`).join('') +
+                    `</optgroup>`;
                 return `<tr>
                     <td class="p-3 font-bold text-slate-900">${esc(m.displayName)}</td>
                     <td class="p-3 text-left" dir="ltr">${esc(m.username)}</td>
