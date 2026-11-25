@@ -73,6 +73,12 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
+// فرستنده ایمیل از حساب SMTP تنظیمشده (میتواند حساب دامین باشد) گرفته میشود.
+function auditMailFrom() {
+    const address = String(process.env.AUDIT_MAIL_FROM || process.env.EMAIL_USER || 'audit-system@haftstores.ir').trim();
+    return `"سامانه انبارگردانی هفت" <${address}>`;
+}
+
 // گروه ایمیل همیشه باید گزارش نهایی را دریافت کند؛ آدرس آن قابل تنظیم از env است.
 const AUDIT_GROUP_MAIL = String(process.env.AUDIT_GROUP_MAIL || 'Oshanak-ITSUP@gbgnetwork.net').trim();
 const AUDIT_GROUP_LABEL = String(process.env.AUDIT_GROUP_LABEL || 'Oshanak-ITSUP').trim();
@@ -433,7 +439,7 @@ app.post('/api/audit/finalize', async (req, res) => {
             mailError = recipients.source === 'disabled' ? 'ارسال ایمیل در تنظیمات غیرفعال است.' : 'گیرنده ایمیل یافت نشد.';
         } else {
             const mailOptions = {
-                from: '"سامانه انبارگردانی هفت" <audit-system@haftstores.ir>',
+                from: auditMailFrom(),
                 to: recipients.to.join(', '),
                 replyTo: auditorInfo.email || undefined,
                 subject: `گزارش انبارگردانی نهایی - فروشگاه ${plant} (${storeName})`,
@@ -517,4 +523,4 @@ if (process.env.HAFT_SKIP_LISTEN !== '1') {
     });
 }
 
-module.exports = { app, resolveAuditRecipients, parseEmails, auditGroupRecipient };
+module.exports = { app, resolveAuditRecipients, parseEmails, auditGroupRecipient, auditMailFrom };

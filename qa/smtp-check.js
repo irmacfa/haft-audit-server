@@ -44,14 +44,15 @@ const transporter = nodemailer.createTransport({
         return;
     }
 
+    const fromAddress = String(process.env.AUDIT_MAIL_FROM || user || 'audit-system@haftstores.ir').trim();
     const info = await transporter.sendMail({
-        from: '"سامانه انبارگردانی هفت" <audit-system@haftstores.ir>',
+        from: `"سامانه انبارگردانی هفت" <${fromAddress}>`,
         to,
         subject: `[SMTP test] ${new Date().toISOString()}`,
         text: 'This is a test message from the audit server SMTP checker.',
         html: '<div dir="rtl">این یک ایمیل آزمایشی از سامانه انبارگردانی هفت است.</div>'
     });
-    console.log(`Test email sent to ${to}: ${info.messageId}`);
+    console.log(`Test email sent from ${fromAddress} to ${to}: ${info.messageId}`);
 })().catch(e => {
     console.error('SMTP check failed:', e.message || e);
     process.exitCode = 1;

@@ -131,7 +131,7 @@
                     <span class="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-sm">۱</span>
                     <div>
                         <h2 class="text-sm font-bold text-orange-700">کد فروشگاه</h2>
-                        <p class="text-[10px] text-slate-500">کد ۴ رقمی پلنت را وارد کنید</p>
+                        <p class="text-[10px] text-slate-500">کد ۴ رقمی پلنت را وارد کنید (جستجوی سراسری موقتاً غیرفعال میشود)</p>
                     </div>
                 </div>
                 <input type="text" id="storeCodeInput" maxlength="4" oninput="handleStoreInput(this.value)" placeholder="مثال: 1001" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 text-center text-2xl font-mono tracking-widest focus:outline-none focus:border-orange-500">
@@ -143,7 +143,7 @@
                     <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">۲</span>
                     <div>
                         <h2 class="text-sm font-bold text-emerald-700">جستجوی سراسری تجهیز</h2>
-                        <p class="text-[10px] text-slate-500">جستجوی اموال یا سریال در مناطق تحت پوشش شما</p>
+                        <p class="text-[10px] text-slate-500">جستجوی اموال یا سریال در مناطق تحت پوشش شما (کد فروشگاه موقتاً غیرفعال میشود)</p>
                     </div>
                 </div>
                 <input type="text" id="globalAssetSearchInput" oninput="handleGlobalAssetSearch(this.value)" placeholder="مثال: 217910401171" class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 text-xs font-mono focus:outline-none focus:border-emerald-500">
@@ -383,6 +383,22 @@
             localAuditData = {};
         }
 
+        // دو مسیر جستجو نباید همزمان فعال باشند؛ وقتی یکی پر شد، دیگری موقتاً غیرفعال میشود.
+        function syncSearchInputs(active) {
+            const storeInput = document.getElementById('storeCodeInput');
+            const globalInput = document.getElementById('globalAssetSearchInput');
+            const storeDisabled = active === 'global';
+            const globalDisabled = active === 'store';
+            storeInput.disabled = storeDisabled;
+            globalInput.disabled = globalDisabled;
+            storeInput.classList.toggle('opacity-50', storeDisabled);
+            storeInput.classList.toggle('cursor-not-allowed', storeDisabled);
+            globalInput.classList.toggle('opacity-50', globalDisabled);
+            globalInput.classList.toggle('cursor-not-allowed', globalDisabled);
+            storeInput.title = storeDisabled ? 'برای وارد کردن کد فروشگاه، جستجوی سراسری را پاک کنید.' : '';
+            globalInput.title = globalDisabled ? 'برای جستجوی سراسری، کد فروشگاه را پاک کنید.' : '';
+        }
+
         function setAppBusy(busy) {
             document.getElementById('appShell').classList.toggle('app-busy', !!busy);
         }
@@ -546,6 +562,22 @@
             const q = cleanCode(query);
             const box = document.getElementById('globalSearchResultBox');
             const content = document.getElementById('globalSearchResultContent');
+            if (String(query || '').trim()) {
+                // جستجوی سراسری فعال است؛ کد فروشگاه و نتایج آن باید کنار بروند.
+                const storeInput = document.getElementById('storeCodeInput');
+                if (storeInput.value.trim() || activityTimer) notifyActivityStop();
+                storeInput.value = '';
+                document.getElementById('resultsContainer').classList.add('hidden');
+                document.getElementById('statusBox').classList.add('hidden');
+                document.getElementById('storeNotFound').classList.add('hidden');
+                document.getElementById('lockBanner').classList.add('hidden');
+                syncSearchInputs('global');
+                currentItems = [];
+                currentStoreName = '';
+                localAuditData = {};
+            } else {
+                syncSearchInputs(null);
+            }
             if (!q || q.length < 4) { box.classList.add('hidden'); content.innerHTML = ''; return; }
             box.classList.remove('hidden');
             content.innerHTML = `<p class="text-slate-500">در حال جستجو...</p>`;
@@ -585,6 +617,15 @@
             document.getElementById('resultsContainer').classList.add('hidden');
             document.getElementById('lockBanner').classList.add('hidden');
             document.getElementById('storeNotFound').classList.add('hidden');
+
+            const hasStoreCode = !!String(value || '').trim();
+            if (hasStoreCode) {
+                // کد فروشگاه فعال است؛ جستجوی سراسری و نتایج آن پاک میشوند.
+                document.getElementById('globalAssetSearchInput').value = '';
+                document.getElementById('globalSearchResultBox').classList.add('hidden');
+                document.getElementById('globalSearchResultContent').innerHTML = '';
+            }
+            syncSearchInputs(hasStoreCode ? 'store' : null);
 
             currentPlant = value.trim();
             if (currentPlant.length < 4) {

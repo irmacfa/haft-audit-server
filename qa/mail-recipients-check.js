@@ -24,7 +24,7 @@ core.getEffectiveSettings = () => settings;
 directory.getGroupMail = async () => adGroupMail;
 directory.listMembers = async () => adMembers;
 
-const { resolveAuditRecipients, auditGroupRecipient } = require('../server');
+const { resolveAuditRecipients, auditGroupRecipient, auditMailFrom } = require('../server');
 const GROUP = '"Oshanak-ITSUP" <Oshanak-ITSUP@gbgnetwork.net>';
 
 const results = [];
@@ -98,9 +98,11 @@ async function check(name, fn) {
     await check('group address and label can be overridden from env', () => {
         process.env.AUDIT_GROUP_MAIL = 'netops@gbgnetwork.net';
         process.env.AUDIT_GROUP_LABEL = 'Net Ops';
+        process.env.EMAIL_USER = 'aghanbari@gbgnetwork.net';
         delete require.cache[require.resolve('../server')];
         const reloaded = require('../server');
         assert.equal(reloaded.auditGroupRecipient(), '"Net Ops" <netops@gbgnetwork.net>');
+        assert.ok(reloaded.auditMailFrom().includes('<aghanbari@gbgnetwork.net>'));
     });
 
     const summary = {

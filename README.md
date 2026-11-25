@@ -162,8 +162,9 @@ npm run create-user -- --list
 
 | متغیر | توضیح |
 |---|---|
-| `EMAIL_USER` | نام کاربری ایمیل سامانه |
-| `EMAIL_PASS` | رمز عبور / App Password ایمیل |
+| `EMAIL_USER` | حساب SMTP (میتواند UPN دامین مانند `aghanbari@gbgnetwork.net` باشد) |
+| `EMAIL_PASS` | رمز عبور / App Password همان حساب (در `.env`، gitignored) |
+| `AUDIT_MAIL_FROM` | آدرس فرستنده گزارش نهایی؛ خالی = همان `EMAIL_USER` |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | تنظیمات SMTP (پیشفرض `mail.haftstores.ir:587` و `false`) |
 | `SMTP_TEST_TO` | گیرنده پیشفرض ایمیل آزمایشی (اختیاری) |
 | `AUDIT_NOTIFY_TO` | گیرنده/گیرندگان اضافی گزارش نهایی (با کاما). خالی = ابتدا ایمیل گروه AD (`LDAP_ALLOWED_GROUP`)، سپس ایمیل اعضای گروه AD، در نهایت `manager@haftstores.ir`. خاموش کردن اعلان ایمیل در پنل ادمین جلوی تمام ارسالها را میگیرد |
