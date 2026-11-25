@@ -473,7 +473,8 @@
             const box = document.getElementById('expertProgress');
             const byExpert = {};
             stores.forEach(s => {
-                const name = s.auditor || 'انبارگردان نامشخص';
+                const name = String(s.auditor || '').trim();
+                if (!name) return;
                 if (!byExpert[name]) byExpert[name] = { total: 0, done: 0, progress: 0 };
                 byExpert[name].total++;
                 if (s.isLocked) byExpert[name].done++;
