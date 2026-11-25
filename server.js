@@ -66,9 +66,11 @@ app.post('/api/reload', (req, res) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'mail.haftstores.ir',
+    host: process.env.SMTP_HOST || 'email.gbgnetwork.net',
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === 'true',
+    // گواهی سرور SMTP داخلی معتبر نیست؛ با SMTP_TLS_REJECT_UNAUTHORIZED=false ارتباط رمزشده ولی بدون تأیید گواهی برقرار میشود.
+    tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false' },
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 

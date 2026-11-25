@@ -97,7 +97,7 @@ aghanbari / <رمز دامین>
 تنظیمات دامین:
 
 - تنظیمات مربوطه: `LDAP_URL`، `LDAP_DOMAIN`، `LDAP_BASE_DN`، `LDAP_ALLOWED_GROUP`، `SESSION_SECRET` و `INTERNAL_TOKEN`.
-- **توجه:** گواهی LDAPS سرور DC منقضی شده است (`CERT_HAS_EXPIRED`)؛ پس از تمدید گواهی، `LDAP_TLS_REJECT_UNAUTHORIZED=true` بگذارید.
+- **توجه:** گواهی LDAPS سرور `DC2.gbgnetwork.net` منقضی است (`CERT_HAS_EXPIRED`)؛ تا تمدید گواهی حتماً `LDAP_TLS_REJECT_UNAUTHORIZED=false` بگذارید، وگرنه ورود با خطای «ارتباط با اکتیو دایرکتوری برقرار نشد» مواجه میشود. پس از تمدید گواهی دوباره `true` کنید.
 
 سایر نکات:
 
@@ -158,7 +158,8 @@ aghanbari / <رمز دامین>
 | `EMAIL_PASS` | رمز عبور / App Password همان حساب (در `.env`، gitignored) |
 | `AUDIT_MAIL_FROM` | آدرس فرستنده گزارش نهایی (پیشفرض `OshanakSUP@oshanak.com`) |
 | `AUDIT_MAIL_FROM_LABEL` | نام نمایشی فرستنده (پیشفرض `OshanakSUP`) |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | تنظیمات SMTP (پیشفرض `mail.haftstores.ir:587` و `false`) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | تنظیمات SMTP (پیشفرض `email.gbgnetwork.net:587` و `false`) |
+| `SMTP_TLS_REJECT_UNAUTHORIZED` | `false` برای سرور داخلی با گواهی نامعتبر؛ ارتباط همچنان رمزشده است ولی گواهی تأیید نمیشود |
 | `SMTP_TEST_TO` | گیرنده پیشفرض ایمیل آزمایشی (اختیاری) |
 | `AUDIT_NOTIFY_TO` | در حال حاضر استفاده نمیشود؛ گیرنده نهایی ثابت است |
 | `AUDIT_GROUP_MAIL` | تنها گیرنده گزارش نهایی (پیشفرض `Oshanak-ITSUP@gbgnetwork.net`) |

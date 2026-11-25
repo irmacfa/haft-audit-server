@@ -33,6 +33,7 @@ const transporter = nodemailer.createTransport({
     host,
     port,
     secure,
+    tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false' },
     auth: { user, pass },
     connectionTimeout: 10000,
     greetingTimeout: 10000,

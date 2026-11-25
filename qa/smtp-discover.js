@@ -29,6 +29,7 @@ async function tryAuth({ host, port, secure }) {
         host,
         port,
         secure,
+        tls: { rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false' },
         auth: { user, pass },
         connectionTimeout: 4000,
         greetingTimeout: 4000,
