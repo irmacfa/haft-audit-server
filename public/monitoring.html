@@ -221,13 +221,55 @@
             border: 1px solid rgba(255, 255, 255, .05);
         }
         #statsGrid .tile-bar i { display: block; height: 100%; border-radius: 999px; background: currentColor; }
-        #statsGrid .tile-label { font-size: 10px; font-weight: 800; line-height: 1.2; }
-        #statsGrid .tile-date { font-size: 9px; color: var(--p-muted); direction: rtl; }
+        /* شبکه فروشگاهها: اندازه متن و چیدمان بهبود یافت؛ عرض کل پنجره استفاده میشود */
+        .mon-store-grid {
+            grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)) !important;
+            gap: 14px !important;
+            width: 100% !important;
+        }
+        #statsGrid .store-tile {
+            min-height: 150px !important;
+            padding: 14px !important;
+            gap: 8px !important;
+            border-radius: 16px !important;
+        }
+        #statsGrid .tile-code { font-size: 20px !important; letter-spacing: .05em !important; }
+        #statsGrid .tile-dot { width: 10px !important; height: 10px !important; flex-basis: 10px !important; }
+        #statsGrid .tile-name {
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            line-height: 1.5 !important;
+            min-height: 42px !important;
+            white-space: normal !important;
+        }
+        #statsGrid .tile-meta { font-size: 11px !important; gap: 6px !important; }
+        #statsGrid .tile-region {
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            border-radius: 7px !important;
+            padding: 2px 8px !important;
+        }
+        #statsGrid .tile-auditor { font-size: 11px !important; }
+        #statsGrid .tile-bar { height: 6px !important; }
+        #statsGrid .tile-label {
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            line-height: 1.3 !important;
+            text-align: center !important;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid currentColor;
+            border-radius: 8px;
+            padding: 3px 6px;
+        }
+        #statsGrid .tile-date { font-size: 11px !important; }
 
         @media (max-width: 640px) {
             #statusStrip > div p:first-child { font-size: 24px !important; }
-            #statsGrid .store-tile { min-height: 112px; padding: 10px !important; }
-            #statsGrid .tile-code { font-size: 13px; }
+            .mon-store-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important; }
+            #statsGrid .store-tile { min-height: 140px !important; padding: 12px !important; }
+            #statsGrid .tile-code { font-size: 18px !important; }
+            #statsGrid .tile-name { font-size: 13px !important; min-height: 39px !important; }
+            #statsGrid .tile-label { font-size: 12px !important; }
         }
     </style>
 </head>
@@ -307,10 +349,10 @@
                     <button type="button" onclick="setMonitorStatus('progress')" id="msProgress" class="mon-tab">🟡 در حال انجام</button>
                     <button type="button" onclick="setMonitorStatus('pending')" id="msPending" class="mon-tab">🔴 در انتظار</button>
                 </div>
-                <span id="gridCountInfo" class="text-[10px] text-slate-400"></span>
+                <span id="gridCountInfo" class="text-[11px] text-slate-400"></span>
             </div>
         </div>
-        <div id="statsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"></div>
+        <div id="statsGrid" class="mon-store-grid grid gap-4"></div>
         <div class="mon-legend mt-4 pt-3 border-t border-slate-700/60">
             <span><i class="bg-emerald-400"></i> تکمیل</span>
             <span><i class="bg-amber-400"></i> در حال انجام</span>
@@ -520,7 +562,7 @@
                             ${auditor}
                         </span>
                         <span class="tile-bar" title="${pct}٪ تایید"><i style="width:${pct}%"></i></span>
-                        <span class="tile-label">${label} · ${pct}٪</span>
+                        <span class="tile-label">${label}: ${pct}٪</span>
                         ${date}
                     </a>`;
             }).join('');
