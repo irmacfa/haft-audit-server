@@ -351,6 +351,20 @@ app.get('/api/monitoring/export', (req, res) => {
     }
 });
 
+// کاتالوگ متریال: حاصل ادغام تمام تبهای فایل اکسل متریال (فعلاً از فایل ثبتشده در مخزن).
+// رابط آپلود این فایل در مرحله بعدی اضافه میشود.
+app.get('/api/materials', (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'catalog', 'materials.json');
+        if (!require('fs').existsSync(filePath)) return res.json([]);
+        const catalog = JSON.parse(require('fs').readFileSync(filePath, 'utf8'));
+        res.json(Array.isArray(catalog) ? catalog : (catalog.items || []));
+    } catch (e) {
+        console.error('[Materials]', e.message);
+        res.status(500).json({ error: 'خطا در خواندن کاتالوگ متریال.' });
+    }
+});
+
 app.post('/api/audit/draft', (req, res) => {
     try {
         const { plant, auditItems, storeName } = req.body;

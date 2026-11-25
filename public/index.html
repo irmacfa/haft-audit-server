@@ -273,17 +273,18 @@
                 </div>
                 <div id="addItemBox" class="manual-add-zone hidden p-4 border-t border-slate-200 bg-white">
                     <div class="flex flex-wrap items-end gap-3">
-                        <div class="flex-1 min-w-[220px]">
-                            <label for="newItemDesc" class="block text-[11px] text-slate-500 mb-1">شرح تجهیز</label>
-                            <input id="newItemDesc" type="text" placeholder="مثال: لپتاپ Dell Latitude" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
+                        <div id="manualFields" class="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                        <div class="w-48">
+                            <label for="newItemMaterial" class="block text-[11px] text-slate-500 mb-1">Material</label>
+                            <select id="newItemMaterial" onchange="syncDescriptionFromMaterial()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" dir="ltr">
+                                <option value="">انتخاب کد متریال</option>
+                            </select>
                         </div>
-                        <div>
-                            <label for="newItemAsset" class="block text-[11px] text-slate-500 mb-1">شماره اموال</label>
-                            <input id="newItemAsset" type="text" dir="ltr" placeholder="مثال: 217910401171" class="w-44 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none">
-                        </div>
-                        <div>
-                            <label for="newItemSerial" class="block text-[11px] text-slate-500 mb-1">شماره سریال</label>
-                            <input id="newItemSerial" type="text" dir="ltr" placeholder="سریال دستگاه" class="w-44 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none">
+                        <div class="flex-1 min-w-[260px]">
+                            <label for="newItemMaterialDesc" class="block text-[11px] text-slate-500 mb-1">Material Description</label>
+                            <select id="newItemMaterialDesc" onchange="syncMaterialFromDescription()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
+                                <option value="">انتخاب شرح متریال</option>
+                            </select>
                         </div>
                         <button id="addManualBtn" type="button" onclick="addManualItem()" class="text-xs px-4 py-2 rounded-xl font-bold">✓ اضافه به رکورد</button>
                         <button id="cancelManualBtn" type="button" onclick="closeAddItemBox()" class="text-xs px-4 py-2 rounded-xl font-bold">انصراف</button>
@@ -307,6 +308,7 @@
         let auditFilter = 'all';
         let currentItems = [];
         let visibleRows = [];
+        let materialCatalog = [];
         let loadingTimer = null;
         let loadingActive = false;
         let activityTimer = null;
@@ -494,6 +496,10 @@
             renderDynamicHeader();
             window.addEventListener('beforeunload', notifyActivityStop);
             try {
+                fetch('/api/materials').then(r => r.json()).then(list => {
+                    materialCatalog = Array.isArray(list) ? list : [];
+                    populateMaterialSelects();
+                }).catch(() => {});
                 fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {});
                 const pr = await pollCacheProgress();
                 if (pr && pr.state === 'loading') showLoading(pr.message, pr.percent, pr.detail);
@@ -532,8 +538,11 @@
                 `<th style="${thStyle}text-align:center;">#</th>` +
                 `<th style="${thStyle}text-align:center;">تایید</th>` +
                 currentColumns.map(c => `<th style="${thStyle}" title="${c.key !== c.label ? c.key : ''}">${c.label}</th>`).join('') +
+                `<th style="${thStyle}" title="Material">Material</th>` +
+                `<th style="${thStyle}" title="Material Description">Material Description</th>` +
                 `<th style="${thStyle}">کد اموال جدید</th>` +
                 `<th style="${thStyle}text-align:center;">وضعیت موجودی</th>`;
+            buildManualFields();
         }
 
         function renderDynamicCells(item) {
@@ -753,37 +762,80 @@
         }
 
         // ---- افزودن دستی تجهیز به رکورد انبارگردانی ----
-        function manualItemFields(desc, assetNo, serial) {
+        function buildManualFields() {
+            const holder = document.getElementById('manualFields');
+            if (!holder) return;
+            holder.innerHTML = currentColumns.map((c, i) => {
+                const label = escapeHtml(c.label || c.key);
+                const isCode = /اموال|سریال|شماره تجهیز/.test(String(c.key));
+                return `<div>
+                    <label for="manualField_${i}" class="block text-[11px] text-slate-500 mb-1">${label}</label>
+                    <input id="manualField_${i}" type="text" dir="${isCode ? 'ltr' : 'rtl'}" placeholder="${label}"
+                        class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none ${isCode ? 'font-mono' : ''}">
+                </div>`;
+            }).join('');
+        }
+
+        function populateMaterialSelects() {
+            const materialSel = document.getElementById('newItemMaterial');
+            const descSel = document.getElementById('newItemMaterialDesc');
+            if (!materialSel || !descSel) return;
+            materialSel.innerHTML = '<option value="">انتخاب کد متریال</option>' +
+                materialCatalog.map(m =>
+                    `<option value="${escapeHtml(m.material)}" title="${escapeHtml(m.description)}">${escapeHtml(m.material)}</option>`).join('');
+            descSel.innerHTML = '<option value="">انتخاب شرح متریال</option>' +
+                materialCatalog.map(m =>
+                    `<option value="${escapeHtml(m.material)}" title="${escapeHtml(m.material)}">${escapeHtml(m.description)}</option>`).join('');
+        }
+
+        function syncMaterialFromDescription() {
+            const descSel = document.getElementById('newItemMaterialDesc');
+            const materialSel = document.getElementById('newItemMaterial');
+            if (descSel && materialSel) materialSel.value = descSel.value;
+        }
+
+        function syncDescriptionFromMaterial() {
+            const materialSel = document.getElementById('newItemMaterial');
+            const descSel = document.getElementById('newItemMaterialDesc');
+            if (materialSel && descSel) descSel.value = materialSel.value;
+        }
+
+        function readManualFields() {
             const fields = {};
-            const descCol = currentColumns.find(c => c.key.includes('شرح'))?.key || currentColumns[0]?.key;
-            const assetCol = currentColumns.find(c => c.key.includes('اموال'))?.key || currentColumns[1]?.key;
-            const serialCol = currentColumns.find(c => c.key.includes('سریال'))?.key || currentColumns[2]?.key;
-            if (descCol) fields[descCol] = desc;
-            if (assetCol) fields[assetCol] = assetNo;
-            if (serialCol) fields[serialCol] = serial;
+            currentColumns.forEach((c, i) => {
+                const el = document.getElementById('manualField_' + i);
+                const value = el ? el.value.trim() : '';
+                if (value) fields[c.key] = value;
+            });
+            const material = document.getElementById('newItemMaterial')?.value.trim() || '';
+            const descSelect = document.getElementById('newItemMaterialDesc');
+            const description = descSelect && descSelect.selectedIndex > 0
+                ? descSelect.options[descSelect.selectedIndex].text.trim() : '';
+            if (material) fields.Material = material;
+            if (description) fields['Material Description'] = description;
             return fields;
         }
 
-        function makeManualItem(uid, data) {
-            const label = data.desc || data.assetNo || data.serial || uid;
-            const assetNo = data.assetNo || '';
-            const serial = data.serial || '';
-            return {
-                _uid: uid, desc: label, assetNo, serial,
-                fields: manualItemFields(label, assetNo, serial),
-                _manual: true
-            };
+        function makeManualItem(uid, fields) {
+            const label = fields['شرح کارت دارایی'] || fields['شرح تجهیز'] || fields['Material Description'] ||
+                fields['شماره تجهیز'] || fields['شماره اموال تجهیز'] || uid;
+            const assetNo = fields['شماره اموال تجهیز'] || '';
+            const serial = fields['شماره سریال کارت دارایی'] || '';
+            return { _uid: uid, desc: label, assetNo, serial, fields: { ...fields }, _manual: true };
         }
 
         function openAddItemBox() {
             if (isCurrentLocked) return;
+            buildManualFields();
             document.getElementById('addItemBox').classList.remove('hidden');
-            document.getElementById('newItemDesc').focus();
+            const first = document.getElementById('manualField_0');
+            if (first) first.focus();
         }
 
         function closeAddItemBox() {
             document.getElementById('addItemBox').classList.add('hidden');
-            ['newItemDesc', 'newItemAsset', 'newItemSerial'].forEach(id => {
+            document.querySelectorAll('#manualFields input').forEach(el => { el.value = ''; });
+            ['newItemMaterial', 'newItemMaterialDesc'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
@@ -791,21 +843,19 @@
 
         function addManualItem() {
             if (isCurrentLocked) return;
-            const desc = document.getElementById('newItemDesc').value.trim();
-            const assetNo = document.getElementById('newItemAsset').value.trim();
-            const serial = document.getElementById('newItemSerial').value.trim();
-            if (!desc && !assetNo && !serial) {
-                document.getElementById('newItemDesc').focus();
+            const fields = readManualFields();
+            if (!Object.values(fields).some(v => String(v).trim())) {
+                const first = document.getElementById('manualField_0');
+                if (first) first.focus();
                 return;
             }
             const uid = 'manual_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-            currentItems.push(makeManualItem(uid, { desc, assetNo, serial }));
+            const item = makeManualItem(uid, fields);
+            currentItems.push(item);
             localAuditData[uid] = {
-                desc: desc || assetNo || serial,
-                assetNo, serial,
-                checked: true,
-                status: 'present',
-                newAsset: ''
+                ...fields,
+                desc: item.desc, assetNo: item.assetNo, serial: item.serial,
+                checked: true, status: 'present', newAsset: ''
             };
             currentItems.forEach((it, i) => { it._rowNo = i + 1; });
             auditFilter = 'all';
@@ -843,6 +893,8 @@
             const filtered = currentItems.filter(item => {
                 const saved = localAuditData[item._uid] || {};
                 const matchQ = !q || currentColumns.some(c => String(item.fields?.[c.key] || '').toLowerCase().includes(q))
+                    || String(item.fields?.Material || '').toLowerCase().includes(q)
+                    || String(item.fields?.['Material Description'] || '').toLowerCase().includes(q)
                     || String(item.assetNo).toLowerCase().includes(q) || String(item.serial).toLowerCase().includes(q);
                 const matchStatus =
                     auditFilter === 'all' ? true :
@@ -889,6 +941,8 @@
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
                         ${renderDynamicCells(item)}
+                        <td style="padding:8px;border-bottom:1px solid #1e293b;color:#cbd5e1;font-family:monospace;font-size:12px;white-space:nowrap;" title="${escapeHtml(item.fields?.Material || '')}">${escapeHtml(item.fields?.Material || '') || '-'}</td>
+                        <td style="padding:8px;border-bottom:1px solid #1e293b;color:#e2e8f0;font-size:12px;" title="${escapeHtml(item.fields?.['Material Description'] || '')}">${escapeHtml(item.fields?.['Material Description'] || '') || '-'}</td>
                         <td style="padding:8px;border-bottom:1px solid #1e293b;">
                             <div id="container_${itemId}">
                                 ${getNewAssetDisplayHtml(itemId, newAssetVal, isCurrentLocked)}
@@ -909,7 +963,11 @@
                     </tr>
                 `);
                 if (!localAuditData[itemId]) {
-                    localAuditData[itemId] = { desc: item.desc, assetNo: item.assetNo, serial: item.serial, checked: false, status: 'present', newAsset: '' };
+                    const initial = { desc: item.desc, assetNo: item.assetNo, serial: item.serial, checked: false, status: 'present', newAsset: '' };
+                    currentColumns.forEach(c => { initial[c.key] = item.fields?.[c.key] || ''; });
+                    initial.Material = item.fields?.Material || '';
+                    initial['Material Description'] = item.fields?.['Material Description'] || '';
+                    localAuditData[itemId] = initial;
                 }
             });
 

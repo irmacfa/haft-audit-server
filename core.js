@@ -270,8 +270,11 @@ function getEquipmentData() {
 function buildReportRows(auditItems) {
     return Object.values(auditItems).map(item => ({
         'شرح کارت دارایی (مدل دستگاه)': item.desc || '',
+        'شماره تجهیز': item['شماره تجهیز'] || '',
         'شماره اموال تجهیز': item.assetNo || '',
         'شماره سریال': item.serial || '',
+        'Material': item.Material || '',
+        'Material Description': item['Material Description'] || '',
         'کد اموال جدید': item.newAsset || '-',
         'وضعیت تایید': item.checked ? 'تایید شده' : 'بررسی نشده',
         'وضعیت موجودی': item.status === 'missing' ? 'فاقد' : 'موجود'
@@ -284,7 +287,7 @@ function writeReportFile(plant, auditItems) {
     // راست به چپ برای اکسل فارسی
     if (!ws['!views']) ws['!views'] = [{}];
     ws['!views'][0].rightToLeft = true;
-    ws['!cols'] = [{ wch: 45 }, { wch: 22 }, { wch: 22 }, { wch: 20 }, { wch: 16 }, { wch: 16 }];
+    ws['!cols'] = [{ wch: 45 }, { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 45 }, { wch: 20 }, { wch: 16 }, { wch: 16 }];
     const wb = XLSX.utils.book_new();
     if (!wb.Workbook) wb.Workbook = {};
     if (!wb.Workbook.Views) wb.Workbook.Views = [];

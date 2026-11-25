@@ -1,0 +1,2492 @@
+{
+  "generatedAt": "2026-11-25T11:52:17.073Z",
+  "sourceSheets": [
+    {
+      "name": "IT6000",
+      "rows": 337
+    },
+    {
+      "name": "IT9000",
+      "rows": 282
+    }
+  ],
+  "count": 619,
+  "items": [
+    {
+      "material": "6000021",
+      "description": "IT-کارت شبکه بD-LinkسDGEم560T"
+    },
+    {
+      "material": "6000033",
+      "description": "IT-هاردHDDکیس1TBبWesternس بنفش مWD20PURZ"
+    },
+    {
+      "material": "6000036",
+      "description": "IT-کیبوردUSBکامپیوتربExonمK110TenKeyLess"
+    },
+    {
+      "material": "6000043",
+      "description": "IT-پکیج موس کیبورد بیسیم بLogitechمMK270"
+    },
+    {
+      "material": "6000078",
+      "description": "IT-باطری سکه ای س سیم دار مNoName"
+    },
+    {
+      "material": "6000079",
+      "description": "IT-ریبون کارتریج بTallyم5040"
+    },
+    {
+      "material": "6000099",
+      "description": "IT-باطریUPSبUFOم12V18A"
+    },
+    {
+      "material": "6000100",
+      "description": "IT-رمDDR3لپتاپ8GBبSamsungمM471B1G73QH0"
+    },
+    {
+      "material": "6000180",
+      "description": "IT-پاور کیس بGREENمGP400A-ECO Rev3.1"
+    },
+    {
+      "material": "6000181",
+      "description": "IT-دیتا کارتریج بHPسLTO-8مQ2078Aظ30TB"
+    },
+    {
+      "material": "6000196",
+      "description": "IT-بازوی نگهدارنده مانیتور بErgoمWLA001"
+    },
+    {
+      "material": "6000197",
+      "description": "IT-پایه خنک کننده لپتاپ بTSCOمNon"
+    },
+    {
+      "material": "6000198",
+      "description": "IT-زیرمانیتوری اداری بErgoمNon"
+    },
+    {
+      "material": "6000199",
+      "description": "IT-کارت پرسنلیRFIDبMifare"
+    },
+    {
+      "material": "6000200",
+      "description": "IT-کارت پرسنلیSCبMifare"
+    },
+    {
+      "material": "6000201",
+      "description": "IT-گلس محافظ صحفهNoName"
+    },
+    {
+      "material": "6000204",
+      "description": "IT-کلاف کابل شبکهSFTPبLegrandم305متري"
+    },
+    {
+      "material": "6000205",
+      "description": "IT-کلاف کابل شبکهUTPبLegrandم305متري"
+    },
+    {
+      "material": "6000206",
+      "description": "IT-سوکتRJ11"
+    },
+    {
+      "material": "6000207",
+      "description": "IT-پلاک کابل شبکه100عددی"
+    },
+    {
+      "material": "6000208",
+      "description": "IT-ترانکینگ100*50"
+    },
+    {
+      "material": "6000209",
+      "description": "IT-کابل برق3*5.2"
+    },
+    {
+      "material": "6000210",
+      "description": "IT-لوله فلکسی روکشدار نمره21"
+    },
+    {
+      "material": "6000211",
+      "description": "IT-پيچ و مهره رک"
+    },
+    {
+      "material": "6000212",
+      "description": "IT-بست کمربندي20سانتي100عددي"
+    },
+    {
+      "material": "6000220",
+      "description": "IT-پد موس"
+    },
+    {
+      "material": "6000221",
+      "description": "IT-فلش بSilicon PowerمTouch T03ظ32GB"
+    },
+    {
+      "material": "6000222",
+      "description": "IT-فلش بSanDiskمUltra Flair CZY3ظ32GB"
+    },
+    {
+      "material": "6000223",
+      "description": "IT-کیف دستی لپتاپ15.6 اینچی"
+    },
+    {
+      "material": "6000224",
+      "description": "IT-قاب موبایلSamsung A13"
+    },
+    {
+      "material": "6000225",
+      "description": "IT-گلس محافظ صفحه بSamsung A13"
+    },
+    {
+      "material": "6000226",
+      "description": "IT-کیف لپتاپ NoName سایز 15.6 اینچی"
+    },
+    {
+      "material": "6000227",
+      "description": "IT-زیرمانیتوری"
+    },
+    {
+      "material": "6000228",
+      "description": "IT-قاب موبایل بنددارXiaomi Redmi Note11S"
+    },
+    {
+      "material": "6000229",
+      "description": "IT-قاب موبایل بنددارXiaomi PocoM3"
+    },
+    {
+      "material": "6000230",
+      "description": "IT-قاب موبایل کلاسوریSamsung A14"
+    },
+    {
+      "material": "6000231",
+      "description": "IT-گلس محافظ صفحه بXiaomi Redmi Note11S"
+    },
+    {
+      "material": "6000232",
+      "description": "IT-گلس محافظ صفحه بXiaomi Poco M3"
+    },
+    {
+      "material": "6000233",
+      "description": "IT-گلس محافظ صفحه بSamsung A14"
+    },
+    {
+      "material": "6000234",
+      "description": "IT-فلش بSilicon PowerسJewelمJ80"
+    },
+    {
+      "material": "6000235",
+      "description": "IT-فلش بSanDiskمUltra Ecoظ256GB"
+    },
+    {
+      "material": "6000236",
+      "description": "IT-قاب موبایلiPhone 13بNillkinمCamshield"
+    },
+    {
+      "material": "6000237",
+      "description": "IT-گلس محافظ صفحه بiPhone 13"
+    },
+    {
+      "material": "6000238",
+      "description": "IT-خمیر سیلیکون بDeepCoolمZ5"
+    },
+    {
+      "material": "6000239",
+      "description": "IT-گلس محافظ صفحه بSamsung A15"
+    },
+    {
+      "material": "6000240",
+      "description": "IT-قاب موبایل بنددارSamsung A15"
+    },
+    {
+      "material": "6000241",
+      "description": "IT-کیف لپتاپ بWiuoمCity Commuter Bag"
+    },
+    {
+      "material": "6000242",
+      "description": "IT-قاب موبایلKing Power"
+    },
+    {
+      "material": "6000243",
+      "description": "IT-قاب موبایلNo Name"
+    },
+    {
+      "material": "6000300",
+      "description": "IT-هدست کامپیوتر بLogitechمH340"
+    },
+    {
+      "material": "6000302",
+      "description": "IT-هابUSB+LanTypeBبTP-LinkمUE330"
+    },
+    {
+      "material": "6000303",
+      "description": "IT-شلف رک بNoNameم عمق 25 سانت"
+    },
+    {
+      "material": "6000304",
+      "description": "IT-رمDDR3لپتاپ8GBبSamsungمDDR3L-PCL3L"
+    },
+    {
+      "material": "6000305",
+      "description": "IT-رمDDR4کیس16GBبCrucialم3200"
+    },
+    {
+      "material": "6000306",
+      "description": "IT-هاردSASسرور3.84TBبHPEم125RI LFF BC"
+    },
+    {
+      "material": "6000307",
+      "description": "IT-کارتریج مشکی بG&BسPlusم81"
+    },
+    {
+      "material": "6000308",
+      "description": "IT-هدست کامپیوتر بLogitechمH390"
+    },
+    {
+      "material": "6000309",
+      "description": "IT-گلس محافظ صفحه بSamsung A16"
+    },
+    {
+      "material": "6000310",
+      "description": "IT-قاب موبایل بنددارSamsung A16"
+    },
+    {
+      "material": "6000311",
+      "description": "IT-کیف دستی لپتاپ Surface"
+    },
+    {
+      "material": "6000313",
+      "description": "IT-ریل رک 42UبHPEسSmallم2U"
+    },
+    {
+      "material": "6000314",
+      "description": "IT-پاور سرور بHPEم460W CS"
+    },
+    {
+      "material": "6000315",
+      "description": "IT-پاور سرور بHPEم460W CS"
+    },
+    {
+      "material": "6000316",
+      "description": "IT-CPUبIntelسXeonمE5-2697 v2"
+    },
+    {
+      "material": "6000317",
+      "description": "IT-کنترلر هارد سروربHPEسSmartArrayمP420i"
+    },
+    {
+      "material": "6000318",
+      "description": "IT-کارت شبکه سرور بHPEس1Gb4Portم331FLR"
+    },
+    {
+      "material": "6000319",
+      "description": "IT-فن سرور بHPEسGen8مDL38X"
+    },
+    {
+      "material": "6000329",
+      "description": "IT-رمDDR4کیس16GBبCrucialمCB16GU3200C8FT"
+    },
+    {
+      "material": "6000337",
+      "description": "IT-باطری سکه ای بMaxellمCR2032"
+    },
+    {
+      "material": "6000339",
+      "description": "IT-پاور سروربHPEسFlex Slotم800W-Platinum"
+    },
+    {
+      "material": "6000340",
+      "description": "IT-CPUبIntelسXeonم6348-2.6GHzCache42MB"
+    },
+    {
+      "material": "6000341",
+      "description": "IT-رمDDR4بHPEسQuad Rankم128GB-3200CAS"
+    },
+    {
+      "material": "6000342",
+      "description": "IT-کنترلر هارد سروربHPEسSmartArrayمP408i"
+    },
+    {
+      "material": "6000343",
+      "description": "IT-باطری استوریج  بHPEم96W"
+    },
+    {
+      "material": "6000344",
+      "description": "IT-ریل کیت بHPEس2U SFFمDL38X"
+    },
+    {
+      "material": "6000345",
+      "description": "IT-کارت شبکه بHPEسSFP28مBCM57414"
+    },
+    {
+      "material": "6000346",
+      "description": "IT-هاردSSDسرور3.84TBبHPEسMU HHمPM1735"
+    },
+    {
+      "material": "6000347",
+      "description": "IT-بوت کنترلر بHPEسPCIeمNS204i-p x2"
+    },
+    {
+      "material": "6000348",
+      "description": "IT-کارت رایزر بHPEسProliantمDL380 Primar"
+    },
+    {
+      "material": "6000349",
+      "description": "IT-هاردSSDسرور1.6TBبSamsungسHHHLمPM1735"
+    },
+    {
+      "material": "6000350",
+      "description": "IT-HDD Trayسرور بHPEسSASم2.5اینچ"
+    },
+    {
+      "material": "6000351",
+      "description": "IT-فنCUPبHPEمDL38X"
+    },
+    {
+      "material": "6000352",
+      "description": "IT-هیت سینک سرور بHPEمDL380"
+    },
+    {
+      "material": "6000353",
+      "description": "IT-ماژول فیبر بHPEسSFPم10G-SR"
+    },
+    {
+      "material": "6000354",
+      "description": "IT-کارت رایزربHPEمDL380ProliantSecondary"
+    },
+    {
+      "material": "6000355",
+      "description": "IT-اسپلیترPOEبNo Nameم48Vto12V2A"
+    },
+    {
+      "material": "6000356",
+      "description": "IT-کابلRJ45toUSBبCiscoمUSB-Consol"
+    },
+    {
+      "material": "6000357",
+      "description": "IT-کارت شبکه بTP-LinkسTGم3468"
+    },
+    {
+      "material": "6000372",
+      "description": "IT-آنتن تقویت سیگنال مودم های ثابتLTE"
+    },
+    {
+      "material": "6000373",
+      "description": "IT-موس بیسیم کامپیوتر بLogitechمM185"
+    },
+    {
+      "material": "6000374",
+      "description": "IT-کارتریج مشکی بHPس17A"
+    },
+    {
+      "material": "6000375",
+      "description": "IT-براکت روتر بCiscoم1941"
+    },
+    {
+      "material": "6000376",
+      "description": "IT-کارتریج مشکی بHPس19AمCF219A"
+    },
+    {
+      "material": "6000377",
+      "description": "IT-سنسور دما ردیاب خودرو بTeltonikaمFM"
+    },
+    {
+      "material": "6000378",
+      "description": "IT-براکت سوئیچ بCiscoم2960"
+    },
+    {
+      "material": "6000379",
+      "description": "IT-پکیج موس کیبوردUSBبGeniusمKM-160"
+    },
+    {
+      "material": "6000380",
+      "description": "IT-کابلVGA"
+    },
+    {
+      "material": "6000381",
+      "description": "IT-کابل پاور کیس کامپیوتر(کد کابلC13)"
+    },
+    {
+      "material": "6000382",
+      "description": "IT-کابل پاور سیستم های AIO(کد کابلC5)"
+    },
+    {
+      "material": "6000383",
+      "description": "IT-کابل شبکه1متری"
+    },
+    {
+      "material": "6000384",
+      "description": "IT-کابل شبکه3متری"
+    },
+    {
+      "material": "6000385",
+      "description": "IT-کابل شبکه5متری"
+    },
+    {
+      "material": "6000386",
+      "description": "IT-کابل شبکه نیم متری"
+    },
+    {
+      "material": "6000387",
+      "description": "IT-هدست کامپیوتر بRapooمH120"
+    },
+    {
+      "material": "6000388",
+      "description": "IT-کارتریج آبی بG&BمAL-CH125C/CH131C"
+    },
+    {
+      "material": "6000389",
+      "description": "IT-کارتریج قرمز بG&BمAL-CH125C/CH131C"
+    },
+    {
+      "material": "6000390",
+      "description": "IT-کارتریج مشکی بG&BمAL-CH125C/CH131C"
+    },
+    {
+      "material": "6000391",
+      "description": "IT-کارتریج زرد بG&BمAL-CH125C/CH131C"
+    },
+    {
+      "material": "6000392",
+      "description": "IT-سیم فنری دهنی تلفن ویپ بCisco"
+    },
+    {
+      "material": "6000393",
+      "description": "IT-کابل امتدادUSB"
+    },
+    {
+      "material": "6000394",
+      "description": "IT-کابلUSBپرینتری"
+    },
+    {
+      "material": "6000395",
+      "description": "IT-کارت شبکه کیس بTP-LinkمTG-3468"
+    },
+    {
+      "material": "6000396",
+      "description": "IT-کارتریج مشکی بHPم131A"
+    },
+    {
+      "material": "6000397",
+      "description": "IT-کارتریج زرد بHPم131A"
+    },
+    {
+      "material": "6000398",
+      "description": "IT-کارتریج آبی بHPم131A"
+    },
+    {
+      "material": "6000399",
+      "description": "IT-کارتریج قرمز بHPم131A"
+    },
+    {
+      "material": "6000400",
+      "description": "IT-CamBoxسایز13*13"
+    },
+    {
+      "material": "6000401",
+      "description": "IT-کارتریج مشکی بG&Bس پلاس م26"
+    },
+    {
+      "material": "6000402",
+      "description": "IT-کارتریج مشکی بG&BمAL-CH540/320/210C"
+    },
+    {
+      "material": "6000403",
+      "description": "IT-اسپیکر کامپیوتر بXP"
+    },
+    {
+      "material": "6000404",
+      "description": "IT-کابل HDMIب فرانت م25متری(اکتیو+شبکه)"
+    },
+    {
+      "material": "6000405",
+      "description": "IT-کابل امتدادUSBب فرانت م30 متری اکتیو"
+    },
+    {
+      "material": "6000406",
+      "description": "IT-تبدیلHDMIب فرانت م دوسر ماده"
+    },
+    {
+      "material": "6000407",
+      "description": "IT-آداپتور لپتاپ بLenovoمG2ITL"
+    },
+    {
+      "material": "6000408",
+      "description": "IT-آداپتور لپتاپ بAsusمn550j"
+    },
+    {
+      "material": "6000409",
+      "description": "IT-آداپتور لپتاپ بAsusمK456U"
+    },
+    {
+      "material": "6000410",
+      "description": "IT-آداپتور مانیتور بGPlusم12Vو2.5A"
+    },
+    {
+      "material": "6000411",
+      "description": "IT-وبکم بRapoo"
+    },
+    {
+      "material": "6000412",
+      "description": "IT-مودمADSLبZyxelم650R-T1"
+    },
+    {
+      "material": "6000413",
+      "description": "IT-پکیج موس کیبوردUSBبGeniusمKM-170"
+    },
+    {
+      "material": "6000414",
+      "description": "IT-کارتریج مشکی بG&Bس پلاس م80"
+    },
+    {
+      "material": "6000415",
+      "description": "IT-شش راهی برق"
+    },
+    {
+      "material": "6000416",
+      "description": "IT-کارتریج آبی بG&BمAL-CH540/320/210C"
+    },
+    {
+      "material": "6000417",
+      "description": "IT-کارتریج قرمز بG&BمAL-CH540/320/210C"
+    },
+    {
+      "material": "6000418",
+      "description": "IT-کارتریج زرد بG&BمAL-CH540/320/210C"
+    },
+    {
+      "material": "6000419",
+      "description": "IT-چهار راهی برق"
+    },
+    {
+      "material": "6000420",
+      "description": "IT-آداپتور تلفن ویپ بCiscoم6921"
+    },
+    {
+      "material": "6000421",
+      "description": "IT-سیم شارژر موبایلUSBTypeAtoTypeC"
+    },
+    {
+      "material": "6000422",
+      "description": "IT-آداپتور موبایل بXiaomiت33واتUSBTypeA"
+    },
+    {
+      "material": "6000423",
+      "description": "IT-آداپتور موبایل بSamsungت15واتUSBTypeA"
+    },
+    {
+      "material": "6000424",
+      "description": "IT-تبدیل دوشاخه برق3به2"
+    },
+    {
+      "material": "6000425",
+      "description": "IT-وبکم بLogitechمC270"
+    },
+    {
+      "material": "6000426",
+      "description": "IT-پکیج موس کیبوردUSBبRapooمX120"
+    },
+    {
+      "material": "6000427",
+      "description": "IT-کیستون پچ پنلCat6UTP"
+    },
+    {
+      "material": "6000428",
+      "description": "IT-وبکم بRapoo مC270"
+    },
+    {
+      "material": "6000429",
+      "description": "IT-آداپتور پرینتر بBixolonم330و24Vو2.5A"
+    },
+    {
+      "material": "6000430",
+      "description": "IT-آداپتور موبایل بSamsungت15واتUSBTypeC"
+    },
+    {
+      "material": "6000431",
+      "description": "IT-پچ کورد فیبرنوری بNexansم2متریSC-SC"
+    },
+    {
+      "material": "6000432",
+      "description": "IT-موسUSBکامپیوتر بGeniusمDX-125"
+    },
+    {
+      "material": "6000433",
+      "description": "IT-کیبوردUSBکامپیوتر بGeniusمKB-118"
+    },
+    {
+      "material": "6000434",
+      "description": "IT-آداپتور کامپیوتر بMSIم19Vو7.9A"
+    },
+    {
+      "material": "6000435",
+      "description": "IT-کابل اسکنر دستی بDatalogicمQD2100"
+    },
+    {
+      "material": "6000436",
+      "description": "IT-پیچ براکت روتر 1941"
+    },
+    {
+      "material": "6000437",
+      "description": "IT-پیچ براکت سوئیچ 2960"
+    },
+    {
+      "material": "6000438",
+      "description": "IT-آداپتور لپتاپ بLenovoمADLX65YLC3D"
+    },
+    {
+      "material": "6000439",
+      "description": "IT-آداپتور لپتاپ بLenovoمADLX65CLGK2A"
+    },
+    {
+      "material": "6000440",
+      "description": "IT-آداپتور لپتاپ بAsusمADP-65DWA"
+    },
+    {
+      "material": "6000441",
+      "description": "IT-آداپتور لپتاپ بAsusمADP-65GD"
+    },
+    {
+      "material": "6000442",
+      "description": "IT-باطری لپتاپ بLenovoسIdeapadمL315IML05"
+    },
+    {
+      "material": "6000443",
+      "description": "IT-فنCPUبDeepCoolمCK-77509"
+    },
+    {
+      "material": "6000444",
+      "description": "IT-موسUSBکامپیوتر بGenuisمDX-150"
+    },
+    {
+      "material": "6000445",
+      "description": "IT-کابلHDMIب فرانت م10متریTCT"
+    },
+    {
+      "material": "6000446",
+      "description": "IT-کارتریج مشکی بHPم130A"
+    },
+    {
+      "material": "6000447",
+      "description": "IT-کارتریج آبی بHPم130A"
+    },
+    {
+      "material": "6000448",
+      "description": "IT-کارتریج قرمز بHPم130A"
+    },
+    {
+      "material": "6000449",
+      "description": "IT-کارتریج زرد بHPم130A"
+    },
+    {
+      "material": "6000450",
+      "description": "IT-موسUSBکامپیوتر بGeniusمDX-100"
+    },
+    {
+      "material": "6000451",
+      "description": "IT-کیبوردUSBکامپیوتر بGeniusمSmartKB-100"
+    },
+    {
+      "material": "6000452",
+      "description": "IT-موس بیسیم کامپیوتر بLogitechمM170"
+    },
+    {
+      "material": "6000453",
+      "description": "IT-کیبورد داک بMicrosftسSurfaceمPro9"
+    },
+    {
+      "material": "6000454",
+      "description": "IT-پچ پنل24پورت بAMPم رک9یونیت"
+    },
+    {
+      "material": "6000455",
+      "description": "IT-کیبل گاید رک9يونيت بAMP"
+    },
+    {
+      "material": "6000456",
+      "description": "IT-کابل شبکه10متری"
+    },
+    {
+      "material": "6000457",
+      "description": "IT-کیستونCat6UTP"
+    },
+    {
+      "material": "6000458",
+      "description": "IT-کابلStackشبکه سوئیچ50سانتی بCiscoمT-1"
+    },
+    {
+      "material": "6000459",
+      "description": "IT-کابلStackپاور سوئیچ 30 سانتی بCisco"
+    },
+    {
+      "material": "6000460",
+      "description": "IT-کابل فیبرنوری5متری بCiscoمH40G-AOC"
+    },
+    {
+      "material": "6000461",
+      "description": "IT-براکت روتر بCiscoمASR1002X(+پیچ)"
+    },
+    {
+      "material": "6000462",
+      "description": "IT-آداپتور لپتاپ بAsusمX455L"
+    },
+    {
+      "material": "6000463",
+      "description": "IT-هابUSB+LanTypeCبBaseusمCW0G"
+    },
+    {
+      "material": "6000464",
+      "description": "IT-پکیج موس کیبورد بیسیم بLogitechمMK470"
+    },
+    {
+      "material": "6000465",
+      "description": "IT-تبدیلDisplayPort2HDMIبKNetمKP-C2100"
+    },
+    {
+      "material": "6000466",
+      "description": "IT-آداپتور مانیتور بSamsungم14Vو1.072A"
+    },
+    {
+      "material": "6000467",
+      "description": "IT-آداپتور مانیتور بXvisioم12Vو2A"
+    },
+    {
+      "material": "6000468",
+      "description": "IT-ست پیچ گوشتی ساعتی بXiaomiمWiha"
+    },
+    {
+      "material": "6000469",
+      "description": "IT-آداپتور لپتاپ بAsusمX450L"
+    },
+    {
+      "material": "6000470",
+      "description": "IT-هدست ویپ بAccutoneمTB710سوکت2.5mm"
+    },
+    {
+      "material": "6000471",
+      "description": "IT-هابUSBTypeCبBaseusمBS-OH151"
+    },
+    {
+      "material": "6000472",
+      "description": "IT-براکت روتر بCiscoم1921"
+    },
+    {
+      "material": "6000473",
+      "description": "IT-کیبل گاید رک42یونیت بAMP"
+    },
+    {
+      "material": "6000474",
+      "description": "IT-پکیج موس کیبورد بیسیم بMSIمKM-10"
+    },
+    {
+      "material": "6000475",
+      "description": "IT-پکیج موس کیبوردUSBبA4TechمEST.1987"
+    },
+    {
+      "material": "6000476",
+      "description": "IT-تبدیلUSB2LanبAsusمNon"
+    },
+    {
+      "material": "6000477",
+      "description": "IT-تبدیلUSB2LanبTP-LinkمUE330"
+    },
+    {
+      "material": "6000478",
+      "description": "IT-تبدیلVGA2DVI"
+    },
+    {
+      "material": "6000479",
+      "description": "IT-تبدیلVGA2HDMIبStarTech"
+    },
+    {
+      "material": "6000480",
+      "description": "IT-قاب ثبت اثرانگشت بSupremaمBiolightNet"
+    },
+    {
+      "material": "6000481",
+      "description": "IT-قاب ثبت اثر انگشت بSupremaمBioStation"
+    },
+    {
+      "material": "6000482",
+      "description": "IT-قاب ثبت اثرانگشت ب دنیای پردازش"
+    },
+    {
+      "material": "6000483",
+      "description": "IT-کابلHDMIبTSCOم5متری"
+    },
+    {
+      "material": "6000484",
+      "description": "IT-کابل پاور رادیویی(کد کابلC7)"
+    },
+    {
+      "material": "6000485",
+      "description": "IT-کابل دیتاMicroUSB-TypeAبTSCOمNon"
+    },
+    {
+      "material": "6000486",
+      "description": "IT-کابل دیتاMicroUSB-TypeBبTSCOمNon"
+    },
+    {
+      "material": "6000487",
+      "description": "IT-کابل شبکه2متری"
+    },
+    {
+      "material": "6000488",
+      "description": "IT-موسUSBکامپیوتر بGeniusمNon"
+    },
+    {
+      "material": "6000489",
+      "description": "IT-موسUSBکامپیوتر بMSIمNon"
+    },
+    {
+      "material": "6000490",
+      "description": "IT-موس بیسیم کامپیوتر بGeniusمNon"
+    },
+    {
+      "material": "6000491",
+      "description": "IT-موس بیسیم کامپیوتر بMSIمNon"
+    },
+    {
+      "material": "6000492",
+      "description": "IT-هابUSBبOricoمNon"
+    },
+    {
+      "material": "6000493",
+      "description": "IT-هدست تلفن شهری بD-LinkمDPH100سوکتRJ9"
+    },
+    {
+      "material": "6000494",
+      "description": "IT-کیبوردUSBکامپیوتر بRapooمNon"
+    },
+    {
+      "material": "6000495",
+      "description": "IT-کیبورد بیسیم کامپیوتر بLogitechمNon"
+    },
+    {
+      "material": "6000496",
+      "description": "IT-کیبورد بیسیم کامپیوتر بMSIمNon"
+    },
+    {
+      "material": "6000497",
+      "description": "IT-کیبوردUSBکامپیوتر بMSIمNon"
+    },
+    {
+      "material": "6000498",
+      "description": "IT-کیبوردUSBکامپیوتر بGeniusمNon"
+    },
+    {
+      "material": "6000499",
+      "description": "IT-کیبوردUSBکامپیوتر بFarassooمNon"
+    },
+    {
+      "material": "6000500",
+      "description": "IT-آداپتورمانیتوSamsungم14Vو2.1Aس5.5*7.9"
+    },
+    {
+      "material": "6000501",
+      "description": "IT-کابلHDMIفرانت م15متری با ارتباط شبکه"
+    },
+    {
+      "material": "6000502",
+      "description": "IT-آداپتور لپتاپ بSurfaceم1625س12Vو2.58A"
+    },
+    {
+      "material": "6000503",
+      "description": "IT-پایه هندهلد بDatalogicمFalcon"
+    },
+    {
+      "material": "6000504",
+      "description": "IT-کارتریج مشکی بG&Bس پلاس م26A"
+    },
+    {
+      "material": "6000505",
+      "description": "IT-سیم کارت اعتباری4Gایرانسل"
+    },
+    {
+      "material": "6000506",
+      "description": "IT-سیم کارت اعتباری4Gرایتل"
+    },
+    {
+      "material": "6000507",
+      "description": "IT-سیم کارت دیتا4Gرایتل"
+    },
+    {
+      "material": "6000508",
+      "description": "IT-سیم کارت دیتا4Gایرانسل"
+    },
+    {
+      "material": "6000509",
+      "description": "IT-سیم کارت دائمی4Gایرانسل"
+    },
+    {
+      "material": "6000510",
+      "description": "IT-سیم کارت دائمی4Gرایتل"
+    },
+    {
+      "material": "6000511",
+      "description": "IT-کارتریج مشکی ب G&Bم80A"
+    },
+    {
+      "material": "6000512",
+      "description": "IT-کارتریج مشکی ب G&Bم85A"
+    },
+    {
+      "material": "6000513",
+      "description": "IT-هدست ویپ بD-Linkم سوکت2.5 ملیمتری"
+    },
+    {
+      "material": "6000514",
+      "description": "IT-براکت اکسس پوینت بCisco"
+    },
+    {
+      "material": "6000515",
+      "description": "IT-موس بیسیم کامپیوتر بLogitechمM190"
+    },
+    {
+      "material": "6000516",
+      "description": "IT-آداپتور لپتاپ بLenovoم330"
+    },
+    {
+      "material": "6000517",
+      "description": "IT-وبکم بBeyond"
+    },
+    {
+      "material": "6000518",
+      "description": "IT-مودمADSLبZyxelمP660RU-T1"
+    },
+    {
+      "material": "6000519",
+      "description": "IT-CamBoxپلاستیکی روکار سهند13*13"
+    },
+    {
+      "material": "6000520",
+      "description": "IT-تبدیل آداپتور برق تایمردار"
+    },
+    {
+      "material": "6000521",
+      "description": "IT-کیبوردUSBکامپیوتر بGeniusمKB-115"
+    },
+    {
+      "material": "6000522",
+      "description": "IT-موسUSBکامپیوتر بGeniusمDX-160"
+    },
+    {
+      "material": "6000523",
+      "description": "IT-تبدیلSerial2USBبUGreenمCR107"
+    },
+    {
+      "material": "6000524",
+      "description": "IT-آداپتور اکسس پوینت بCiscoم48V3.5A"
+    },
+    {
+      "material": "6000525",
+      "description": "IT-تبدیلUSB2RS232بKnetمCOU"
+    },
+    {
+      "material": "6000526",
+      "description": "IT-تبدیلHDMI2VGA"
+    },
+    {
+      "material": "6000527",
+      "description": "IT-ماژول دو زوجGdotبCiscoمHWIC-2SHDSL"
+    },
+    {
+      "material": "6000528",
+      "description": "IT-ماژول چهار زوجGdotبCiscoمHWIC-4SHDSL"
+    },
+    {
+      "material": "6000529",
+      "description": "IT-هدست ویپ بNoNameمHS-110سوکت2.5mm"
+    },
+    {
+      "material": "6000530",
+      "description": "IT-آداپتور اکسس پوینت ب آرتسین م48V1A"
+    },
+    {
+      "material": "6000531",
+      "description": "IT-هابUSBTypeCبBaseusمCahub-CW0G"
+    },
+    {
+      "material": "6000532",
+      "description": "IT-کیبورد داک بMicrosftسSurfaceمPro8"
+    },
+    {
+      "material": "6000662",
+      "description": "IT-هاردSSDکیس50GBبWesternمWDS500G2B0A"
+    },
+    {
+      "material": "6000663",
+      "description": "IT-ماژول فیبر10GBبHPم560SFP+Adapter"
+    },
+    {
+      "material": "6000664",
+      "description": "IT-باطری لپتاپ بAsus X450مX550A"
+    },
+    {
+      "material": "6000665",
+      "description": "IT-باطري هندهلدDatalogicX3/X4مBT-49"
+    },
+    {
+      "material": "6000666",
+      "description": "IT-هاردSSDکیس120GBبWesternمWDS120G1G0A"
+    },
+    {
+      "material": "6000667",
+      "description": "IT-باطری مودم دانگل بTP-LinkمTBL-68A2000"
+    },
+    {
+      "material": "6000668",
+      "description": "IT-خنک کنندهCPUبGREENم240 ARGB"
+    },
+    {
+      "material": "6000669",
+      "description": "IT-مادربرد بASUSسGamingمZ590-PLUS"
+    },
+    {
+      "material": "6000670",
+      "description": "IT-CPUبIntelسCore i7م11700K"
+    },
+    {
+      "material": "6000671",
+      "description": "IT-رمDDR4کیس16GBبAdataمXPG-D60G"
+    },
+    {
+      "material": "6000672",
+      "description": "IT-کارت گرافیک کیس12GBبASUSمRTX 3060"
+    },
+    {
+      "material": "6000673",
+      "description": "IT-پاور کیس بGREENمGP750B-OCPT"
+    },
+    {
+      "material": "6000674",
+      "description": "IT-HDD Cageکامپیوتر سرور بHPEم 3.5 اینچ"
+    },
+    {
+      "material": "6000675",
+      "description": "IT-تبدیل هارد سرور بHPEم3.5به2.5"
+    },
+    {
+      "material": "6000676",
+      "description": "IT-رمDDR4لپتاپ4GBبSamsungمM471A1G43DB0"
+    },
+    {
+      "material": "6000677",
+      "description": "IT-رمDDR4کیس8GBبGigabyteمGP-GR26C"
+    },
+    {
+      "material": "6000678",
+      "description": "IT-هاردSSDکیس240GBبWesternمWDS240G2G0A"
+    },
+    {
+      "material": "6000679",
+      "description": "IT-هارد1ترابایت بWesternس بنفش مWD10PURZ"
+    },
+    {
+      "material": "6000680",
+      "description": "IT-هاردM2کیس240GBبWesternمWDS240G2G0C"
+    },
+    {
+      "material": "6000681",
+      "description": "IT-رمDDR4لپتاپ8GBبSamsungمM471A1G43DB0"
+    },
+    {
+      "material": "6000682",
+      "description": "IT-رمDDR3کیس8GBKingstonمKVR16N11"
+    },
+    {
+      "material": "6000683",
+      "description": "IT-ماژول پاور بCiscoسPWR-C1م1100WAC"
+    },
+    {
+      "material": "6000684",
+      "description": "IT-ماژول شبکه سوئیچ بCiscoسC3850م2-10GB"
+    },
+    {
+      "material": "6000685",
+      "description": "IT-رم روتر8GBبCiscoمM-ASR1002X"
+    },
+    {
+      "material": "6000686",
+      "description": "IT-هارد1.6ترابایتSSD-PCIeبSamsungمPM1735"
+    },
+    {
+      "material": "6000687",
+      "description": "IT-هارد3.8ترابایتSSD-PCIeبSamsungمPM1643"
+    },
+    {
+      "material": "6000688",
+      "description": "IT-هارد1.9ترابایتSSD-PCIبSamsungمPM1643a"
+    },
+    {
+      "material": "6000689",
+      "description": "IT-هارد کیس4ترابایت بSeagateمExos"
+    },
+    {
+      "material": "6000690",
+      "description": "IT-هارد کیس10ترابایت بSeagateمExos"
+    },
+    {
+      "material": "6000691",
+      "description": "IT-ماژول فیبر10/25GBبHPم640SFP+Adapter"
+    },
+    {
+      "material": "6000692",
+      "description": "IT-رید کنترلر بHPEسSmart ArrayمP420i"
+    },
+    {
+      "material": "6000693",
+      "description": "IT-ماژول پاور بCiscoسG10م800W"
+    },
+    {
+      "material": "6000694",
+      "description": "IT-ماژول پاور بCiscoسG8م750W"
+    },
+    {
+      "material": "6000695",
+      "description": "IT-رمDDR4لپتاپ8GBبAdataمAD4S213338G15"
+    },
+    {
+      "material": "6000696",
+      "description": "IT-رمDDR4لپتاپ8GBبHynixمHMA81GS6AFR8N"
+    },
+    {
+      "material": "6000697",
+      "description": "IT-رمDDR4لپتاپ4GBبKingstonمKVR16N11"
+    },
+    {
+      "material": "6000698",
+      "description": "IT-هاردSSDلپتاپ240GBبCrucialمBX500"
+    },
+    {
+      "material": "6000699",
+      "description": "IT-رمDDR4لپتاپ8GBبCrucialمCT8G4SFS8266"
+    },
+    {
+      "material": "6000700",
+      "description": "IT-رمDDR3لپتاپ8GBبSamsungمM471B1G73DB0"
+    },
+    {
+      "material": "6000701",
+      "description": "IT-مادربرد بAsusمH510M-A"
+    },
+    {
+      "material": "6000702",
+      "description": "IT-رمDDR4کیس16GBبKingstonسFury Beast"
+    },
+    {
+      "material": "6000703",
+      "description": "IT-پاور کیس بGREENمGP350A-ECO Rev3.1"
+    },
+    {
+      "material": "6000704",
+      "description": "IT-باطری لپتاپ بAsus X455LمK455 C21N1401"
+    },
+    {
+      "material": "6000705",
+      "description": "IT-باطری لپتاپ بAsus K456UمC21N1508"
+    },
+    {
+      "material": "6000706",
+      "description": "IT-ماژول فیبر بCiscoسSFPمGLC-T"
+    },
+    {
+      "material": "6000707",
+      "description": "IT-باطری لپتاپ بAsus X401A"
+    },
+    {
+      "material": "6000708",
+      "description": "IT-ماژول فیبر بFortinetسSFP+مSR"
+    },
+    {
+      "material": "6000709",
+      "description": "IT-ماژول فیبر بFortinetسSFPمSX"
+    },
+    {
+      "material": "6000710",
+      "description": "IT-ماژول فیبر بCiscoسSFP+م10GBase-SR"
+    },
+    {
+      "material": "6000711",
+      "description": "IT-ماژول فیبر بCiscoسSFPمGLC-SX-MM"
+    },
+    {
+      "material": "6000712",
+      "description": "IT-باطری لپتاپ بDell Vostro 330مBC04"
+    },
+    {
+      "material": "6000713",
+      "description": "IT-رمDDR4کیس32GBبCrucialمPC4-25600"
+    },
+    {
+      "material": "6000714",
+      "description": "IT-هاردSSDکیس250GBبWesternمWDS250G1B0A"
+    },
+    {
+      "material": "6000715",
+      "description": "IT-هاردSSDکیس256GBبAdataمSU800"
+    },
+    {
+      "material": "6000716",
+      "description": "IT-درام پرینتر بHPم19A"
+    },
+    {
+      "material": "6000717",
+      "description": "IT-دیتاکارتریج بHPم LTO-8 UltriumRW30TB"
+    },
+    {
+      "material": "6000718",
+      "description": "IT-رمDDR4لپتاپ8GBبSKHynixمT2400"
+    },
+    {
+      "material": "6000719",
+      "description": "IT-فنCPUبDeepCoolمCK-11509"
+    },
+    {
+      "material": "6000720",
+      "description": "IT-رمDDR4لپتاپ8GBبCrucialمCT8G4DFS8266"
+    },
+    {
+      "material": "6000721",
+      "description": "IT-هاردSSDکیس240GBبAdataمSU650"
+    },
+    {
+      "material": "6000722",
+      "description": "IT-هارد داک بOricoم6218US3"
+    },
+    {
+      "material": "6000723",
+      "description": "IT-هاب داک بOricoمM2P2-C3-C"
+    },
+    {
+      "material": "6000724",
+      "description": "IT-رم کیس8 گیگDDR4ب Crucial-م CB8GU2666"
+    },
+    {
+      "material": "6000725",
+      "description": "IT-پایه هندهلد بDatalogicمX3/X4"
+    },
+    {
+      "material": "6000726",
+      "description": "IT-تبدیلUSB2LightningبAnkerمA8812"
+    },
+    {
+      "material": "6000727",
+      "description": "IT-آداپتور موبایل بBaseusم30W-GAN3"
+    },
+    {
+      "material": "6000728",
+      "description": "IT-هابUSBبA4TechمNon"
+    },
+    {
+      "material": "6000729",
+      "description": "IT-پريز برق قرمز توکار ترانک سايز45*45"
+    },
+    {
+      "material": "6000730",
+      "description": "IT-کادر توکار ترانک سايز دو ماژول"
+    },
+    {
+      "material": "6000731",
+      "description": "IT-زانويي90درجه تخت ترانک سايز5.5*2.5"
+    },
+    {
+      "material": "6001031",
+      "description": "IT-پريز برق قرمز توکار ترانک سايز 45*45"
+    },
+    {
+      "material": "6001395",
+      "description": "IT-Deleted-Listing Problem-14050430"
+    },
+    {
+      "material": "6001396",
+      "description": "IT-Deleted-Listing Problem-14050430"
+    },
+    {
+      "material": "6001398",
+      "description": "IT-کابل دیتاTypeC-TypeAبLDNioم25W"
+    },
+    {
+      "material": "6001399",
+      "description": "IT-کابل دیتاTypeC-TypeCبLDNioم65W"
+    },
+    {
+      "material": "6001403",
+      "description": "IT-باطریUPSبUFOم12V65A"
+    },
+    {
+      "material": "6001452",
+      "description": "IT-فنCPUبIntelمLGA1700"
+    },
+    {
+      "material": "6001462",
+      "description": "IT-باطریUPSبUFOم12V28A"
+    },
+    {
+      "material": "6001481",
+      "description": "IT-کابل برق ب سیمیا م 3*4"
+    },
+    {
+      "material": "6001494",
+      "description": "IT-ماژول فیبر بCiscoسSFPم10G-SR"
+    },
+    {
+      "material": "6001497",
+      "description": "IT-کلاف کابل شبکهUTPبLegrandم305متري"
+    },
+    {
+      "material": "6001499",
+      "description": "IT-Deleted"
+    },
+    {
+      "material": "6001537",
+      "description": "IT-هابUSBبNo Name"
+    },
+    {
+      "material": "6001539",
+      "description": "IT-آداپتور تلفن ویپ بCiscoم502G"
+    },
+    {
+      "material": "6001540",
+      "description": "IT-آداپتور ثبت اثر انگشتSupremaسBioLight"
+    },
+    {
+      "material": "6001587",
+      "description": "IT-کابل فیبرنوری1متری بNoNameسMO3 LC2LC"
+    },
+    {
+      "material": "6001588",
+      "description": "IT-کابل فیبرنوری2متری بNoNameسMO3 LC2LC"
+    },
+    {
+      "material": "6001589",
+      "description": "IT-CPUبIntelسXeonمE5-2650"
+    },
+    {
+      "material": "9000011",
+      "description": "IT-دستگاه Cisco ATA مدل SPA112"
+    },
+    {
+      "material": "9000012",
+      "description": "IT-سوئیچ 48 پورت ب Cisco م 2960 س PST-L"
+    },
+    {
+      "material": "9000013",
+      "description": "IT-لپتاپ Asus سری K513 مدل K513Ep-L1379"
+    },
+    {
+      "material": "9000014",
+      "description": "IT-پرینترچندکاره+فکس پاناسوینک KX-MB2026"
+    },
+    {
+      "material": "9000015",
+      "description": "IT-کامپیوتر AIO برند Asus مدل ET2020I"
+    },
+    {
+      "material": "9000016",
+      "description": "IT-لپتاپLenovoسری IdeaPad مدل L3 15IML05"
+    },
+    {
+      "material": "9000017",
+      "description": "IT-لپتاپ Asus مدل X450L"
+    },
+    {
+      "material": "9000018",
+      "description": "IT-کامپیوتر صندوق Hanasis"
+    },
+    {
+      "material": "9000019",
+      "description": "IT-کامپیوتر صندوق Posbank Anyshop E2 Qs"
+    },
+    {
+      "material": "9000020",
+      "description": "IT-کامپیوتر صندوق Posbank مدل Bluo Qs"
+    },
+    {
+      "material": "9000021",
+      "description": "IT-اسکنر دستی فروشگاهی Datalogic-QD2100"
+    },
+    {
+      "material": "9000022",
+      "description": "IT-دستگاه ثبت ترددRFIDدنیای پردازشX990-C"
+    },
+    {
+      "material": "9000023",
+      "description": "IT-اکسس پوینت برند Cisco مدل 2702N"
+    },
+    {
+      "material": "9000024",
+      "description": "IT-اکسس پوینت برند Cisco مدل 3702N"
+    },
+    {
+      "material": "9000025",
+      "description": "IT-اکسس پوینت برند Cisco مدل 1142N"
+    },
+    {
+      "material": "9000026",
+      "description": "IT-اکسس پوینت برند Cisco مدل 1602I"
+    },
+    {
+      "material": "9000027",
+      "description": "IT-مانیتور کامپیوتر LG مدل 19M38A"
+    },
+    {
+      "material": "9000028",
+      "description": "IT-مانیتور کامپیوتر سامسونگ مدل S19R310N"
+    },
+    {
+      "material": "9000029",
+      "description": "IT-کامپیوتر AIO برند MSI مدل MSAA8C"
+    },
+    {
+      "material": "9000030",
+      "description": "IT-دستگاه کنترل تردد دارای صفحه کلید EDP"
+    },
+    {
+      "material": "9000031",
+      "description": "IT-تلفن شهری بیسیم پاناسونیک KX-TG36BX"
+    },
+    {
+      "material": "9000032",
+      "description": "IT-پرینتر صندوق Bixolon 350III"
+    },
+    {
+      "material": "9000033",
+      "description": "IT-کامپیوتر صندوق Posbank Anyshop E2"
+    },
+    {
+      "material": "9000034",
+      "description": "IT-کامپیوتر صندوق Posbank Apexa G"
+    },
+    {
+      "material": "9000035",
+      "description": "IT-اسکنر رومیزی فروشگاهیDatalogic-2200VS"
+    },
+    {
+      "material": "9000036",
+      "description": "IT-اسکنر رومیزی فروشگاهیDatalogic-3200VS"
+    },
+    {
+      "material": "9000037",
+      "description": "IT-اکسس پوینت برند Cisco مدل 3602I"
+    },
+    {
+      "material": "9000038",
+      "description": "IT-دستگاه هندهلد Memor X3"
+    },
+    {
+      "material": "9000039",
+      "description": "IT-دستگاه هندهلد Skorpio X4"
+    },
+    {
+      "material": "9000040",
+      "description": "IT-کیس کامپیوتر Green مدل آوا"
+    },
+    {
+      "material": "9000041",
+      "description": "IT-کیس کامپیوتر Green مدل Wee"
+    },
+    {
+      "material": "9000042",
+      "description": "IT-کیس کامپیوتر SaData مدل Sabalan"
+    },
+    {
+      "material": "9000043",
+      "description": "IT-روتر برند Cisco مدل 1921"
+    },
+    {
+      "material": "9000044",
+      "description": "IT-اسکنردستی فروشگاهی Honeywell-YJ-HH360"
+    },
+    {
+      "material": "9000045",
+      "description": "IT-دستگاهDVRبرند Hikvision مدل DS-7216HQ"
+    },
+    {
+      "material": "9000046",
+      "description": "IT-اکسس پوینت برند Cisco مدل 2602I"
+    },
+    {
+      "material": "9000047",
+      "description": "IT-کیس کامپیوتر Green مدل هیوا"
+    },
+    {
+      "material": "9000048",
+      "description": "IT-مانیتور کامپیوتر LG مدل 20MP38HB"
+    },
+    {
+      "material": "9000049",
+      "description": "IT-کامپیوتر AIO برند MSI مدل MS-AA78"
+    },
+    {
+      "material": "9000050",
+      "description": "IT-پرینتر صندوق Beko-TM-H6000IV"
+    },
+    {
+      "material": "9000051",
+      "description": "IT-کامپیوتر صندوق Beko TR500"
+    },
+    {
+      "material": "9000052",
+      "description": "IT-پرینتراداریCanonمدل i-Sensys LBP251dw"
+    },
+    {
+      "material": "9000053",
+      "description": "IT-سوئیچ 48 پورت ب Cisco م 3750 س TS-S"
+    },
+    {
+      "material": "9000054",
+      "description": "IT-پرینتر صندوق Bixolon 330II"
+    },
+    {
+      "material": "9000055",
+      "description": "IT-مانیتور کامپیوتر SAM مدل LS20BF525HH"
+    },
+    {
+      "material": "9000056",
+      "description": "IT-مانیتورکامپیوترسامسونگ مدل S19A330NHM"
+    },
+    {
+      "material": "9000057",
+      "description": "IT-لپتاپ Sony سری Vaio مدل PCG-61212W"
+    },
+    {
+      "material": "9000058",
+      "description": "IT-کامپیوتر صندوق Bayamax"
+    },
+    {
+      "material": "9000059",
+      "description": "IT-مودمLTEبرندHuawei ایرانسل مدلB612-233"
+    },
+    {
+      "material": "9000060",
+      "description": "IT-روتر برند Cisco مدل 1941"
+    },
+    {
+      "material": "9000061",
+      "description": "IT-تلفن ویپ برند Cisco مدل 7911G"
+    },
+    {
+      "material": "9000062",
+      "description": "IT-پرینتر اداری HP M401a"
+    },
+    {
+      "material": "9000063",
+      "description": "IT-پرینتر HP P2055"
+    },
+    {
+      "material": "9000064",
+      "description": "IT-پرینترچندکاره+فکس پاناسوینک KX-MB2025"
+    },
+    {
+      "material": "9000065",
+      "description": "IT-پرینترچند کاره برندRicoh م SP-212SFNw"
+    },
+    {
+      "material": "9000066",
+      "description": "IT-دستگاه هندهلد Skorpio X3"
+    },
+    {
+      "material": "9000067",
+      "description": "IT-دستگاه هندهلد Falcon"
+    },
+    {
+      "material": "9000068",
+      "description": "IT-تلفن ویپ برند Cisco مدل 502G"
+    },
+    {
+      "material": "9000069",
+      "description": "IT-تلفن ویپ برند Cisco مدل 6921"
+    },
+    {
+      "material": "9000070",
+      "description": "IT-تلفن شهری سیمی پاناسونیک KX-TG3661JX"
+    },
+    {
+      "material": "9000071",
+      "description": "IT-پرینتر اداری HP M402"
+    },
+    {
+      "material": "9000072",
+      "description": "IT-دستگاه ثبت تردد اثر انگشتBiolight Net"
+    },
+    {
+      "material": "9000073",
+      "description": "IT-دی وی دی رایتر اکسترنالAsus مدل 08U9M"
+    },
+    {
+      "material": "9000074",
+      "description": "IT-کامپیوترسرورHP-ProliantG8-DL380-12LFF"
+    },
+    {
+      "material": "9000075",
+      "description": "IT-مودم LTE برند SoyeaLink مدل B622-335"
+    },
+    {
+      "material": "9000076",
+      "description": "IT-لپتاپ Lenovoسری Thinkbook مدل 15G2ITL"
+    },
+    {
+      "material": "9000077",
+      "description": "IT-پرینتر HP P2036"
+    },
+    {
+      "material": "9000078",
+      "description": "IT-اسکنر Canon سری LiDE 300 مدل K10486"
+    },
+    {
+      "material": "9000079",
+      "description": "IT-UTMفایروال بFortinetم Fortigate 1100E"
+    },
+    {
+      "material": "9000080",
+      "description": "IT-سوئیچ6پورتPOE ب D-Link م DES-F1006P-E"
+    },
+    {
+      "material": "9000081",
+      "description": "IT-دستگاه ATA برند Grandstream مدل HT503"
+    },
+    {
+      "material": "9000082",
+      "description": "IT-مانیتور کامپیوتر جی پلاس مدل GDM275LN"
+    },
+    {
+      "material": "9000083",
+      "description": "IT-کیس کامپیوتر Green مدل پارس Evo"
+    },
+    {
+      "material": "9000084",
+      "description": "IT-لپتاپ Lenovo سری Thinkbook مدل 15HA"
+    },
+    {
+      "material": "9000085",
+      "description": "IT-لپتاپ Lenovoسری IdeaPad مدل 330-15IKB"
+    },
+    {
+      "material": "9000086",
+      "description": "IT-رک دیواری Elgonet م 9 یونیت عمق60"
+    },
+    {
+      "material": "9000087",
+      "description": "IT-ردیاب خودرو ب Teltonika م FMB920"
+    },
+    {
+      "material": "9000088",
+      "description": "IT-مودم LTE برند TP-Link مدل TL-MR100"
+    },
+    {
+      "material": "9000089",
+      "description": "IT-اسپیکر کامپیوتری Mini Digital - D-O2A"
+    },
+    {
+      "material": "9000090",
+      "description": "IT-اسپيکر کامپيوتري VanMaax"
+    },
+    {
+      "material": "9000091",
+      "description": "IT-کيس کامپيوتر Datis"
+    },
+    {
+      "material": "9000092",
+      "description": "IT-کيس کامپيوتر TSCO"
+    },
+    {
+      "material": "9000093",
+      "description": "IT-پرينتر اداري HP M401dn"
+    },
+    {
+      "material": "9000094",
+      "description": "IT-اسپیکرتحت شبکه سقفی جوان پردازش مCSS5"
+    },
+    {
+      "material": "9000095",
+      "description": "IT-اسکنر Canon مدل  LiDe 110"
+    },
+    {
+      "material": "9000096",
+      "description": "IT-اسکنر Canon مدل  LiDe 120"
+    },
+    {
+      "material": "9000097",
+      "description": "IT-اسکنر Kodak-ScanMate-i2400"
+    },
+    {
+      "material": "9000098",
+      "description": "IT-پرینتر HP M605"
+    },
+    {
+      "material": "9000099",
+      "description": "IT-پرینتر HP P1102"
+    },
+    {
+      "material": "9000100",
+      "description": "IT-پرینتر HP P2035"
+    },
+    {
+      "material": "9000101",
+      "description": "IT-پرینتر کارت پرسنلی Hiti مدل C8-200s"
+    },
+    {
+      "material": "9000102",
+      "description": "IT-پرینتر کارت پرسنلی MagiCard م DT49XD"
+    },
+    {
+      "material": "9000103",
+      "description": "IT-پرینترچند کاره برندRicoh م SP-213SFNw"
+    },
+    {
+      "material": "9000104",
+      "description": "IT-پرینتررنگی جوهر افشان Epson مدل L1300"
+    },
+    {
+      "material": "9000105",
+      "description": "IT-تلفن ویپ برند Cisco مدل 504G"
+    },
+    {
+      "material": "9000106",
+      "description": "IT-تلفن ویپ کنفرانس Yealink مدل CP690"
+    },
+    {
+      "material": "9000107",
+      "description": "IT-دانگل 3G رایتل مدل WU260"
+    },
+    {
+      "material": "9000108",
+      "description": "IT-دانگل 4G برند Huawei مدل E3372h-153"
+    },
+    {
+      "material": "9000109",
+      "description": "IT-دستگاه DVR برندHikvision مدل DS-7104H"
+    },
+    {
+      "material": "9000110",
+      "description": "IT-دستگاه DVRبرندHikvisionمدل iDS-7208H"
+    },
+    {
+      "material": "9000111",
+      "description": "IT-دستگاه NVR برند Dahuaمدل XVR5104HS-s2"
+    },
+    {
+      "material": "9000112",
+      "description": "IT-دستگاه ثبت تردد+چهره Biolight Station"
+    },
+    {
+      "material": "9000113",
+      "description": "IT-دوربین حفاظتی Hikvision م DS-2CE16H0T"
+    },
+    {
+      "material": "9000114",
+      "description": "IT-دوربین حفاظتیDahua مدل 4MP Vari-Focal"
+    },
+    {
+      "material": "9000115",
+      "description": "IT-دوربین عکسبرداری Canon EOS-700D"
+    },
+    {
+      "material": "9000116",
+      "description": "IT-دوربین عکسبرداری نیکون D5300"
+    },
+    {
+      "material": "9000117",
+      "description": "IT-رک ثابت زمینی HP م 9 یونیت عمق60"
+    },
+    {
+      "material": "9000118",
+      "description": "IT-رک ثابت زمینی آمادسیستم م9یونیت عمق60"
+    },
+    {
+      "material": "9000119",
+      "description": "IT-رک دیواری  آماد سیستم م 9 یونیت عمق60"
+    },
+    {
+      "material": "9000120",
+      "description": "IT-رک دیواری HP م 9 یونیت عمق60"
+    },
+    {
+      "material": "9000121",
+      "description": "IT-رک متحرک زمینی HP م 9 یونیت"
+    },
+    {
+      "material": "9000122",
+      "description": "IT-رک متحرک زمینی آماد سیستم م 9 یونیت"
+    },
+    {
+      "material": "9000123",
+      "description": "IT-روترهمراه-دانگل TP-Link مدل TL-MR3020"
+    },
+    {
+      "material": "9000124",
+      "description": "IT-روترهمراه-دانگل TP-Link مدل TL-MR3040"
+    },
+    {
+      "material": "9000125",
+      "description": "IT-سوئیچ 24 پورت ب Cisco م 2960 س TS-L"
+    },
+    {
+      "material": "9000126",
+      "description": "IT-سوئیچ 24 پورت ب Cisco م 2960 س TT-L"
+    },
+    {
+      "material": "9000127",
+      "description": "IT-سوئیچ 4 پورت KVM ب D-Link مدل DKVM-4U"
+    },
+    {
+      "material": "9000128",
+      "description": "IT-سوئیچ 8 پورت Cnet مدل CNSH-800X"
+    },
+    {
+      "material": "9000129",
+      "description": "IT-سوئیچ 8 پورت D-Link مدل DES-1008A"
+    },
+    {
+      "material": "9000130",
+      "description": "IT-سوئیچ 8 پورت D-Link مدل DES-108"
+    },
+    {
+      "material": "9000131",
+      "description": "IT-سوئیچ 8 پورت TP-Link مدل TL-SG1008D"
+    },
+    {
+      "material": "9000132",
+      "description": "IT-کامپیوتر AIO برند MSI مدل 3160NGW"
+    },
+    {
+      "material": "9000133",
+      "description": "IT-کامپیوتر سرور HP-Proliant-G10-DL380"
+    },
+    {
+      "material": "9000134",
+      "description": "IT-کامپیوتر صندوق Beko TR550"
+    },
+    {
+      "material": "9000135",
+      "description": "IT-موبایل شیائومی مدل Poco M3"
+    },
+    {
+      "material": "9000136",
+      "description": "IT-لپتاپ Lenovoسری Thinkbook مدل 14G2-TL"
+    },
+    {
+      "material": "9000137",
+      "description": "IT-لپتاپ Surface مدل Surface 1"
+    },
+    {
+      "material": "9000138",
+      "description": "IT-مانیتور کامپیوتر XVision مدل XL2020AI"
+    },
+    {
+      "material": "9000139",
+      "description": "IT-مانیتور کامپیوتر جی پلاس مدل GDM225JN"
+    },
+    {
+      "material": "9000140",
+      "description": "IT-مانیتور کامپیوتر جی پلاس مدل GDM245JN"
+    },
+    {
+      "material": "9000141",
+      "description": "IT-مانیتور کامپیوترسامسونگ مدل E-1945-NX"
+    },
+    {
+      "material": "9000142",
+      "description": "IT-مودم 4G برند D-Link مدل D100"
+    },
+    {
+      "material": "9000143",
+      "description": "IT-مودم ADSL برند D-Link مدل DSL-2520U"
+    },
+    {
+      "material": "9000144",
+      "description": "IT-مودم ADSL برند Huawei مدل AR-1833"
+    },
+    {
+      "material": "9000145",
+      "description": "IT-مودم ADSL برند Zyxel مدل 650R-T1"
+    },
+    {
+      "material": "9000146",
+      "description": "IT-مودم ADSL برند Zyxel مدل P660RU-T1"
+    },
+    {
+      "material": "9000147",
+      "description": "IT-مودم LTE برند Huawei مدل Ooredoo"
+    },
+    {
+      "material": "9000148",
+      "description": "IT-مودم LTEبرندHuawei سری TFi60مدل B612S"
+    },
+    {
+      "material": "9000149",
+      "description": "IT-مودم جی دات ب TainetسScorpio م 1520GR"
+    },
+    {
+      "material": "9000150",
+      "description": "IT-وبکم No Name"
+    },
+    {
+      "material": "9000151",
+      "description": "IT-ویدئو پرژکتور Hitachi مدل CP-X4022Wn"
+    },
+    {
+      "material": "9000152",
+      "description": "IT-تبلت Samsungس Galaxy Tab 2 م GT-P3100"
+    },
+    {
+      "material": "9000153",
+      "description": "IT-اسکنر  Kodak سری Alaris مدل E1025"
+    },
+    {
+      "material": "9000154",
+      "description": "IT-تبلت Samsungس Galaxy Tab A7 م SM-T225"
+    },
+    {
+      "material": "9000155",
+      "description": "IT-سوئیچ 48 پورت ب Cisco م C3850 س U-S"
+    },
+    {
+      "material": "9000156",
+      "description": "IT-سوئیچ 24پورت بCiscoم C3750G س TS-S1U"
+    },
+    {
+      "material": "9000157",
+      "description": "IT-روتر برند Cisco مدل ASR 1002-X"
+    },
+    {
+      "material": "9000158",
+      "description": "IT-اسکنر HP سری Scanjet مدل 200"
+    },
+    {
+      "material": "9000159",
+      "description": "IT-موبایل شیائومی م Poco Mg 5Gرم 6 ظ 128"
+    },
+    {
+      "material": "9000160",
+      "description": "IT-کیس کامپیوتر Green مدل Midi2002"
+    },
+    {
+      "material": "9000161",
+      "description": "IT-کیس کامپیوتر Green مدل MD121"
+    },
+    {
+      "material": "9000162",
+      "description": "IT-مانیتور کامپیوتر LG مدل L1755SE"
+    },
+    {
+      "material": "9000163",
+      "description": "IT-موبایل شیائومی مRedmi Note 11Sرم6ظ64"
+    },
+    {
+      "material": "9000164",
+      "description": "IT-مانیتور کامپیوتر Samsung مدل P20500"
+    },
+    {
+      "material": "9000165",
+      "description": "IT-کامپیوتر AIO برند MSI مدل MS-AA8A"
+    },
+    {
+      "material": "9000166",
+      "description": "IT-مانیتور کامپیوتر Samsungم B1955NPluss"
+    },
+    {
+      "material": "9000167",
+      "description": "IT-مانیتور کامپیوتر Samsungم +1963UW"
+    },
+    {
+      "material": "9000168",
+      "description": "IT-رادیو وایرلس ب Mikrotik م Dyna Dish 5"
+    },
+    {
+      "material": "9000169",
+      "description": "IT-دوربین حفاظتی Aplinex سIPC م B118M-AS"
+    },
+    {
+      "material": "9000170",
+      "description": "IT-هارد1.6ترابایتSSD-PCIeبSamsungمPM1735"
+    },
+    {
+      "material": "9000171",
+      "description": "IT-هارد3.8ترابایتSSD-PCIeبSamsungمPM1643"
+    },
+    {
+      "material": "9000172",
+      "description": "IT-هارد1.9ترابایتSSD-PCIبSamsungمPM1643a"
+    },
+    {
+      "material": "9000173",
+      "description": "IT-تبلت Samsungس Galaxy Tab A7 م SM-T505"
+    },
+    {
+      "material": "9000174",
+      "description": "IT-دوربین حفاظتیDahua سIPC م HFW3441E-SA"
+    },
+    {
+      "material": "9000175",
+      "description": "IT-موبایل iPhone م13CH ر4 ظ128 مشکی"
+    },
+    {
+      "material": "9000176",
+      "description": "IT-موبایل سامسونگ م A13 رم 4 ظ 64"
+    },
+    {
+      "material": "9000177",
+      "description": "IT-پیجر ب آریا م RS-100M"
+    },
+    {
+      "material": "9000178",
+      "description": "IT-اسکنر Plustek س SmartOffice م PN30U"
+    },
+    {
+      "material": "9000179",
+      "description": "IT-پرینترچندکاره+فکس بPanasonicمKXMB2275"
+    },
+    {
+      "material": "9000180",
+      "description": "IT-مانیتور 22 اینچ بSamsungمLS22F355HN"
+    },
+    {
+      "material": "9000181",
+      "description": "IT-کامپیوتر صندوق بPartnerمSP-550"
+    },
+    {
+      "material": "9000182",
+      "description": "IT-Rack ATS ب APC مAP-7723"
+    },
+    {
+      "material": "9000183",
+      "description": "IT-مانیتور 24 اینچ بLGم24MP68VQ"
+    },
+    {
+      "material": "9000184",
+      "description": "IT-کامپیوتر صندوق OKPos"
+    },
+    {
+      "material": "9000185",
+      "description": "IT-مانیتور 23 اینچ بSamsungمS23B575Vplus"
+    },
+    {
+      "material": "9000186",
+      "description": "IT-پرینترچند کاره برندHP مM1536DNF"
+    },
+    {
+      "material": "9000187",
+      "description": "IT-مانیتور کامپیوتر SamsungمS19B315NPlus"
+    },
+    {
+      "material": "9000188",
+      "description": "IT-مانیتور هوشمندGPlusسSmartBoardم86اینچ"
+    },
+    {
+      "material": "9000189",
+      "description": "IT-تبلت گرافیکی بXP-Penم13.3 Pro"
+    },
+    {
+      "material": "9000190",
+      "description": "IT-تقویت آنتن ب GreetwinمGW-24GDWL"
+    },
+    {
+      "material": "9000191",
+      "description": "IT-تقویت آنتن بKianTelecomمKA83C"
+    },
+    {
+      "material": "9000192",
+      "description": "IT-مودم فیبرنوری بHuaweiمHG8245Q2"
+    },
+    {
+      "material": "9000193",
+      "description": "IT-ویدئو پرژکتور بEpson مEB-X49"
+    },
+    {
+      "material": "9000194",
+      "description": "IT-مانیتور 34اینچ بHuaweiمMateView GT"
+    },
+    {
+      "material": "9000195",
+      "description": "IT-دوربین حفاظتیDahuaسIPCمHDW3441TM-AS"
+    },
+    {
+      "material": "9000196",
+      "description": "IT-UTMفایروال بFortinetمFortigate 400F"
+    },
+    {
+      "material": "9000197",
+      "description": "IT-سوئیچ48پورت فیبربCiscoسNexusمC3064-X"
+    },
+    {
+      "material": "9000198",
+      "description": "IT-پرینتر اداری بHPم402n"
+    },
+    {
+      "material": "9000199",
+      "description": "IT-پرینتر اداری بHPم402d"
+    },
+    {
+      "material": "9000200",
+      "description": "IT-پرینتر اداری بHPم402dn"
+    },
+    {
+      "material": "9000201",
+      "description": "IT-موبایل سامسونگ م A14 رم 4 ظ 64"
+    },
+    {
+      "material": "9000202",
+      "description": "IT-لپتاپ Asus مدل X540U"
+    },
+    {
+      "material": "9000203",
+      "description": "IT-لپتاپ Asus مدل X401A"
+    },
+    {
+      "material": "9000204",
+      "description": "IT-مانیتور کامپیوتر بAOCم20E1H"
+    },
+    {
+      "material": "9000205",
+      "description": "IT-دروبین حفاظتیDahuaسIPCمHFW3441EP-SA"
+    },
+    {
+      "material": "9000206",
+      "description": "IT-موبایل بHuaweiسAscendبG750-U10ظ8GB"
+    },
+    {
+      "material": "9000207",
+      "description": "IT-دوربین حفاظتیDahuaسIPCمHFW3449EP-AS"
+    },
+    {
+      "material": "9000208",
+      "description": "IT-مودم فیبرنوری بHuaweiسGPONمHG8546M"
+    },
+    {
+      "material": "9000209",
+      "description": "IT-هارد اکسترنال بSiliconPowerمArmorA85"
+    },
+    {
+      "material": "9000210",
+      "description": "IT-مانیتور کامپیوتر بAOCمE2070WHN"
+    },
+    {
+      "material": "9000211",
+      "description": "IT-اسکنر دستی فروشگاهی بDatalogicمQW2100"
+    },
+    {
+      "material": "9000212",
+      "description": "IT-صندوقSelfCheckOutبTozinSadrمPS-KaraNT"
+    },
+    {
+      "material": "9000213",
+      "description": "IT-صندوقSelfCheckOutبPosiflexمKT2150"
+    },
+    {
+      "material": "9000214",
+      "description": "IT-تلفن ویپ بCiscoم6941"
+    },
+    {
+      "material": "9000215",
+      "description": "IT-آنتن تقویت سیگنالCiscoسAirم2566P4W-R"
+    },
+    {
+      "material": "9000216",
+      "description": "IT-موبایل بSamsungمA15رم4GBظ128GB"
+    },
+    {
+      "material": "9000217",
+      "description": "IT-لپتاپ بLenovoسThinkbookم15G4IAP"
+    },
+    {
+      "material": "9000218",
+      "description": "IT-UTMفایروال بFortinetمFortigateFG-60F"
+    },
+    {
+      "material": "9000219",
+      "description": "IT-سوئیچ24پورت بCiscoس3850م24XS-S"
+    },
+    {
+      "material": "9000220",
+      "description": "IT-ترازو لیبل ب توزین صدر مLSG17A"
+    },
+    {
+      "material": "9000221",
+      "description": "IT-اسکنر دستی فروشگاهی DatalogicمQBT2590"
+    },
+    {
+      "material": "9000222",
+      "description": "IT-دوربین حفاظتیDahuaسIPCمHDW3449TMP-AS"
+    },
+    {
+      "material": "9000223",
+      "description": "IT-وبکم بRapoo مC200"
+    },
+    {
+      "material": "9000224",
+      "description": "IT-کامپیوتر صندوق بPosbankسApexaمX"
+    },
+    {
+      "material": "9000225",
+      "description": "IT-اسکنر اداری بKodakسAlarisمi2620"
+    },
+    {
+      "material": "9000226",
+      "description": "IT-کامپیوترAIOبiMacسRetinaم2017(i7-32G)"
+    },
+    {
+      "material": "9000227",
+      "description": "IT-اسکنر اداری بHPسScanjetب4500fn1"
+    },
+    {
+      "material": "9000228",
+      "description": "IT-اسکنر اداری بHPسScanjetمG3110"
+    },
+    {
+      "material": "9000229",
+      "description": "IT-لپتاپ بAsusسExpertBookمB1502CB"
+    },
+    {
+      "material": "9000230",
+      "description": "IT-لپتاپ بAsusسExpertBookمB1402CV"
+    },
+    {
+      "material": "9000231",
+      "description": "IT-لپتاپ بAsusسZenbookمQ425MA-U71TB"
+    },
+    {
+      "material": "9000232",
+      "description": "IT-ترازو لیبل ب توزین صدر مLSG18"
+    },
+    {
+      "material": "9000233",
+      "description": "IT-لپتاپ بAsusسExpertBookمB1402CV"
+    },
+    {
+      "material": "9000234",
+      "description": "IT-لپتاپ بMicrosoftسSurfaceمPro 9"
+    },
+    {
+      "material": "9000235",
+      "description": "IT-سوئیچ24پورت بCiscoسC3750Gم24PS-S"
+    },
+    {
+      "material": "9000236",
+      "description": "IT-پرینتر صندوق بBixolonمSPR350-PlusV"
+    },
+    {
+      "material": "9000237",
+      "description": "IT-مودمLTEبMikrotikمLTAP LTE6 KIT"
+    },
+    {
+      "material": "9000238",
+      "description": "IT-مودمLTEبMikrotikمSXT LTE6 KIT"
+    },
+    {
+      "material": "9000239",
+      "description": "IT-فرستندهHDMIبPowerologyمPHDMRABK"
+    },
+    {
+      "material": "9000240",
+      "description": "IT-تلویزیون بGPlusم-GTV-85SQ848N-Smart"
+    },
+    {
+      "material": "9000241",
+      "description": "IT-مودمLTEبHuaweiمB636-336"
+    },
+    {
+      "material": "9000242",
+      "description": "IT-موبایل بSamsungمA16رم4ظ128GB"
+    },
+    {
+      "material": "9000243",
+      "description": "IT-لپتاپ بDellسVostroم3300"
+    },
+    {
+      "material": "9000244",
+      "description": "IT-سروربHPEسProliant Gen8مDL380p LFF CTO"
+    },
+    {
+      "material": "9000245",
+      "description": "IT-هارد اکسترنال5TبSiliconPowerمArmorA66"
+    },
+    {
+      "material": "9000246",
+      "description": "IT-اسکنر اداری بCanonمLiDe220"
+    },
+    {
+      "material": "9000247",
+      "description": "IT-کپی چندکاره بToshibaسe-Studioم3028A"
+    },
+    {
+      "material": "9000248",
+      "description": "IT-مانیتور کامپیوتر بGPlusمGDM-226LN"
+    },
+    {
+      "material": "9000249",
+      "description": "IT-شاسی سرور بHPEسProliantمDL380"
+    },
+    {
+      "material": "9000250",
+      "description": "IT-ویدئو پرژکتور بXiaomiسWanboمX2 Max"
+    },
+    {
+      "material": "9000251",
+      "description": "IT-هارد سرور بSeagateسExosمST6000NM0115"
+    },
+    {
+      "material": "9000252",
+      "description": "IT-هاردSSDسرور3.2TBبSamsungسMU HHمPM1735"
+    },
+    {
+      "material": "9000253",
+      "description": "IT-سوئیچ24پورت بCiscoسC3750م24TS-S1U"
+    },
+    {
+      "material": "9000254",
+      "description": "IT-بلوور ب رونیکس م1205"
+    },
+    {
+      "material": "9000255",
+      "description": "IT-مانیتور کامپیوترSamsungمS19V310NPlus"
+    },
+    {
+      "material": "9000256",
+      "description": "IT-پرینتر چندکاره بHPسMFPمM130fw"
+    },
+    {
+      "material": "9000257",
+      "description": "IT-مودم فیبرنوری بHuaweiمHG8245C"
+    },
+    {
+      "material": "9000258",
+      "description": "IT-اکسس پوینت بCiscoم3802I"
+    },
+    {
+      "material": "9000259",
+      "description": "IT-تلویزیون بDenayسSmart LEDمMC-43A4"
+    },
+    {
+      "material": "9000260",
+      "description": "IT-هارد سرور بSeagateسExosمST8000NM018B"
+    },
+    {
+      "material": "9000261",
+      "description": "IT-موبایل بHTCمDesire 500"
+    },
+    {
+      "material": "9000262",
+      "description": "IT-مودم فیبرنوری بUtelسGPONمG442"
+    },
+    {
+      "material": "9000263",
+      "description": "IT-مودم فیبرنوری بFiberhomeمAN5506-04-FS"
+    },
+    {
+      "material": "9000264",
+      "description": "IT-مودم فیبرنوری بSandLightمSA976V"
+    },
+    {
+      "material": "9000265",
+      "description": "IT-مودم فیبرنوری بUtelسGPONمUF5400"
+    },
+    {
+      "material": "9000266",
+      "description": "IT-مودم فیبرنوریHuaweiسGPONمHG8245H-UPC"
+    },
+    {
+      "material": "9000267",
+      "description": "IT-لپتاپ بAsusسExpertBookمP1503CVA"
+    },
+    {
+      "material": "9000268",
+      "description": "IT-مودمADSLبD-LinkمDSL-2750U"
+    },
+    {
+      "material": "9000269",
+      "description": "IT-مودمADSLبD-LinkمDSL-2730U"
+    },
+    {
+      "material": "9000270",
+      "description": "IT-مودمADSLبTP-LinkمTD-8811 V4"
+    },
+    {
+      "material": "9000271",
+      "description": "IT-مودمADSLبHuaweiسEcholifeمHG521"
+    },
+    {
+      "material": "9000272",
+      "description": "IT-ثبت اثرانگشت بSupremaمBioStation3"
+    },
+    {
+      "material": "9000273",
+      "description": "IT-دوربین حفاظتیDahuaسIPCمHFW3441E-S-S2"
+    },
+    {
+      "material": "9000274",
+      "description": "IT-دوربین حفاظتی بDahuaسIPCمHDW3441TM-AS"
+    },
+    {
+      "material": "9000275",
+      "description": "IT-رک دیواری بHP Proم9یونیت عمق60"
+    },
+    {
+      "material": "9000276",
+      "description": "IT-پرینتر رنگی چندکاره بHPسPro 200مM276n"
+    },
+    {
+      "material": "9000277",
+      "description": "IT-کیس کامپیوتر بCoolmaster"
+    },
+    {
+      "material": "9000278",
+      "description": "IT-موبایل بSamsungمA17رم4GBظ128GB"
+    },
+    {
+      "material": "9000279",
+      "description": "IT-تلویزیون بGPlusمGTV-855Q878S-Smart"
+    },
+    {
+      "material": "9000281",
+      "description": "IT-مانیتور کامپیوتر بXVisionمXS2050H"
+    },
+    {
+      "material": "9000282",
+      "description": "IT-Deleted-Listing Problem-14050430"
+    },
+    {
+      "material": "9000284",
+      "description": "IT-اسکنر اداری بKodakسAlarisمi2600"
+    },
+    {
+      "material": "9000285",
+      "description": "IT-پچ پنل24پورت بLegrandم رک9یونیت"
+    },
+    {
+      "material": "9000286",
+      "description": "IT-دوربین حفاظتی بDahuaسIPCمHFW3449T1PAS"
+    },
+    {
+      "material": "9000291",
+      "description": "IT-مودم فیبرنوری بHuaweiسGPONمEG8145X6"
+    },
+    {
+      "material": "9000292",
+      "description": "IT-سوئیچ48پورت فیبربCiscoسNexusمC3064PQ"
+    },
+    {
+      "material": "9000293",
+      "description": "IT-ثبت اثر انگشتSupremaسBioLightمBLR-OC"
+    },
+    {
+      "material": "9000294",
+      "description": "IT-ثبت اثر انگشتSupremaسBioLightمBLN-OC"
+    },
+    {
+      "material": "9000295",
+      "description": "IT-UTMفایروال بFortinetمFortigateFG-200G"
+    },
+    {
+      "material": "9000296",
+      "description": "IT-UTMفایروال بFortinetمFortigateFG-90G"
+    },
+    {
+      "material": "9000297",
+      "description": "IT-مانیتور کامپیوتر بXVisionمXK2030H"
+    },
+    {
+      "material": "9000302",
+      "description": "IT-کیس کامپیوتر بGreenمHoma"
+    }
+  ]
+}
