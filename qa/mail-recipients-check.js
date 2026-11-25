@@ -1,4 +1,5 @@
-// تست گیرندگان ایمیل گزارش نهایی: گروه Oshanak-ITSUP همیشه اضافه میشود مگر اعلان خاموش باشد.
+// تست گیرنده/فرستنده ایمیل گزارش نهایی:
+// From = OshanakSUP، To = Oshanak-ITSUP، و خاموش کردن اعلان ایمیل کلید قطع کامل است.
 // اجرا: npm run test:mail  (یا node qa/mail-recipients-check.js)
 const fs = require('fs');
 const os = require('os');
@@ -14,18 +15,16 @@ process.env.AUTH_MODE = 'local';
 process.env.AUDIT_NOTIFY_TO = '';
 process.env.AUDIT_GROUP_MAIL = 'Oshanak-ITSUP@gbgnetwork.net';
 process.env.AUDIT_GROUP_LABEL = 'Oshanak-ITSUP';
+delete process.env.AUDIT_MAIL_FROM;
+delete process.env.AUDIT_MAIL_FROM_LABEL;
 
 const core = require('../core');
-const directory = require('../ad-directory');
 let settings = { emailNotifyEnabled: true, emailNotifyTo: '' };
-let adGroupMail = '';
-let adMembers = [];
 core.getEffectiveSettings = () => settings;
-directory.getGroupMail = async () => adGroupMail;
-directory.listMembers = async () => adMembers;
 
 const { resolveAuditRecipients, auditGroupRecipient, auditMailFrom } = require('../server');
-const GROUP = '"Oshanak-ITSUP" <Oshanak-ITSUP@gbgnetwork.net>';
+const ITSUP = '"Oshanak-ITSUP" <Oshanak-ITSUP@gbgnetwork.net>';
+const SUP = '"OshanakSUP" <OshanakSUP@oshanak.com>';
 
 const results = [];
 async function check(name, fn) {
@@ -35,74 +34,63 @@ async function check(name, fn) {
 
 (async () => {
     await check('group recipient has display name and address', () => {
-        assert.equal(auditGroupRecipient(), GROUP);
+        assert.equal(auditGroupRecipient(), ITSUP);
+    });
+
+    await check('sender defaults to OshanakSUP group', () => {
+        assert.equal(auditMailFrom(), SUP);
     });
 
     await check('disabled notification is a full kill switch (even over env)', async () => {
-        settings = { emailNotifyEnabled: false, emailNotifyTo: '' };
+        settings = { emailNotifyEnabled: false, emailNotifyTo: 'panel@example.com' };
         process.env.AUDIT_NOTIFY_TO = 'ops@example.com';
         const r = await resolveAuditRecipients('');
         assert.deepEqual(r, { to: [], source: 'disabled' });
         process.env.AUDIT_NOTIFY_TO = '';
     });
 
-    await check('env recipient + group are both used', async () => {
-        settings = { emailNotifyEnabled: true, emailNotifyTo: 'panel@example.com' };
+    await check('env recipient is ignored; only ITSUP group is used', async () => {
+        settings = { emailNotifyEnabled: true, emailNotifyTo: '' };
         process.env.AUDIT_NOTIFY_TO = 'ops@example.com';
         const r = await resolveAuditRecipients('');
-        assert.equal(r.source, 'env');
-        assert.deepEqual(r.to, ['ops@example.com', GROUP]);
+        assert.deepEqual(r, { to: [ITSUP], source: 'audit-group' });
         process.env.AUDIT_NOTIFY_TO = '';
     });
 
-    await check('admin panel recipient + group are both used', async () => {
+    await check('admin panel recipient is ignored; only ITSUP group is used', async () => {
         settings = { emailNotifyEnabled: true, emailNotifyTo: 'panel@example.com' };
         const r = await resolveAuditRecipients('');
-        assert.equal(r.source, 'settings');
-        assert.deepEqual(r.to, ['panel@example.com', GROUP]);
+        assert.deepEqual(r, { to: [ITSUP], source: 'audit-group' });
     });
 
-    await check('AD group mail + group are both used', async () => {
+    await check('raw ITSUP address in env is replaced, not duplicated', async () => {
         settings = { emailNotifyEnabled: true, emailNotifyTo: '' };
-        adGroupMail = 'it-ad@example.com';
+        process.env.AUDIT_NOTIFY_TO = 'Oshanak-ITSUP@gbgnetwork.net, ops@example.com';
         const r = await resolveAuditRecipients('');
-        assert.equal(r.source, 'ad-group');
-        assert.deepEqual(r.to, ['it-ad@example.com', GROUP]);
-        adGroupMail = '';
+        assert.deepEqual(r.to, [ITSUP]);
+        process.env.AUDIT_NOTIFY_TO = '';
     });
 
-    await check('AD members + group are both used', async () => {
+    await check('empty group address disables sending', async () => {
         settings = { emailNotifyEnabled: true, emailNotifyTo: '' };
-        adMembers = [{ mail: 'member@example.com' }];
-        const r = await resolveAuditRecipients('');
-        assert.equal(r.source, 'ad-members');
-        assert.deepEqual(r.to, ['member@example.com', GROUP]);
-        adMembers = [];
+        process.env.AUDIT_GROUP_MAIL = '';
+        delete require.cache[require.resolve('../server')];
+        const reloaded = require('../server');
+        const r = await reloaded.resolveAuditRecipients('');
+        assert.deepEqual(r, { to: [], source: 'no-group' });
     });
 
-    await check('fallback manager + group are both used', async () => {
-        settings = { emailNotifyEnabled: true, emailNotifyTo: '' };
-        const r = await resolveAuditRecipients('');
-        assert.equal(r.source, 'fallback');
-        assert.deepEqual(r.to, ['manager@haftstores.ir', GROUP]);
-    });
-
-    await check('raw group address is replaced, not duplicated', async () => {
-        settings = { emailNotifyEnabled: true, emailNotifyTo: 'Oshanak-ITSUP@gbgnetwork.net, panel@example.com' };
-        const r = await resolveAuditRecipients('');
-        assert.equal(r.to.filter(x => x.toLowerCase().includes('oshanak-itsup@gbgnetwork.net')).length, 1);
-        assert.equal(r.to[0], GROUP);
-        assert.equal(r.to[1], 'panel@example.com');
-    });
-
-    await check('group address and label can be overridden from env', () => {
+    await check('recipient group and sender can be overridden from env', async () => {
         process.env.AUDIT_GROUP_MAIL = 'netops@gbgnetwork.net';
         process.env.AUDIT_GROUP_LABEL = 'Net Ops';
-        process.env.EMAIL_USER = 'aghanbari@gbgnetwork.net';
+        process.env.AUDIT_MAIL_FROM = 'sender@gbgnetwork.net';
+        process.env.AUDIT_MAIL_FROM_LABEL = 'Sender';
         delete require.cache[require.resolve('../server')];
         const reloaded = require('../server');
         assert.equal(reloaded.auditGroupRecipient(), '"Net Ops" <netops@gbgnetwork.net>');
-        assert.ok(reloaded.auditMailFrom().includes('<aghanbari@gbgnetwork.net>'));
+        assert.equal(reloaded.auditMailFrom(), '"Sender" <sender@gbgnetwork.net>');
+        const r = await reloaded.resolveAuditRecipients('');
+        assert.deepEqual(r, { to: ['"Net Ops" <netops@gbgnetwork.net>'], source: 'audit-group' });
     });
 
     const summary = {

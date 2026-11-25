@@ -8,7 +8,7 @@ const path = require('path');
 const { execFile } = require('child_process');
 const localUsers = require('./local-users');
 
-const IS_LOCAL = (process.env.AUTH_MODE || 'hybrid').toLowerCase() === 'local';
+const IS_LOCAL = (process.env.AUTH_MODE || 'ldap').toLowerCase() === 'local';
 const GROUP = process.env.LDAP_ALLOWED_GROUP || 'Oshanak-ITSUP';
 const LINKS_PATH = path.join(__dirname, 'db', 'region_members.json');
 const CACHE_MS = 5 * 60 * 1000;

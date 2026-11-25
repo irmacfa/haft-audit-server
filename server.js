@@ -6,7 +6,6 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const core = require('./core');
 const auth = require('./auth');
-const directory = require('./ad-directory');
 const regionAccess = require('./region-access');
 const activity = require('./live-activity');
 
@@ -73,14 +72,18 @@ const transporter = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-// فرستنده ایمیل از حساب SMTP تنظیمشده (میتواند حساب دامین باشد) گرفته میشود.
+// فرستنده پیشفرض گروه OshanakSUP است؛ حساب SMTP (EMAIL_USER) باید Send As روی آن داشته باشد.
 function auditMailFrom() {
-    const address = String(process.env.AUDIT_MAIL_FROM || process.env.EMAIL_USER || 'audit-system@haftstores.ir').trim();
-    return `"سامانه انبارگردانی هفت" <${address}>`;
+    const address = String(process.env.AUDIT_MAIL_FROM || 'OshanakSUP@oshanak.com')
+        .replace(/[<>"\r\n]/g, '').trim();
+    if (!address) return '';
+    const label = String(process.env.AUDIT_MAIL_FROM_LABEL || 'OshanakSUP').replace(/[<>"\r\n]/g, '').trim();
+    return label ? `"${label}" <${address}>` : address;
 }
 
 // گروه ایمیل همیشه باید گزارش نهایی را دریافت کند؛ آدرس آن قابل تنظیم از env است.
-const AUDIT_GROUP_MAIL = String(process.env.AUDIT_GROUP_MAIL || 'Oshanak-ITSUP@gbgnetwork.net').trim();
+// صراحتاً خالی گذاشتن env گیرنده را خاموش میکند (برخلاف پردازش || که به پیشفرض برمیگردد).
+const AUDIT_GROUP_MAIL = String(process.env.AUDIT_GROUP_MAIL ?? 'Oshanak-ITSUP@gbgnetwork.net').trim();
 const AUDIT_GROUP_LABEL = String(process.env.AUDIT_GROUP_LABEL || 'Oshanak-ITSUP').trim();
 
 function auditGroupRecipient() {
@@ -97,50 +100,14 @@ function parseEmails(value) {
         .filter(Boolean))];
 }
 
-async function resolveBaseRecipients(fallbackManagerEmail) {
+// گیرنده پیشفرض گزارش نهایی فقط گروه ITSUP است.
+// خاموش کردن اعلان ایمیل در پنل ادمین یک کلید قطع کامل است.
+async function resolveAuditRecipients() {
     const settings = core.getEffectiveSettings();
-    // خاموش کردن اعلان ایمیل در پنل ادمین یک کلید قطع کامل است (حتی روی env هم اولویت دارد).
     if (settings.emailNotifyEnabled === false) return { to: [], source: 'disabled' };
-
-    const envTo = parseEmails(process.env.AUDIT_NOTIFY_TO);
-    if (envTo.length) return { to: envTo, source: 'env' };
-
-    const settingsTo = parseEmails(settings.emailNotifyTo);
-    if (settingsTo.length) return { to: settingsTo, source: 'settings' };
-
-    const requestTo = parseEmails(fallbackManagerEmail);
-    if (requestTo.length) return { to: requestTo, source: 'request' };
-
-    try {
-        const groupMail = String(await directory.getGroupMail() || '').trim();
-        if (groupMail) return { to: parseEmails(groupMail), source: 'ad-group' };
-    } catch (e) {
-        console.warn('[Audit Mail] group mail lookup failed:', e.message || e);
-    }
-
-    try {
-        const members = await directory.listMembers();
-        const memberMails = parseEmails(members.map(m => m && m.mail).filter(Boolean).join(','));
-        if (memberMails.length) return { to: memberMails, source: 'ad-members' };
-    } catch (e) {
-        console.warn('[Audit Mail] member mail lookup failed:', e.message || e);
-    }
-
-    return { to: ['manager@haftstores.ir'], source: 'fallback' };
-}
-
-// علاوه بر گیرندگان تنظیمشده، گروه ایمیل همیشه گزارش نهایی را هم میگیرد
-// (مگر اینکه ارسال ایمیل در تنظیمات ادمین خاموش باشد).
-async function resolveAuditRecipients(fallbackManagerEmail) {
-    const resolved = await resolveBaseRecipients(fallbackManagerEmail);
-    if (resolved.source === 'disabled') return resolved;
     const groupRecipient = auditGroupRecipient();
-    if (!groupRecipient) return resolved;
-    const to = [...resolved.to];
-    const existing = to.findIndex(addr => String(addr).toLowerCase().includes(AUDIT_GROUP_MAIL.toLowerCase()));
-    if (existing >= 0) to[existing] = groupRecipient;
-    else to.push(groupRecipient);
-    return { ...resolved, to };
+    if (!groupRecipient) return { to: [], source: 'no-group' };
+    return { to: [groupRecipient], source: 'audit-group' };
 }
 
 // تنظیمات عمومی پورتها (برای ساخت لینکهای بین پنلها در شبکه داخلی)

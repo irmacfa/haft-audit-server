@@ -1,7 +1,7 @@
 /**
  * احراز هویت پنلهای انبارگردانی
- * حالت پیشفرض hybrid است: حساب مدیر از فایل محلی و سایر کاربران از اکتیو دایرکتوری میآیند.
- * AUTH_MODE=local یعنی همه کاربران محلی (برای ماشین کاملاً آفلاین) و AUTH_MODE=ldap یعنی همه از دامین.
+ * حالت پیشفرض ldap است: تمام ورودها (شامل مدیر) از اکتیو دایرکتوری میآیند.
+ * حالت hybrid فقط یک fallback محلی نگه میدارد و local برای ماشین کاملاً آفلاین است.
  * نشست با کوکی امضاشده بین دو سرور (پورتهای پیشفرض 2030/2031) مشترک است.
  */
 const crypto = require('crypto');
@@ -9,9 +9,8 @@ const path = require('path');
 require('dotenv').config();
 const localUsers = require('./local-users');
 
-// hybrid (پیشفرض): مدیر محلی، کاربران عادی از اکتیو دایرکتوری
-// local: همه محلی | ldap: همه از دامین
-const AUTH_MODE = (process.env.AUTH_MODE || 'hybrid').toLowerCase();
+// ldap (پیشفرض): همه از دامین | hybrid: مدیر محلی بهعنوان fallback | local: همه محلی
+const AUTH_MODE = (process.env.AUTH_MODE || 'ldap').toLowerCase();
 const IS_LOCAL = AUTH_MODE === 'local';
 const IS_HYBRID = AUTH_MODE === 'hybrid';
 

@@ -2,7 +2,7 @@
 // اجرا:
 //   npm run test:smtp                     => فقط احراز هویت SMTP (هیچ ایمیلی فرستاده نمیشود)
 //   node qa/smtp-check.js --send          => ارسال ایمیل آزمایشی به AUDIT_GROUP_MAIL / SMTP_TEST_TO
-//   node qa/smtp-check.js --send --to user@example.com
+//   node qa/smtp-check.js --send --to user@example.com --from OshanakSUP@oshanak.com
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
@@ -24,6 +24,10 @@ const to = (toIndex >= 0 && args[toIndex + 1]) ||
     process.env.SMTP_TEST_TO ||
     process.env.AUDIT_GROUP_MAIL ||
     'Oshanak-ITSUP@gbgnetwork.net';
+const fromIndex = args.indexOf('--from');
+const fromAddress = String((fromIndex >= 0 && args[fromIndex + 1]) ||
+    process.env.AUDIT_MAIL_FROM || 'OshanakSUP@oshanak.com').replace(/[<>"\r\n]/g, '').trim();
+const fromLabel = String(process.env.AUDIT_MAIL_FROM_LABEL || 'OshanakSUP').replace(/[<>"\r\n]/g, '').trim();
 
 const transporter = nodemailer.createTransport({
     host,
@@ -44,9 +48,8 @@ const transporter = nodemailer.createTransport({
         return;
     }
 
-    const fromAddress = String(process.env.AUDIT_MAIL_FROM || user || 'audit-system@haftstores.ir').trim();
     const info = await transporter.sendMail({
-        from: `"سامانه انبارگردانی هفت" <${fromAddress}>`,
+        from: fromLabel ? `"${fromLabel}" <${fromAddress}>` : fromAddress,
         to,
         subject: `[SMTP test] ${new Date().toISOString()}`,
         text: 'This is a test message from the audit server SMTP checker.',
