@@ -274,18 +274,6 @@
                 <div id="addItemBox" class="manual-add-zone hidden p-4 border-t border-slate-200 bg-white">
                     <div class="flex flex-wrap items-end gap-3">
                         <div id="manualFields" class="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
-                        <div class="w-48">
-                            <label for="newItemMaterial" class="block text-[11px] text-slate-500 mb-1">Material</label>
-                            <select id="newItemMaterial" onchange="syncDescriptionFromMaterial()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none" dir="ltr">
-                                <option value="">انتخاب کد متریال</option>
-                            </select>
-                        </div>
-                        <div class="flex-1 min-w-[260px]">
-                            <label for="newItemMaterialDesc" class="block text-[11px] text-slate-500 mb-1">Material Description</label>
-                            <select id="newItemMaterialDesc" onchange="syncMaterialFromDescription()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
-                                <option value="">انتخاب شرح متریال</option>
-                            </select>
-                        </div>
                         <button id="addManualBtn" type="button" onclick="addManualItem()" class="text-xs px-4 py-2 rounded-xl font-bold">✓ اضافه به رکورد</button>
                         <button id="cancelManualBtn" type="button" onclick="closeAddItemBox()" class="text-xs px-4 py-2 rounded-xl font-bold">انصراف</button>
                     </div>
@@ -309,6 +297,8 @@
         let currentItems = [];
         let visibleRows = [];
         let materialCatalog = [];
+        const MATERIAL_DESC_KEY = 'شرح کارت دارایی';
+        const MATERIAL_CODE_KEY = 'شماره متریال تجهیز';
         let loadingTimer = null;
         let loadingActive = false;
         let activityTimer = null;
@@ -498,7 +488,7 @@
             try {
                 fetch('/api/materials').then(r => r.json()).then(list => {
                     materialCatalog = Array.isArray(list) ? list : [];
-                    populateMaterialSelects();
+                    populateManualMaterialCombos();
                 }).catch(() => {});
                 fetch('/api/cache/warmup', { method: 'POST' }).catch(() => {});
                 const pr = await pollCacheProgress();
@@ -538,11 +528,10 @@
                 `<th style="${thStyle}text-align:center;">#</th>` +
                 `<th style="${thStyle}text-align:center;">تایید</th>` +
                 currentColumns.map(c => `<th style="${thStyle}" title="${c.key !== c.label ? c.key : ''}">${c.label}</th>`).join('') +
-                `<th style="${thStyle}" title="Material">Material</th>` +
-                `<th style="${thStyle}" title="Material Description">Material Description</th>` +
                 `<th style="${thStyle}">کد اموال جدید</th>` +
                 `<th style="${thStyle}text-align:center;">وضعیت موجودی</th>`;
             buildManualFields();
+            populateManualMaterialCombos();
         }
 
         function renderDynamicCells(item) {
@@ -762,63 +751,89 @@
         }
 
         // ---- افزودن دستی تجهیز به رکورد انبارگردانی ----
+        function isMaterialCodeColumn(key) {
+            return String(key) === MATERIAL_CODE_KEY || (/متریال/.test(String(key)) && !/شرح/.test(String(key)));
+        }
+        function isMaterialDescColumn(key) {
+            return String(key) === MATERIAL_DESC_KEY;
+        }
+
         function buildManualFields() {
             const holder = document.getElementById('manualFields');
             if (!holder) return;
+            const inputClass = 'w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none';
             holder.innerHTML = currentColumns.map((c, i) => {
                 const label = escapeHtml(c.label || c.key);
-                const isCode = /اموال|سریال|شماره تجهیز/.test(String(c.key));
+                const key = String(c.key);
+                const isComboCode = isMaterialCodeColumn(key);
+                const isComboDesc = isMaterialDescColumn(key);
+                if (isComboCode || isComboDesc) {
+                    return `<div>
+                        <label for="manualField_${i}" class="block text-[11px] text-slate-500 mb-1">${label}</label>
+                        <select id="manualField_${i}" data-material-combo="${isComboCode ? 'code' : 'desc'}"
+                            onchange="syncMaterialCombo('${isComboCode ? 'code' : 'desc'}')"
+                            class="${inputClass} ${isComboCode ? 'font-mono' : ''}" dir="${isComboCode ? 'ltr' : 'rtl'}">
+                            <option value="">${isComboCode ? 'انتخاب کد متریال' : 'انتخاب شرح متریال'}</option>
+                        </select>
+                    </div>`;
+                }
+                const isCode = /اموال|سریال|شماره تجهیز/.test(key);
                 return `<div>
                     <label for="manualField_${i}" class="block text-[11px] text-slate-500 mb-1">${label}</label>
                     <input id="manualField_${i}" type="text" dir="${isCode ? 'ltr' : 'rtl'}" placeholder="${label}"
-                        class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none ${isCode ? 'font-mono' : ''}">
+                        class="${inputClass} ${isCode ? 'font-mono' : ''}">
                 </div>`;
             }).join('');
+            populateManualMaterialCombos();
         }
 
-        function populateMaterialSelects() {
-            const materialSel = document.getElementById('newItemMaterial');
-            const descSel = document.getElementById('newItemMaterialDesc');
-            if (!materialSel || !descSel) return;
-            materialSel.innerHTML = '<option value="">انتخاب کد متریال</option>' +
+        function materialComboElements() {
+            const descIndex = currentColumns.findIndex(c => isMaterialDescColumn(c.key));
+            const codeIndex = currentColumns.findIndex(c => isMaterialCodeColumn(c.key));
+            return {
+                desc: descIndex >= 0 ? document.getElementById('manualField_' + descIndex) : null,
+                code: codeIndex >= 0 ? document.getElementById('manualField_' + codeIndex) : null
+            };
+        }
+
+        function populateManualMaterialCombos() {
+            const { desc, code } = materialComboElements();
+            if (!desc || !code) return;
+            // مقدار گزینه، کد متریال است تا کدها و شرحهای تکراری قابل تشخیص بمانند.
+            code.innerHTML = '<option value="">انتخاب کد متریال</option>' +
                 materialCatalog.map(m =>
                     `<option value="${escapeHtml(m.material)}" title="${escapeHtml(m.description)}">${escapeHtml(m.material)}</option>`).join('');
-            descSel.innerHTML = '<option value="">انتخاب شرح متریال</option>' +
+            desc.innerHTML = '<option value="">انتخاب شرح متریال</option>' +
                 materialCatalog.map(m =>
                     `<option value="${escapeHtml(m.material)}" title="${escapeHtml(m.material)}">${escapeHtml(m.description)}</option>`).join('');
         }
 
-        function syncMaterialFromDescription() {
-            const descSel = document.getElementById('newItemMaterialDesc');
-            const materialSel = document.getElementById('newItemMaterial');
-            if (descSel && materialSel) materialSel.value = descSel.value;
-        }
-
-        function syncDescriptionFromMaterial() {
-            const materialSel = document.getElementById('newItemMaterial');
-            const descSel = document.getElementById('newItemMaterialDesc');
-            if (materialSel && descSel) descSel.value = materialSel.value;
+        function syncMaterialCombo(kind) {
+            const { desc, code } = materialComboElements();
+            if (!desc || !code) return;
+            const selected = (kind === 'desc' ? desc : code).value;
+            desc.value = selected;
+            code.value = selected;
         }
 
         function readManualFields() {
             const fields = {};
             currentColumns.forEach((c, i) => {
                 const el = document.getElementById('manualField_' + i);
-                const value = el ? el.value.trim() : '';
-                if (value) fields[c.key] = value;
+                if (!el) return;
+                const key = String(c.key);
+                let value = el.value.trim();
+                if (isMaterialDescColumn(key) && el.tagName === 'SELECT' && el.selectedIndex > 0) {
+                    value = el.options[el.selectedIndex].text.trim();
+                }
+                if (value) fields[key] = value;
             });
-            const material = document.getElementById('newItemMaterial')?.value.trim() || '';
-            const descSelect = document.getElementById('newItemMaterialDesc');
-            const description = descSelect && descSelect.selectedIndex > 0
-                ? descSelect.options[descSelect.selectedIndex].text.trim() : '';
-            if (material) fields.Material = material;
-            if (description) fields['Material Description'] = description;
             return fields;
         }
 
         function makeManualItem(uid, fields) {
-            const label = fields['شرح کارت دارایی'] || fields['شرح تجهیز'] || fields['Material Description'] ||
-                fields['شماره تجهیز'] || fields['شماره اموال تجهیز'] || uid;
+            const label = fields[MATERIAL_DESC_KEY] || fields['شرح تجهیز'] || fields['شماره تجهیز'] ||
+                fields['شماره اموال تجهیز'] || fields[MATERIAL_CODE_KEY] || uid;
             const assetNo = fields['شماره اموال تجهیز'] || '';
             const serial = fields['شماره سریال کارت دارایی'] || '';
             return { _uid: uid, desc: label, assetNo, serial, fields: { ...fields }, _manual: true };
@@ -834,10 +849,9 @@
 
         function closeAddItemBox() {
             document.getElementById('addItemBox').classList.add('hidden');
-            document.querySelectorAll('#manualFields input').forEach(el => { el.value = ''; });
-            ['newItemMaterial', 'newItemMaterialDesc'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
+            document.querySelectorAll('#manualFields input, #manualFields select').forEach(el => {
+                if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                else el.value = '';
             });
         }
 
@@ -893,8 +907,6 @@
             const filtered = currentItems.filter(item => {
                 const saved = localAuditData[item._uid] || {};
                 const matchQ = !q || currentColumns.some(c => String(item.fields?.[c.key] || '').toLowerCase().includes(q))
-                    || String(item.fields?.Material || '').toLowerCase().includes(q)
-                    || String(item.fields?.['Material Description'] || '').toLowerCase().includes(q)
                     || String(item.assetNo).toLowerCase().includes(q) || String(item.serial).toLowerCase().includes(q);
                 const matchStatus =
                     auditFilter === 'all' ? true :
@@ -941,8 +953,6 @@
                             <input type="checkbox" ${saved.checked ? 'checked' : ''} ${disabledAttr} onchange="updateMemory('${itemId}', 'checked', this.checked)" class="w-5 h-5 accent-orange-600 cursor-pointer">
                         </td>
                         ${renderDynamicCells(item)}
-                        <td style="padding:8px;border-bottom:1px solid #1e293b;color:#cbd5e1;font-family:monospace;font-size:12px;white-space:nowrap;" title="${escapeHtml(item.fields?.Material || '')}">${escapeHtml(item.fields?.Material || '') || '-'}</td>
-                        <td style="padding:8px;border-bottom:1px solid #1e293b;color:#e2e8f0;font-size:12px;" title="${escapeHtml(item.fields?.['Material Description'] || '')}">${escapeHtml(item.fields?.['Material Description'] || '') || '-'}</td>
                         <td style="padding:8px;border-bottom:1px solid #1e293b;">
                             <div id="container_${itemId}">
                                 ${getNewAssetDisplayHtml(itemId, newAssetVal, isCurrentLocked)}
@@ -965,8 +975,6 @@
                 if (!localAuditData[itemId]) {
                     const initial = { desc: item.desc, assetNo: item.assetNo, serial: item.serial, checked: false, status: 'present', newAsset: '' };
                     currentColumns.forEach(c => { initial[c.key] = item.fields?.[c.key] || ''; });
-                    initial.Material = item.fields?.Material || '';
-                    initial['Material Description'] = item.fields?.['Material Description'] || '';
                     localAuditData[itemId] = initial;
                 }
             });
